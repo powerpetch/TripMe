@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import SearchTab from './SearchTab';
+import PopularPlaces from './PopularPlaces';
+import AdditionalContent from './AdditionalContent';
 
 function MainContent() {
   const [activeTab, setActiveTab] = useState('Search All');
@@ -78,6 +80,9 @@ function MainContent() {
           
           <SearchTab placeholder={getActiveSearchPlaceholder()} />
         </div>
+
+        <PopularPlaces />
+        <AdditionalContent />
       </main>
     </div>
   );

@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Header() {
+  const navigate = useNavigate();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState('THB');
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const mainSearchBarPosition = document.querySelector('.search-container').offsetTop;
+      const offset = 70; // Adjust this value to require more scrolling
+      setIsScrolled(window.scrollY > mainSearchBarPosition + offset);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const currencies = [
     { code: 'THB', country: 'Thailand' },
@@ -12,8 +26,14 @@ function Header() {
     { code: 'JPY', country: 'Japan' }
   ];
 
+  const handleMenuClick = (item) => {
+    if (item === 'Map') {
+      navigate('/map');
+    }
+  };
+
   return (
-    <header className="header">
+    <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="top-bar">
         <nav className="navigation">
           <div className="logo-container">
@@ -24,11 +44,28 @@ function Header() {
             </a>
           </div>
           
-          <div className="menu-container">
+          {isScrolled && (
+            <div className="mini-search-container">
+              <div className="mini-search">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="mini-search-input"
+                />
+                <button className="mini-search-button">🔍</button>
+              </div>
+            </div>
+          )}
+
+          <div className={`menu-container ${isScrolled ? 'scrolled' : ''}`}>
             <div className="menu">
-              {['Translator', 'Currency', 'Trip-Part'].map((item) => (
+              {['Translator', 'Currency', 'Trip-Part', 'Map'].map((item) => (
                 <div key={item} className="menu-item">
-                  <button className="menu-button" type="button">
+                  <button 
+                    className="menu-button" 
+                    type="button"
+                    onClick={() => handleMenuClick(item)}
+                  >
                     <span className="menu-text">{item}</span>
                   </button>
                 </div>
