@@ -1,12 +1,21 @@
 import React, { useState } from 'react';
+import phuketImage from '../assets/phuket.jpg';
+import japanImage from '../assets/Mount-Fuji.jpg';
+import australiaImage from '../assets/Sydney.jpg';
+import USAImage from '../assets/new-york.jpg';
+import italyImage from '../assets/venice.jpeg';
+import franceImage from '../assets/paris.jpg';
+import egyptImage from '../assets/cairo.jpg';
+import brazilImage from '../assets/rio-de-janeiro.jpeg';
 
 function PopularPlaces() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const placesToShow = 2; // Number of places to display at once
 
   const places = [
     {
       id: 1,
-      image: 'https://example.com/thailand.jpg',
+      image: phuketImage,
       country: 'Thailand',
       location: 'Phuket',
       likes: '2.5k',
@@ -14,7 +23,7 @@ function PopularPlaces() {
     },
     {
       id: 2,
-      image: 'https://example.com/japan.jpg',
+      image: japanImage,
       country: 'Japan',
       location: 'Mount Fuji',
       likes: '3.2k',
@@ -22,7 +31,7 @@ function PopularPlaces() {
     },
     {
       id: 3,
-      image: 'https://example.com/france.jpg',
+      image: franceImage,
       country: 'France',
       location: 'Paris',
       likes: '4.1k',
@@ -30,7 +39,7 @@ function PopularPlaces() {
     },
     {
       id: 4,
-      image: 'https://example.com/italy.jpg',
+      image: italyImage,
       country: 'Italy',
       location: 'Venice',
       likes: '3.8k',
@@ -38,7 +47,7 @@ function PopularPlaces() {
     },
     {
       id: 5,
-      image: 'https://example.com/usa.jpg',
+      image: USAImage,
       country: 'USA',
       location: 'New York',
       likes: '5.0k',
@@ -46,7 +55,7 @@ function PopularPlaces() {
     },
     {
       id: 6,
-      image: 'https://example.com/australia.jpg',
+      image: australiaImage,
       country: 'Australia',
       location: 'Sydney',
       likes: '3.5k',
@@ -54,7 +63,7 @@ function PopularPlaces() {
     },
     {
       id: 7,
-      image: 'https://example.com/egypt.jpg',
+      image: egyptImage,
       country: 'Egypt',
       location: 'Cairo',
       likes: '2.8k',
@@ -62,7 +71,7 @@ function PopularPlaces() {
     },
     {
       id: 8,
-      image: 'https://example.com/brazil.jpg',
+      image: brazilImage,
       country: 'Brazil',
       location: 'Rio de Janeiro',
       likes: '4.7k',
@@ -72,51 +81,53 @@ function PopularPlaces() {
 
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex + 4 >= places.length ? 0 : prevIndex + 4
+      prevIndex + 1 >= places.length ? 0 : prevIndex + 1
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => 
-      prevIndex - 4 < 0 ? places.length - 4 : prevIndex - 4
+      prevIndex - 1 < 0 ? places.length - 1 : prevIndex - 1
     );
   };
 
   const showLeftArrow = currentIndex > 0;
-  const showRightArrow = currentIndex + 4 < places.length;
+  const showRightArrow = currentIndex + placesToShow < places.length;
 
   return (
-    <div className="popular-places">
-      <h2 className="section-title">Popular Destinations</h2>
-      <div className="places-container">
-        {showLeftArrow && (
-          <button className="nav-button prev" onClick={prevSlide}>←</button>
-        )}
-        <div className="places-wrapper">
-          {places.slice(currentIndex, currentIndex + 4).map((place) => (
-            <div key={place.id} className="place-card">
-              <div className="place-image">
-                <img src={place.image} alt={place.location} />
-              </div>
-              <div className="place-info">
-                <div className="place-header">
-                  <h3>{place.location}</h3>
-                  <span className="country">{place.country}</span>
+    <>
+      <div className="popular-places">
+        <h2 className="section-title">Popular Destinations</h2>
+        <div className="places-container">
+          {showLeftArrow && (
+            <button className="nav-button prev" onClick={prevSlide}>←</button>
+          )}
+          <div className="places-wrapper">
+            {places.slice(currentIndex, currentIndex + placesToShow + 1).map((place, index) => (
+              <div key={place.id} className={`place-card ${index === placesToShow ? 'peek' : ''}`}>
+                <div className="place-image">
+                  <img src={place.image} alt={place.location} />
                 </div>
-                <div className="place-stats">
-                  <span className="likes">♥ {place.likes}</span>
-                  <button className="save-button">Save</button>
+                <div className="place-info">
+                  <div className="place-header">
+                    <h3>{place.location}</h3>
+                    <span className="country">{place.country}</span>
+                  </div>
+                  <div className="place-stats">
+                    <span className="likes">♥ {place.likes}</span>
+                    <button className="save-button">Save</button>
+                  </div>
+                  <p className="place-description">{place.description}</p>
                 </div>
-                <p className="place-description">{place.description}</p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+          {showRightArrow && (
+            <button className="nav-button next" onClick={nextSlide}>→</button>
+          )}
         </div>
-        {showRightArrow && (
-          <button className="nav-button next" onClick={nextSlide}>→</button>
-        )}
       </div>
-    </div>
+    </>
   );
 }
 

@@ -506,24 +506,30 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 40px;
 }
 
 .places-wrapper {
   display: flex;
-  gap: 20px;
   overflow: hidden;
-  transition: transform 0.3s ease;
-  margin: 0 20px;
+  padding: 0 20px;
+  transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .place-card {
-  flex: 0 0 calc(50% - 10px);
+  flex: 0 0 45%;
   background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  margin: 0 10px;
+  position: relative;
+  transition: transform 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.place-card.peek {
+  flex: 0 0 10%;
+  opacity: 0.5;
 }
 
 .place-card:hover {
@@ -549,6 +555,9 @@ body {
 
 .place-info {
   padding: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .place-header {
@@ -589,6 +598,17 @@ body {
   color: #2c3e50;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  display: none;
+}
+
+.place-card:not(.peek) .save-button {
+  display: block;
 }
 
 .save-button:hover {
@@ -625,11 +645,11 @@ body {
 }
 
 .prev {
-  left: -20px;
+  left: 0;
 }
 
 .next {
-  right: -20px;
+  right: 0;
 }
 
 /* Update mini search container styles */
@@ -701,4 +721,47 @@ body {
 .map-container {
   width: 100%;
   height: 100vh;
+}
+
+.slide-animation {
+  animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.slide-animation-left {
+  animation: slideInLeft 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+.slide-animation-right {
+  animation: slideInRight 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
