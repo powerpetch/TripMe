@@ -5,6 +5,7 @@ import Header from './components/Header';
 import MainContent from './components/MainContent';
 import RightSidebar from './components/RightSidebar';
 import Map from './components/Map';
+import Translator from './components/Translator';
 
 function App() {
   const location = useLocation();
@@ -16,8 +17,9 @@ function App() {
         <Routes>
           <Route path="/" element={<MainContent />} />
           <Route path="/map" element={<Map />} />
+          <Route path="/translate" element={<Translator />} />
         </Routes>
-        {location.pathname !== '/map' && <RightSidebar />}
+        {location.pathname !== '/map' && location.pathname !== '/translate' && <RightSidebar />}
       </div>
     </div>
   );

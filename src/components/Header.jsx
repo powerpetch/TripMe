@@ -27,8 +27,21 @@ function Header() {
   ];
 
   const handleMenuClick = (item) => {
-    if (item === 'Map') {
-      navigate('/map');
+    switch (item) {
+      case 'Translator':
+        navigate('/translate');
+        break;
+      case 'Currency':
+        navigate('/currency'); // Ensure this route exists
+        break;
+      case 'Trip-Part':
+        navigate('/trip-part'); // Ensure this route exists
+        break;
+      case 'Map':
+        navigate('/map');
+        break;
+      default:
+        break;
     }
   };
 

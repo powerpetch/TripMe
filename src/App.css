@@ -140,8 +140,9 @@ body {
 
 .hero-title {
   font-size: 48px;
-  margin: 0;
+  margin: 50px 0 0; /* Add top margin to move it down */
   color: #2c3e50;
+  text-align: center;
 }
 
 /* Tab styles */
@@ -764,4 +765,41 @@ body {
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.translator-container {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.select-box {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.textarea-box {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background-color: #ffffff;
+  resize: none;
+  height: 400px;
+}
+
+.translate-button {
+  background-color: #3b82f6;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.translate-button:hover {
+  background-color: #2563eb;
 }
