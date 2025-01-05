@@ -1,0 +1,78 @@
+.about-padding {
+    padding: 80px 0; /* Increase the padding to make the section longer */
+  }
+
+/* ...start about... */
+.line {
+  height: 2px;
+  width: 50px;
+  background: #006400;
+  display: block;
+  margin: 20px auto 20px;
+}
+
+.line::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 150px;
+  height: 2px;
+  border-bottom: 2px dashed #006400;
+  margin-left: -75px;
+}
+
+.sectioner-header p {
+  color: #818992;
+  font-size: 17px;
+}
+
+.section-content {
+  margin-top: 80px;
+}
+
+.icon-box {
+  margin-bottom: 50px;
+}
+
+.icon-box i {
+  display: block;
+  position: relative;
+  width: 135px;
+  height: 135px;
+  border-radius: 100px;
+  background: #4caf50;
+  background: linear-gradient(to left, #4caf50, #81c784);
+  color: #ffffff;
+  font-size: 50px;
+  line-height: 135px;
+  margin: 0 auto;
+}
+
+.icon-box h5 {
+  margin-top: 30px;
+}
+
+.icon-box p {
+  color: #818992;
+  font-size: 14px;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.about-btn {
+  color: #006400; /* Dark green color */
+  padding: 10px 40px;
+  border: 2px solid #006400; /* Dark green border */
+  border-radius: 7px;
+  /* margin-top: 30px; */
+  display: inline-block;
+  font-size: 18px;
+}
+
+.about-btn:hover {
+  background: #006400; /* Dark green background on hover */
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* ...end about... */
