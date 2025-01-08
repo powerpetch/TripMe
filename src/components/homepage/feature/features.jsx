@@ -1,5 +1,5 @@
 import React from 'react';
-import '../App.css';
+import './features.css';
 
 const Features = () => (
   <section class="feature section-padding" data-scroll-index='2'>

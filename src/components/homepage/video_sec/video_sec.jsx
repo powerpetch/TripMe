@@ -1,5 +1,5 @@
 import React from "react";
-import '../App.css';
+import './video_sec.css';
 
 const VideoSection = () => (
     <section class="video-section prelative text-center white">
