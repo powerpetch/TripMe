@@ -1,13 +1,13 @@
 import React from "react";
-import '../App.css';
+import '../../App.css';
 
 const Tips = () => (
     <section class="faq section-padding prelative" data-scroll-index='5'>
   <div class="container">
     <div class="row">
       <div class="col-md-12">
-        <div class="sectioner-header text-center">
-          <h3>Frequently Asked Questions</h3>
+        <div class="text-4xl sectioner-header text-center">
+          <h3>Tips for traveler</h3>
           <span class="line"></span>
           <p>Sed quis nisi nisi. Proin consectetur porttitor dui sit amet viverra. Fusce sit amet lorem faucibus, vestibulum ante in, pharetra ante.</p>
         </div>

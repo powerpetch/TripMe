@@ -1,5 +1,5 @@
 import React from "react";
-import '../App.css';
+import '../../App.css';
 
 const Popular = () => (
     <section class="team section-padding" data-scroll-index='3'>

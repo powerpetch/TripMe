@@ -1,0 +1,97 @@
+.navbar {
+    @apply fixed top-0 left-0 w-full bg-transparent z-50 flex items-center justify-between px-4 py-2; /* Tailwind utilities */
+    line-height: 1.25;
+    min-height: 50px;
+  }
+  
+  .navbar .nav-item {
+    @apply mx-2; /* Margin between nav items */
+  }
+  
+  .navbar .nav-item a {
+    @apply text-white uppercase font-semibold text-sm tracking-wide transition duration-300; /* Tailwind for text styles */
+  }
+  
+  .navbar .nav-item a:hover {
+    @apply text-black; /* Hover effect */
+  }
+  
+  .navbar .navbar-toggler {
+    @apply text-white cursor-pointer; /* Button for toggling */
+  }
+  
+  .navbar .navbar-toggler span {
+    @apply text-white; /* Icon color */
+  }
+  
+  /* Navbar scroll effect */
+  .nav-scroll {
+    @apply bg-white shadow-md transition-all duration-300; /* Background and transition for scroll */
+  }
+  
+  .nav-scroll .nav-item a {
+    @apply text-gray-800; /* Text color when scrolled */
+  }
+  
+  .nav-scroll .nav-item a:hover {
+    @apply text-blue-600; /* Hover color on scroll */
+  }
+  
+  .nav-scroll .navbar-brand img {
+    @apply transform scale-105; /* Slight zoom effect for brand logo */
+  }
+  
+  .nav-scroll .navbar-toggler span {
+    @apply text-gray-800; /* Icon color when scrolled */
+  }
+  
+  /* Active link styling */
+  .navbar .active {
+    @apply text-green-500; /* Active link color */
+  }
+  
+  .navbar-style2 .active:after,
+  .navbar-style2 .nav-link:after {
+    display: none;
+  }
+  
+
+  .banner-text {
+    padding-right: 80px;
+    margin: 50px 0px 0px;
+  }
+  
+  .banner-text p {
+    margin: 40px 0px;
+  }
+  
+  .banner-text ul {
+    list-style: none;
+  }
+  
+  .banner-text ul li {
+    display: inline-block;
+    margin: 0px 10px 10px 0px;
+  }
+  
+  .banner-text ul li a {
+    display: block;
+  }
+  
+  .banner-text ul li a img {
+    width: 150px;
+    border-radius: 7px;
+  }
+  
+  .prelative {
+    position: relative;
+  }
+  
+  .section-padding {
+    padding: 80px 0px;
+  }
+  
+  .sectioner-header {
+    width: 69%;
+    margin: 0 auto;
+  }

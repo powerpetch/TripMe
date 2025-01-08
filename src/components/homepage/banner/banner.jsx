@@ -1,11 +1,11 @@
 import React from 'react';
 import Typical from 'react-typical';
-import applightWave from '../images/applight-wave.svg';
+import applightWave from '../../../images/applight-wave.svg';
 import './banner.css';
-import world from '../assets/world-png.gif';
-import '../animation/animate.css'; // Import animate.css
-import SearchBar from './searchbar';
-import Background from '../images/back.mp4';
+import world from '../../../assets/world-png.gif';
+import '../../../animation/animate.css'; // Import animate.css
+import SearchBar from '../searchbar';
+import Background from '../../../images/back.mp4';
 
 const Banner = () => (
   <section className="banner" data-scroll-index='0'>
