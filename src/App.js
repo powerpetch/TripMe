@@ -7,26 +7,50 @@ import './App.css';
 
 import { Routes, Route } from 'react-router-dom';
 
+// Homepage Components
 import Header from './components/homepage/header/header';
 import Banner from './components/homepage/banner/banner';
 import About from './components/homepage/about/about';
 import VideoSection from './components/homepage/video_sec/video_sec';
-import Features from './components/homepage/feature/features';
-import Popular from './components/homepage/popular';
 import Blog from './components/homepage/rec_place/rec_place';
 import Tips from './components/homepage/tips';
 import Footer from './components/homepage/footer/footer';
 import Testimonial from './components/homepage/testimonial';
-
 import TravelSection from './components/homepage/travel_sec';
+import Login from './components/auth/login';
 
-import LoginPopup from './components/auth/login_pop';
+// Translator Component
+import Translator from './components/translator/translator';
+
+const HomePage = ({ handleLoginOpen }) => {
+  return (
+    <>
+      <Header handleLoginPopup={handleLoginOpen} isHomePage={true} />
+      <Banner />
+      <About />
+      <VideoSection />
+      <Blog />
+      <TravelSection />
+      <Testimonial />
+      <Tips />
+      <Footer />
+    </>
+  );
+};
 
 function App() {
-  const [loginPopup, setLoginPopup] = useState(false);
-  
-  const handleLoginPopup = () => {
-    setLoginPopup(!loginPopup);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const handleLoginOpen = () => {
+    setIsLoginOpen(true);
+  };
+
+  const handleLoginClose = () => {
+    setIsLoginOpen(false);
+  };
+
+  const handleSignIn = () => {
+    setIsLoginOpen(false);
   };
 
   useEffect(() => {
@@ -35,33 +59,18 @@ function App() {
 
   return (
     <div className="relative">
-      <div className={loginPopup ? "blur-sm" : ""}>
-        <Header handleLoginPopup={handleLoginPopup} />
+      <div className={isLoginOpen ? "blur-sm" : ""}>
         <Routes>
-          <Route path="/" element={
-            <>
-              <Banner />
-              <About />
-              <VideoSection />
-              <Blog />
-              {/* <Features /> */}
-              {/* <Popular /> */}
-              <TravelSection />
-              <Testimonial />
-              <Tips />
-            </>
-          } />
+          <Route path="/" element={<HomePage handleLoginOpen={handleLoginOpen} />} />
+          <Route path="/translator" element={<Translator />} />
         </Routes>
-        <Footer />
       </div>
 
-      {loginPopup && (
-        <div className="fixed inset-0 bg-black/30 z-40">
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <LoginPopup loginPopup={loginPopup} handleLoginPopup={handleLoginPopup} />
-          </div>
-        </div>
-      )}
+      <Login 
+        isOpen={isLoginOpen}
+        onClose={handleLoginClose}
+        handleSignIn={handleSignIn}
+      />
     </div>
   );
 }

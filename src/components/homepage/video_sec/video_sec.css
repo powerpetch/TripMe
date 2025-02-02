@@ -13,7 +13,7 @@
   }
   
   .video-overlay {
-    background: linear-gradient(to left, rgba(76, 175, 80, 0.90), rgba(129, 199, 132, 0.90));
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.7), rgba(25, 25, 25, 0.90));
     opacity: 0.7;
   }
   
