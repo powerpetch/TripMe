@@ -5,14 +5,27 @@ import '../../../animation/animate.css';
 import SearchBar from '../searchbar';
 import Background from '../../../images/back.mp4';
 
+import { FaSearch } from "react-icons/fa";
+
 const words = ['Adventure', 'Destination', 'Trip', 'Experience'];
 
 const Banner = () => {
   const [index, setIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return; // Skip animation on mobile
+    
     const typingSpeed = isDeleting ? 50 : 100;
     const word = words[index];
     
@@ -30,7 +43,7 @@ const Banner = () => {
     }, typingSpeed);
 
     return () => clearTimeout(timeout);
-  }, [displayedText, isDeleting, index]);
+  }, [displayedText, isDeleting, index, isMobile]);
 
   return (
     <section className="banner" data-scroll-index="0">
@@ -39,16 +52,31 @@ const Banner = () => {
         <video src={Background} autoPlay loop muted />
       </div>
 
-      {/* Banner Text */}
-      <div className="banner-text">
-        <h1 className="white">Discovery your</h1>
-        <h2 className="white">Next <span className="typing-effect">{displayedText}</span></h2>
-      </div>
-
-      {/* Search Bar */}
-      <div className="search-bar-container">
-        <SearchBar />
-      </div>
+      {/* Conditional Rendering for Mobile & Desktop */}
+      {isMobile ? (
+        <div className="mobile-search-bar min-h-screen flex justify-center items-center px-4">
+          <div className="w-full max-w-lg bg-white flex items-center rounded-full shadow-md px-4 py-3">
+            <input
+              type="text"
+              placeholder="Where are you going?"
+              className="w-full outline-none text-gray-700 placeholder-gray-400"
+            />
+            <button className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition">
+              <FaSearch />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="banner-text hidden md:block">
+            <h1 className="white">Discovery your</h1>
+            <h2 className="white">Next <span className="typing-effect">{displayedText}</span></h2>
+          </div>
+          <div className="search-bar-container hidden md:flex">
+            <SearchBar />
+          </div>
+        </>
+      )}
 
       {/* Bottom Curve */}
       <span className="svg-wave">
