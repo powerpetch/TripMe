@@ -17,7 +17,7 @@ const Banner = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(window.innerWidth <= 870);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -61,7 +61,7 @@ const Banner = () => {
               placeholder="Where are you going?"
               className="w-full outline-none text-gray-700 placeholder-gray-400"
             />
-            <button className="bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition">
+            <button className="bg-green-800 text-white p-2 rounded-full hover:bg-green-700 transition">
               <FaSearch />
             </button>
           </div>

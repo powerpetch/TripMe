@@ -22,7 +22,7 @@ html, body {
 
 .banner {
   position: relative;
-  min-height: 85vh;
+  min-height: 95vh;
   width: 100%;
   padding: 0;
   overflow: hidden;
@@ -53,46 +53,19 @@ html, body {
 
 .banner-text h1 {
   margin-top: 120px;
-  font-size: clamp(2.5rem, 5vw, 4.7rem);
+  font-size: clamp(2.5rem, 5vw, 80rem); /* Add it 80rem cuz for extra 4k screen (try f12 and select 4k to see what i said)*/
   @apply text-center md:text-left; 
 }
 
 .banner-text h2 {
   margin-top: 30px;
-  font-size: clamp(3rem, 5vw, 5.5rem);
+  font-size: clamp(3rem, 5vw, 80rem);
   @apply text-center md:text-left; 
 }
 
 .banner-text span::after {
   animation: none !important;
   opacity: 0; /* Keeps the cursor always visible, remove this line if no cursor is desired at all */
-}
-
-/* 🎯 Fix: Make it match the second image on smaller screens */
-@media screen and (max-width: 1024px) {
-  .banner-text {
-    left: 10%; /* Move text to the left */
-    text-align: left; /* Left align text */
-    width: 80%;
-  }
-
-  .banner-text h1 {
-    font-size: 3rem; /* Reduce text size */
-    @apply text-center md:text-left; 
-  }
-
-  .banner-text h2 {
-    font-size: 3.5rem;
-    @apply text-center md:text-left; 
-  }
-
-  /* Full-width search bar */
-  .search-bar-container {
-    width: 90%;
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-  }
 }
 
 /* Input field */
@@ -161,3 +134,18 @@ html, body {
   width: 100%;
   height: auto;
 }
+
+/* @media screen and (max-width: 2560px) {
+  .banner-text h1 {
+    margin-top: 80px;
+  }
+
+  .banner-text h2 {
+    margin-top: 20px;
+  }
+
+  .search-bar-container {
+    bottom: 50px;
+  }
+  
+} */

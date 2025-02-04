@@ -22,6 +22,9 @@ import Login from './components/auth/login';
 // Translator Component
 import Translator from './components/translator/translator';
 
+// Currency Component
+import Currency from './components/currency/currency';
+
 const HomePage = ({ handleLoginOpen }) => {
   return (
     <>
@@ -63,6 +66,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage handleLoginOpen={handleLoginOpen} />} />
           <Route path="/translator" element={<Translator />} />
+          <Route path="/currency" element={<Currency />} />
         </Routes>
       </div>
 

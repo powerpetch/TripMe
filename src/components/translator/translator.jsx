@@ -68,22 +68,23 @@ function Translator() {
     return (
         <div className="min-h-screen flex flex-col items-center bg-green-100 p-4">
             {/* Desktop Header Bar */}
-            <div className="hidden md:block w-full bg-white p-4 shadow-md fixed top-0 left-0 z-50">
-                <div className="container mx-auto flex items-center justify-between">
-                    <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-                        <img src={logoGreen} alt="Logo" className="h-12 transition-transform duration-300" />
-                    </div>
-                    <div className="flex space-x-8">
-                        <button className="text-gray-700 hover:text-green-600 text-lg" onClick={() => navigate("/")}>Home</button>
-                        <button className="text-green-600 font-bold text-lg" onClick={() => navigate("/translator")}>Translator</button>
-                        <button className="text-gray-700 hover:text-green-600 text-lg" onClick={() => navigate("/currency")}>Currency</button>
-                        <button className="text-gray-700 hover:text-green-600 text-lg" onClick={() => navigate("/map")}>Map</button>
-                        <button className="text-gray-700 hover:text-green-600 text-lg" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-                        <button className="text-gray-700 hover:text-green-600 text-lg" onClick={() => navigate("/faq")}>FAQ</button>
-                        <button className="text-gray-700 hover:text-green-600 text-lg" onClick={() => navigate("/contact")}>Contact</button>
+            <div className="hidden md:block w-full bg-white shadow-md fixed top-0 left-0 z-50">
+                <div className="container mx-auto px-6 py-3">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+                            <img src={logoGreen} alt="Logo" className="h-12" />
+                        </div>
+                    <div className="hidden md:flex items-center space-x-8">
+                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/")}>Home</button>
+                        <button className="text-green-600 font-bold" onClick={() => navigate("/translator")}>Translator</button>
+                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/currency")}>currency</button>
+                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/map")}>Map</button>
+                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
+                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/contact")}>Contact</button>
                     </div>
                 </div>
             </div>
+        </div>
 
             {/* Translator Container */}
             <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg w-full max-w-md md:max-w-2xl mt-24 flex flex-col items-center">

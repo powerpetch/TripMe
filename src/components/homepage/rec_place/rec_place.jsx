@@ -63,6 +63,12 @@ const Blog = () => {
             pagination={{el: ".swiper-pagination", clickable: true, dynamicBullets: true}}
             loop
             className="swiper-container"
+            breakpoints={{
+              300: {slidesPerView: 1},
+              855: {slidesPerView: 2},
+              1149: {slidesPerView: 3},
+              1448: {slidesPerView: 4},
+            }}
           >
             {/* Slide 1 */}
             <SwiperSlide>
