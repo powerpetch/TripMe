@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import WOW from 'wowjs';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bxslider/dist/jquery.bxslider.min.css';
@@ -17,18 +17,16 @@ import Tips from './components/homepage/tips';
 import Footer from './components/homepage/footer/footer';
 import Testimonial from './components/homepage/testimonial';
 import TravelSection from './components/homepage/travel_sec';
-import Login from './components/auth/login';
+import AuthPage from './components/auth/login';
 
-// Translator Component
+// Other Components
 import Translator from './components/translator/translator';
-
-// Currency Component
 import Currency from './components/currency/currency';
 
-const HomePage = ({ handleLoginOpen }) => {
+const HomePage = () => {
   return (
     <>
-      <Header handleLoginPopup={handleLoginOpen} isHomePage={true} />
+      <Header isHomePage={true} />
       <Banner />
       <About />
       <VideoSection />
@@ -42,39 +40,18 @@ const HomePage = ({ handleLoginOpen }) => {
 };
 
 function App() {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  const handleLoginOpen = () => {
-    setIsLoginOpen(true);
-  };
-
-  const handleLoginClose = () => {
-    setIsLoginOpen(false);
-  };
-
-  const handleSignIn = () => {
-    setIsLoginOpen(false);
-  };
-
   useEffect(() => {
     new WOW.WOW().init();
   }, []);
 
   return (
-    <div className="relative">
-      <div className={isLoginOpen ? "blur-sm" : ""}>
-        <Routes>
-          <Route path="/" element={<HomePage handleLoginOpen={handleLoginOpen} />} />
-          <Route path="/translator" element={<Translator />} />
-          <Route path="/currency" element={<Currency />} />
-        </Routes>
-      </div>
-
-      <Login 
-        isOpen={isLoginOpen}
-        onClose={handleLoginClose}
-        handleSignIn={handleSignIn}
-      />
+    <div>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/translator" element={<Translator />} />
+        <Route path="/currency" element={<Currency />} />
+        <Route path="/login" element={<AuthPage />} />
+      </Routes>
     </div>
   );
 }

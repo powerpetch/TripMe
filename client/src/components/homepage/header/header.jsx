@@ -49,10 +49,9 @@ const Header = ({ handleLoginPopup }) => {
             <li className="nav-item"><Link className="nav-link" to="/Currency">Currency</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/Map">Map</Link></li>
             <li className="nav-item"><Link className="nav-link" to="/Trip-tgt">Trip-tgt</Link></li>
-            <li className="nav-item"><Link className="nav-link" to="/faq">FAQ</Link></li>
-            <li className="nav-item"><Link className="nav-link" to="/contact">Contact</Link></li>
+            {/* <li className="nav-item"><Link className="nav-link" to="/contact">Contact</Link></li> */}
             <button
-              onClick={handleLoginPopup}
+              onClick={() => navigate('/login')}
               className={`
                 flex items-center justify-center 
                 px-4 py-2 
@@ -103,10 +102,9 @@ const Header = ({ handleLoginPopup }) => {
         <Link className="text-lg text-white" to="/Currency" onClick={() => setMenuOpen(false)}>Currency</Link>
         <Link className="text-lg text-white" to="/Map" onClick={() => setMenuOpen(false)}>Map</Link>
         <Link className="text-lg text-white" to="/Trip-tgt" onClick={() => setMenuOpen(false)}>Trip-tgt</Link>
-        <Link className="text-lg text-white" to="/faq" onClick={() => setMenuOpen(false)}>FAQ</Link>
-        <Link className="text-lg text-white" to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
+        {/* <Link className="text-lg text-white" to="/contact" onClick={() => setMenuOpen(false)}>Contact</Link> */}
         <button
-              onClick={handleLoginPopup}
+              onClick={() => navigate('/login')}
               className={`
                 flex items-center justify-center 
                 px-4 py-2 

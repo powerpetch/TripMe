@@ -9,11 +9,13 @@ import { FaSearch } from "react-icons/fa";
 
 const words = ['Adventure', 'Destination', 'Trip', 'Experience'];
 
+
 const Banner = () => {
   const [index, setIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
     const handleResize = () => {

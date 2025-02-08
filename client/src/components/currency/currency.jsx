@@ -8,7 +8,7 @@ import logoGreen from '../../images/new-logo-green.png';
 const CurrencyExchange = () => {
   const [currencies, setCurrencies] = useState([]);
   const [baseCurrency, setBaseCurrency] = useState({ label: "USD", value: "USD" });
-  const [compareCurrency, setCompareCurrency] = useState({ label: "EUR", value: "EUR" });
+  const [compareCurrency, setCompareCurrency] = useState({ label: "THB", value: "THB" });
   const [amount, setAmount] = useState(1);
   const [convertedAmount, setConvertedAmount] = useState(0);
   const [exchangeRates, setExchangeRates] = useState({});
@@ -66,7 +66,7 @@ const CurrencyExchange = () => {
               <button className="text-green-600 font-bold" onClick={() => navigate("/currency")}>Currency</button>
               <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/map")}>Map</button>
               <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/contact")}>Contact</button>
+              {/* <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/contact")}>Contact</button> */}
             </div>
           </div>
         </div>
@@ -84,13 +84,14 @@ const CurrencyExchange = () => {
         </div>
         
         {menuOpen && (
-          <div className="px-4 pt-2 pb-3 space-y-1">
+          <div className="fixed top-20 left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-4 md:hidden">
             <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/")}>Home</button>
             <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/translator")}>Translator</button>
             <button className="block text-green-600 font-bold w-full text-left px-3 py-2 rounded-md bg-gray-100" onClick={() => navigate("/currency")}>Currency</button>
             <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/map")}>Map</button>
             <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/contact")}>Contact</button>
+            {/* <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/contact")}>Contact</button> */}
+            <button className="text-white bg-green-500 p-2 rounded-md" onClick={() => navigate("/sign-in")}>Sign In</button>
           </div>
         )}
       </div>

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoGreen from '../../images/new-logo-green.png';
-import languages from './languages';
 
 import { BiTransfer } from "react-icons/bi";
 import { FaCopy } from "react-icons/fa6";
@@ -10,11 +9,90 @@ import { MdCurrencyExchange } from "react-icons/md";
 import { LuMap } from "react-icons/lu";
 import { AiOutlineHome, AiOutlineSetting, AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 
+const languages = {
+    'en': 'English',
+    'th': 'Thai',
+    'zh': 'Chinese',
+    'ja': 'Japanese',
+    'ko': 'Korean',
+    'fr': 'French',
+    'de': 'German',
+    'es': 'Spanish',
+    'it': 'Italian',
+    'ru': 'Russian',
+    'vi': 'Vietnamese',
+    'id': 'Indonesian',
+    'ms': 'Malay',
+    'ar': 'Arabic',
+    'hi': 'Hindi',
+    'bn': 'Bengali',
+    'pt': 'Portuguese',
+    'tr': 'Turkish',
+    'nl': 'Dutch',
+    'pl': 'Polish',
+    'sv': 'Swedish',
+    'da': 'Danish',
+    'fi': 'Finnish',
+    'no': 'Norwegian',
+    'cs': 'Czech',
+    'hu': 'Hungarian',
+    'el': 'Greek',
+    'he': 'Hebrew',
+    'ro': 'Romanian',
+    'sk': 'Slovak',
+    'uk': 'Ukrainian',
+    'hr': 'Croatian',
+    'ca': 'Catalan',
+    'eu': 'Basque',
+    'ga': 'Irish',
+    'is': 'Icelandic',
+    'mk': 'Macedonian',
+    'mt': 'Maltese',
+    'sr': 'Serbian',
+    'sq': 'Albanian',
+    'hy': 'Armenian',
+    'az': 'Azerbaijani',
+    'ka': 'Georgian',
+    'uz': 'Uzbek',
+    'kk': 'Kazakh',
+    'ky': 'Kyrgyz',
+    'tg': 'Tajik',
+    'tk': 'Turkmen',
+    'mn': 'Mongolian',
+    'ps': 'Pashto',
+    'ks': 'Kashmiri',
+    'sd': 'Sindhi',
+    'ne': 'Nepali',
+    'pa': 'Punjabi',
+    'gu': 'Gujarati',
+    'or': 'Oriya',
+    'ta': 'Tamil',
+    'te': 'Telugu',
+    'kn': 'Kannada',
+    'ml': 'Malayalam',
+    'si': 'Sinhala',
+    'lo': 'Lao',
+    'my': 'Burmese',
+    'km': 'Khmer',
+    'bo': 'Tibetan',
+    'dz': 'Dzongkha',
+    'new': 'Newari',
+    'kok': 'Konkani',
+    'sdh': 'Kurdish',
+    'ku': 'Kurdish',
+    'prs': 'Dari',
+    'fa': 'Persian',
+    'ug': 'Uyghur',
+    'hmn': 'Hmong',
+};
+
+const API_KEY = "AIzaSyArbG896ceCNRBpNzN1Xpe2aUMEzuwvNBo";
+
 function Translator() {
     const [fromText, setFromText] = useState('');
     const [toText, setToText] = useState('');
-    const [fromLanguage, setFromLanguage] = useState('en-GB');
-    const [toLanguage, setToLanguage] = useState('th-TH');
+    const [fromLanguage, setFromLanguage] = useState('en');
+    const [toLanguage, setToLanguage] = useState('th');    
     const [loading, setLoading] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
@@ -45,24 +123,39 @@ function Translator() {
         setToLanguage(fromLanguage);
     };
 
-    const handleTranslate = () => {
+    const handleTranslate = async () => {
         if (!fromText) {
             setToText('');
             return;
         }
         setLoading(true);
-        let url = `https://api.mymemory.translated.net/get?q=${fromText}&langpair=${fromLanguage}|${toLanguage}`;
 
-        fetch(url)
-            .then((res) => res.json())
-            .then((data) => {
-                setToText(data.responseData.translatedText);
-                setLoading(false);
-            })
-            .catch(() => {
-                setLoading(false);
-                alert("Translation failed. Please try again.");
+        try {
+            const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    q: fromText,
+                    source: fromLanguage,
+                    target: toLanguage,
+                    format: 'text'
+                })
             });
+            const data = await response.json();
+            
+            if (data.data && data.data.translations) {
+                setToText(data.data.translations[0].translatedText);
+            } else {
+                throw new Error('Translation failed');
+            }
+        } catch (error) {
+            console.error('Translation error:', error);
+            alert("Translation failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -74,17 +167,17 @@ function Translator() {
                         <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
                             <img src={logoGreen} alt="Logo" className="h-12" />
                         </div>
-                    <div className="hidden md:flex items-center space-x-8">
-                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/")}>Home</button>
-                        <button className="text-green-600 font-bold" onClick={() => navigate("/translator")}>Translator</button>
-                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/currency")}>currency</button>
-                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/map")}>Map</button>
-                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-                        <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/contact")}>Contact</button>
+                        <div className="hidden md:flex items-center space-x-8">
+                            <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/")}>Home</button>
+                            <button className="text-green-600 font-bold" onClick={() => navigate("/translator")}>Translator</button>
+                            <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/currency")}>Currency</button>
+                            <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/map")}>Map</button>
+                            <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
+                            {/* <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/contact")}>Contact</button> */}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
             {/* Translator Container */}
             <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg w-full max-w-md md:max-w-2xl mt-24 flex flex-col items-center">
@@ -169,13 +262,12 @@ function Translator() {
             {/* Mobile Menu */}
             {menuOpen && (
                 <div className="fixed top-20 left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-4 md:hidden">
-                    <button className="text-gray-700" onClick={() => navigate("/")}>Home</button>
-                    <button className="text-green-600 font-bold" onClick={() => navigate("/translator")}>Translator</button>
-                    <button className="text-gray-700" onClick={() => navigate("/currency")}>Currency</button>
-                    <button className="text-gray-700" onClick={() => navigate("/map")}>Map</button>
-                    <button className="text-gray-700" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-                    <button className="text-gray-700" onClick={() => navigate("/faq")}>FAQ</button>
-                    <button className="text-gray-700" onClick={() => navigate("/contact")}>Contact</button>
+                    <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/")}>Home</button>
+                    <button className="block text-green-600 font-bold w-full text-left px-3 py-2 rounded-md bg-gray-100" onClick={() => navigate("/translator")}>Translator</button>
+                    <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/currency")}>Currency</button>
+                    <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/map")}>Map</button>
+                    <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
+                    {/* <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/contact")}>Contact</button> */}
                     <button className="text-white bg-green-500 p-2 rounded-md" onClick={() => navigate("/sign-in")}>Sign In</button>
                 </div>
             )}
