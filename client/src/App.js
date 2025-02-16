@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import WOW from 'wowjs';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bxslider/dist/jquery.bxslider.min.css';
 import 'wowjs/css/libs/animate.css';
@@ -23,6 +24,9 @@ import AuthPage from './components/auth/login';
 import Translator from './components/translator/translator';
 import Currency from './components/currency/currency';
 
+import MapPage from './components/map/MapPage';
+
+// -----------------------------------------------
 const HomePage = () => {
   return (
     <>
@@ -38,6 +42,7 @@ const HomePage = () => {
     </>
   );
 };
+// ------------------------------------------------
 
 function App() {
   useEffect(() => {
@@ -50,6 +55,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/translator" element={<Translator />} />
         <Route path="/currency" element={<Currency />} />
+        <Route path="/map" element={<MapPage />} />
         <Route path="/login" element={<AuthPage />} />
       </Routes>
     </div>
