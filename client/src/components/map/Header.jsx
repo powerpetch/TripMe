@@ -1,4 +1,3 @@
-// src/components/map/Header.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logoGreen from '../../images/new-logo-green.png';
@@ -9,12 +8,10 @@ function Header({ onSearchLocation }) {
   const navigate = useNavigate();
   const [autocomplete, setAutocomplete] = useState(null);
 
-  // เมื่อ Autocomplete โหลดเสร็จ => เก็บ instance ไว้ใน state
   const handleAutoLoad = (auto) => {
     setAutocomplete(auto);
   };
 
-  // เมื่อผู้ใช้เลือกสถานที่ (onPlaceChanged)
   const handlePlaceChanged = () => {
     if (autocomplete !== null) {
       const place = autocomplete.getPlace();
@@ -25,7 +22,6 @@ function Header({ onSearchLocation }) {
     }
   };
 
-  // ปุ่ม “Go” (fallback ถ้า user ไม่เลือกจาก Dropdown)
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('User pressed Go, fallback logic here if needed');
@@ -50,7 +46,6 @@ function Header({ onSearchLocation }) {
           {/* ไอคอน Search ด้านซ้าย */}
           <FaSearch className="text-gray-500 mr-2" />
 
-          {/* ครอบ input ด้วย <Autocomplete> */}
           <div className="flex-1">
             <Autocomplete
               onLoad={handleAutoLoad}
@@ -64,7 +59,6 @@ function Header({ onSearchLocation }) {
             </Autocomplete>
           </div>
 
-          {/* ปุ่ม Go ด้านขวาสุด */}
           <button
             type="submit"
             className="

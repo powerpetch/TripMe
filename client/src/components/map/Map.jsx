@@ -1,4 +1,3 @@
-// src/components/map/Map.jsx
 import React, { useCallback } from 'react';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 
@@ -27,7 +26,6 @@ function Map({
     return <div className="w-full h-full flex items-center justify-center">Loading map...</div>;
   }
 
-  // สร้าง marker แสดงทั้งหมด (ถ้า showAllMarkers เป็น true)
   const renderAllMarkers = () => {
     return places.map((place, i) => {
       const lat = place.geometry?.location?.lat();
@@ -38,7 +36,6 @@ function Map({
         <Marker
           key={i}
           position={{ lat, lng }}
-          // optional: ลองใส่ icon สีแดง
           icon={{
             url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
           }}
@@ -48,7 +45,6 @@ function Map({
     });
   };
 
-  // สร้าง marker เฉพาะจุดที่ผู้ใช้คลิก
   const renderSelectedMarker = () => {
     if (!selectedPlace) return null;
     const lat = selectedPlace.geometry?.location?.lat();
@@ -77,9 +73,7 @@ function Map({
         zoomControl: true,
       }}
     >
-      {/* ถ้า user กดปุ่ม “แสดงทั้งหมด” => showAllMarkers = true => วาด Marker ทั้งหมด */}
       {showAllMarkers && renderAllMarkers()}
-      {/* ถ้า user คลิกสถานที่ลิสต์ => selectedPlace => วาด Marker เดียว */}
       {!showAllMarkers && renderSelectedMarker()}
     </GoogleMap>
   );

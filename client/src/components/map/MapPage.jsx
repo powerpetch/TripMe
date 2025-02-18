@@ -1,4 +1,3 @@
-// src/components/map/MapPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './Header';
 import Map from './Map';
@@ -23,14 +22,12 @@ function MapPage() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [places, setPlaces] = useState([]);
 
-  // สถานที่ที่ user เลือก => แสดงเฉพาะพิน
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [showAllMarkers, setShowAllMarkers] = useState(false);
   const [detailedPlace, setDetailedPlace] = useState(null);
 
   const mapRef = useRef(null);
 
-  // Geolocation เริ่มต้น
   useEffect(() => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -45,7 +42,6 @@ function MapPage() {
     }
   }, []);
 
-  // Toggle Category
   const handleSelectCategory = (catKey) => {
     if (selectedCategory === catKey && isPanelOpen) {
       setIsPanelOpen(false);
@@ -58,7 +54,6 @@ function MapPage() {
     setDetailedPlace(null);
   };
 
-  // ปิด Side Panel
   const handleClosePanel = () => {
     setIsPanelOpen(false);
     setPlaces([]);
@@ -68,7 +63,6 @@ function MapPage() {
     setShowAllMarkers(false);
   };
 
-  // Nearby Search
   useEffect(() => {
     if (!isPanelOpen) return;
     if (!selectedCategory) return;
@@ -125,7 +119,6 @@ function MapPage() {
     setDetailedPlace(null);
   };
 
-  // **เพิ่ม**: เมื่อ Autocomplete เลือกสถานที่ => Pan Map + Marker + getDetails + เปิด Panel
   const handleSearchLocation = (place) => {
     // 1) pan map
     const lat = place.geometry.location.lat();
@@ -145,7 +138,6 @@ function MapPage() {
 
   return (
     <div className="flex flex-col w-full h-screen overflow-hidden bg-gray-50">
-      {/* ส่ง handleSearchLocation ไป Header */}
       <Header onSearchLocation={handleSearchLocation} />
 
       <div className="relative flex-1">

@@ -6,7 +6,6 @@ import { FaStarHalfAlt } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { FaSearchLocation } from "react-icons/fa";
 
-// Custom Star Rating Component
 const StarRating = ({ rating }) => {
   const stars = [];
   const totalStars = 5;
@@ -28,7 +27,6 @@ const StarRating = ({ rating }) => {
   );
 };
 
-// ลิสต์สถานที่
 function PlaceList({ places, onSelectPlaceInList }) {
   if (places.length === 0) {
     return <p className="text-sm text-gray-500 p-2">ยังไม่มีข้อมูล</p>;
@@ -150,7 +148,6 @@ function DetailedInfo({ place, onBackToList }) {
   );
 }
 
-// SidePanel หลัก
 export default function SidePanel({
   isOpen,
   onClose,
