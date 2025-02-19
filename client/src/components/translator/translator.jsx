@@ -86,7 +86,7 @@ const languages = {
     'hmn': 'Hmong',
 };
 
-const API_KEY = "AIzaSyArbG896ceCNRBpNzN1Xpe2aUMEzuwvNBo";
+const API_KEY = process.env.REACT_APP_GOOGLE_TRANSLATE_API_KEY;
 
 function Translator() {
     const [fromText, setFromText] = useState('');
@@ -131,6 +131,7 @@ function Translator() {
         setLoading(true);
 
         try {
+            console.log('Attempting translation...');
             const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${API_KEY}`, {
                 method: 'POST',
                 headers: {
