@@ -101,12 +101,12 @@ const AuthPage = () => {
       const data = await res.json();
 
       if (res.ok) {
-        console.log("Token:", data.token);
-        // เก็บ token => localStorage
+        // Store user data including password
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        // ถ้าต้องการบันทึก user => localStorage.setItem("user", JSON.stringify(data.user));
-        // จากนั้นไปหน้าอื่น
+        localStorage.setItem("user", JSON.stringify({
+          ...data.user,
+          password: signInPassword // Add password to stored user data
+        }));
         navigate("/");
       } else {
         setIsEmailError(true);

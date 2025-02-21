@@ -30,6 +30,9 @@ import TripDetail from './components/trip/TripDetail';
 // เพจใหม่
 import TripTogetherPage from './components/trip/TripTogetherPage'; // <-- สร้างไฟล์ไว้ตามตัวอย่างด้านบน
 
+import ProfilePage from './components/profile/ProfilePage';
+import EditProfilePage from './components/profile/EditProfilePage';
+
 function NotFound() {
   return <div style={{ padding: '2rem' }}>404 - Page Not Found</div>;
 }
@@ -65,13 +68,12 @@ function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/login" element={<AuthPage />} />
 
-        {/* เพิ่มเส้นทาง Trip-tgt */}
         <Route path="/Trip-tgt" element={<TripTogetherPage />} />
 
-        {/* ตัวอย่างหน้า TripDetail */}
         <Route path="/trip/:id" element={<TripDetail />} />
         
-        {/* หากต้องการ /trip/new หรือ /trip/:id/edit ก็เพิ่มได้ตรงนี้ */}
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/edit-profile" element={<EditProfilePage />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
