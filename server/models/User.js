@@ -71,6 +71,15 @@ const userSchema = new mongoose.Schema({
     type: String // เก็บ path ของไฟล์
   },
 
+  country: {
+    type: String,
+    default: ""
+  },
+  city: {
+    type: String,
+    default: ""
+  },
+
   // Timestamps
   createdAt: { 
     type: Date, 

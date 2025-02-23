@@ -83,18 +83,22 @@ router.put("/update",
   ]), 
   async (req, res) => {
     try {
+      console.log("DEBUG: req.body =>", req.body);
+      console.log("DEBUG: country =>", req.body.country);
+      console.log("DEBUG: city =>", req.body.city);
+
       const user = await User.findById(req.userId);
       if (!user) {
-        return res.status(404).json({ 
+        return res.status(404).json({
           success: false,
-          message: "User not found" 
+          message: "User not found"
         });
       }
 
       // อัพเดทข้อมูลพื้นฐาน
       const updateFields = [
-        'username', 'firstName', 'lastName', 'gender',
-        'tel', 'language', 'dob', 'twitter', 'facebook', 'instagram'
+        "username", "firstName", "lastName", "gender", "tel", 
+        "language", "dob", "country", "city", "twitter", "facebook", "instagram"
       ];
 
       updateFields.forEach(field => {

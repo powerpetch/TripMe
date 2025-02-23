@@ -16,6 +16,9 @@ function ProfilePage() {
   const [phone, setPhone] = useState(null);
   const [gender, setGender] = useState(null);
   const [language, setLanguage] = useState(null);
+  const [country, setCountry] = useState(null);
+  const [city, setCity] = useState(null);
+  const [birthDate, setBirthDate] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
@@ -162,7 +165,9 @@ function ProfilePage() {
                   {user.username || "No Name"}
                 </h2>
                 <p className="text-gray-500">{user.email}</p>
-                <p className="text-sm text-gray-400">Bangkok, Thailand</p>
+                <p className="text-sm text-gray-400">
+                {user.city || "Unknown City"}, {user.country || "Unknown Country"}
+                </p>
               </div>
             </div>
 
@@ -208,7 +213,7 @@ function ProfilePage() {
               <hr />
               <div className="flex items-center justify-between py-2">
                   <div className="text-gray-600 font-semibold">Date of birth</div>
-                  <div className="text-gray-700">01/01/1990</div>
+                  <div className="text-gray-700">{user.dob || "N/A"}</div>
                 </div>
             </div>
           </div>

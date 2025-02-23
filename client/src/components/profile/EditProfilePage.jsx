@@ -1,48 +1,11 @@
-// src/pages/EditProfilePage.jsx
-
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaCamera } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { COUNTRY_CODES, COUNTRIES, DAYS, MONTHS, YEARS } from "../../js/mockData";
 
-// Mock Country Code (ตัวอย่าง)
-const COUNTRY_CODES = [
-  { label: "+66 (Thailand)", value: "+66" },
-  { label: "+1 (USA)", value: "+1" },
-  { label: "+44 (UK)", value: "+44" },
-  { label: "+81 (Japan)", value: "+81" },
-  { label: "+86 (China)", value: "+86" },
-  { label: "+91 (India)", value: "+91" },
-  { label: "+61 (Australia)", value: "+61" },
-  { label: "+49 (Germany)", value: "+49" },
-  // ... เพิ่มได้ตามต้องการ
-];
 
-// Mock Days (1–31)
-const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
-
-// Mock Months (1–12)
-const MONTHS = [
-  { label: "Jan", value: "1" },
-  { label: "Feb", value: "2" },
-  { label: "Mar", value: "3" },
-  { label: "Apr", value: "4" },
-  { label: "May", value: "5" },
-  { label: "Jun", value: "6" },
-  { label: "Jul", value: "7" },
-  { label: "Aug", value: "8" },
-  { label: "Sep", value: "9" },
-  { label: "Oct", value: "10" },
-  { label: "Nov", value: "11" },
-  { label: "Dec", value: "12" },
-];
-
-// Mock Years (1960–ปัจจุบัน)
-const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = [];
-for (let y = 1960; y <= CURRENT_YEAR; y++) {
-  YEARS.push(y);
-}
 
 function EditProfilePage() {
   const navigate = useNavigate();
@@ -82,6 +45,16 @@ function EditProfilePage() {
   const [facebook, setFacebook] = useState("");
   const [instagram, setInstagram] = useState("");
 
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+
+  const avatarURL = user && user.avatar 
+  ? `http://localhost:5000${user.avatar}`
+  : null;
+const coverURL = user && user.cover
+  ? `http://localhost:5000${user.cover}`
+  : null;
+
   // โหลดข้อมูล User จาก Backend (mock)
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -109,9 +82,29 @@ function EditProfilePage() {
           setLastName(data.user.lastName || "");
           setGender(data.user.gender || "N/A");
 
-          // สมมติ data.user.tel => "+66xxxx"
-          // ตัดเครื่องหมายทั้งหมด => setTel
-          setTel(data.user.tel?.replace(/\D/g, "") || "");
+          if (data.user.tel) {
+            // สมมติ user.tel = "+66xxxxxxxx"
+            // ลองหาใน COUNTRY_CODES
+            const found = COUNTRY_CODES.find((c) =>
+              data.user.tel.startsWith(c.value)
+            );
+            if (found) {
+              // setCountryCode เป็นค่านั้น
+              setCountryCode(found.value);
+              // ตัด prefix ออก
+              const digits = data.user.tel.slice(found.value.length);
+              // ตัดเครื่องหมาย + ออกซ้ำ ถ้ามี
+              setTel(digits.replace(/\D/g, ""));
+            } else {
+              // ไม่มี match => fallback
+              setCountryCode("+66"); // หรือจะ set เป็น "" ก็ได้
+              setTel(data.user.tel.replace(/\D/g, ""));
+            }
+          } else {
+            // ไม่มี tel
+            setTel("");
+            setCountryCode("+66");
+          }
 
           setLanguage(data.user.language || "");
 
@@ -127,6 +120,9 @@ function EditProfilePage() {
           setTwitter(data.user.twitter || "");
           setFacebook(data.user.facebook || "");
           setInstagram(data.user.instagram || "");
+
+          setCountry(data.user.country || "");
+          setCity(data.user.city || "");
         }
       })
       .catch(err => console.error(err));
@@ -167,6 +163,8 @@ function EditProfilePage() {
 
   // --------- บันทึก ---------
   const handleSave = () => {
+    console.log("DEBUG country =>", country);
+    console.log("DEBUG city =>", city);
     const token = localStorage.getItem("token");
     if (!token) return;
 
@@ -181,6 +179,8 @@ function EditProfilePage() {
     formData.append("twitter", twitter);
     formData.append("facebook", facebook);
     formData.append("instagram", instagram);
+    formData.append("country", country);
+    formData.append("city", city);
 
     // ถ้ามีอัปโหลด cover
     if (coverFile) {
@@ -284,17 +284,9 @@ function EditProfilePage() {
           {/* Cover */}
           <div className="relative w-full h-52 bg-gray-200 overflow-hidden rounded-lg">
             {coverPreview ? (
-              <img
-                src={coverPreview}
-                alt="cover preview"
-                className="object-cover w-full h-full"
-              />
-            ) : user.cover ? (
-              <img
-                src={user.cover}
-                alt="cover"
-                className="object-cover w-full h-full"
-              />
+              <img src={coverPreview} alt="cover preview" className="object-cover w-full h-full" />
+            ) : coverURL ? (
+              <img src={coverURL} alt="cover" className="object-cover w-full h-full" />
             ) : (
               <div className="text-gray-500 flex items-center justify-center h-full text-lg">
                 No Cover
@@ -308,7 +300,6 @@ function EditProfilePage() {
             >
               <FaCamera className="text-gray-600" />
             </div>
-            {/* hidden input cover */}
             <input
               type="file"
               accept="image/*"
@@ -318,27 +309,21 @@ function EditProfilePage() {
             />
           </div>
 
-          {/* Avatar (ซ้อนทับขอบล่าง cover) */}
+          {/* Avatar */}
           <div className="flex items-center px-4 mt-[-48px] relative z-10">
             <div className="relative w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
               {avatarPreview ? (
-                <img
-                  src={avatarPreview}
-                  alt="avatar preview"
-                  className="object-cover w-full h-full"
-                />
-              ) : user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt="avatar"
-                  className="object-cover w-full h-full"
-                />
+                <img src={avatarPreview} alt="avatar preview" className="object-cover w-full h-full" />
+              ) : avatarURL ? (
+                <img src={avatarURL} alt="avatar" className="object-cover w-full h-full" />
               ) : (
-                <FaUserCircle className="text-gray-400 text-[90px]" />
+                <div className="absolute top-[-5px] left-[-8px]"> {/* Added positioning */}
+                <FaUserCircle className="text-gray-400 text-[120px]" /> {/* Adjusted size */}
+              </div>
               )}
               {/* ไอคอนกล้องบน avatar */}
               <div
-                className="absolute bottom-1 right-1 bg-white rounded-full p-1 cursor-pointer hover:bg-gray-100 shadow"
+                className="absolute bottom-2 right-2 bg-white rounded-full p-2 cursor-pointer hover:bg-gray-100 shadow "
                 onClick={() => avatarInputRef.current.click()}
               >
                 <FaCamera className="text-gray-600" />
@@ -481,6 +466,42 @@ function EditProfilePage() {
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Country
+              </label>
+              <select
+                className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              >
+                <option value="">Select Country</option>
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* City */}
+            <div>
+              <label className="block text-gray-700 mb-1 font-medium">
+                City
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  className="border w-full p-2 pl-8 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Enter your city"
+                />
+                <FaMapMarkerAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
             </div>
 
