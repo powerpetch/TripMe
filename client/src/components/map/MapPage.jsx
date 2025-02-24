@@ -120,19 +120,19 @@ function MapPage() {
   };
 
   const handleSearchLocation = (place) => {
-    // 1) pan map
+    // 1. pan map
     const lat = place.geometry.location.lat();
     const lng = place.geometry.location.lng();
     setCoordinates({ lat, lng });
 
-    // 2) สร้าง marker เฉพาะจุด
+    // 2. สร้าง marker เฉพาะจุด
     setSelectedPlace(place);
     setShowAllMarkers(false);
-    // 3) fetch details => setDetailedPlace
+    // 3. fetch details => setDetailedPlace
     setDetailedPlace(null);
     fetchPlaceDetails(place);
 
-    // 4) เปิด panel เพื่อให้เห็นข้อมูล
+    // 4. เปิด panel เพื่อให้เห็นข้อมูล
     setIsPanelOpen(true);
   };
 

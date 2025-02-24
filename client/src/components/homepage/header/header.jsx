@@ -36,6 +36,35 @@ const Header = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+      
+      if (token && storedUser) {
+        try {
+          const res = await fetch("http://localhost:5000/api/user/profile", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await res.json();
+          
+          if (res.ok && data.user) {
+            setCurrentUser({
+              ...JSON.parse(storedUser),
+              avatar: data.user.avatar
+            });
+          }
+        } catch (err) {
+          console.error("Fetch user error:", err);
+        }
+      }
+    };
+  
+    fetchUserData();
+  }, []);
+
   // logout
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -61,10 +90,10 @@ const Header = () => {
         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
         onClick={() => {
           setShowUserMenu(false);
-          navigate("/setting"); // ตัวอย่าง
+          navigate("/change-password"); // ตัวอย่าง
         }}
       >
-        Setting
+        Change Password
       </button>
       <button
         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -154,15 +183,25 @@ const Header = () => {
                   }
                 `}
               >
-                <FaUserCircle 
-                  className={`text-2xl ${
-                    scrolled ? 'text-gray-700' : 'text-white'
-                  }`} 
+              {currentUser.avatar ? (
+                <img
+                  src={
+                    currentUser.avatar.startsWith("http")
+                      ? currentUser.avatar
+                      : `http://localhost:5000${currentUser.avatar}`
+                  }
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full object-cover"
                 />
-              </button>
-              {showUserMenu && userMenuDropdown}
-            </div>
-          )}
+              ) : (
+                <FaUserCircle 
+                  className={`text-2xl ${scrolled ? 'text-gray-700' : 'text-white'}`} 
+                />
+              )}
+            </button>
+            {showUserMenu && userMenuDropdown}
+          </div>
+        )}
         </div>
       </div>
 

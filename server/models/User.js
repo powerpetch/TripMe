@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  // ข้อมูลพื้นฐานสำหรับ Authentication
   username: { 
     type: String, 
     required: [true, 'Username is required'],
@@ -23,7 +22,7 @@ const userSchema = new mongoose.Schema({
     minlength: [8, 'Password must be at least 8 characters']
   },
 
-  // ข้อมูลส่วนตัว
+  // User profile
   firstName: {
     type: String,
     trim: true
@@ -49,7 +48,7 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
 
-  // โซเชียลมีเดีย
+  // Social media
   twitter: {
     type: String,
     trim: true
@@ -63,7 +62,7 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
 
-  // รูปภาพ
+  // Pic
   avatar: {
     type: String // เก็บ path ของไฟล์
   },
@@ -90,7 +89,7 @@ const userSchema = new mongoose.Schema({
     default: Date.now 
   }
 }, {
-  timestamps: true // เพิ่ม createdAt และ updatedAt อัตโนมัติ
+  timestamps: true // for createdAt and updatedAt automatically
 });
 
 // อัพเดท updatedAt เมื่อมีการแก้ไขข้อมูล

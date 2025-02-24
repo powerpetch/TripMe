@@ -32,6 +32,7 @@ import TripTogetherPage from './components/trip/TripTogetherPage'; // <-- สร
 
 import ProfilePage from './components/profile/ProfilePage';
 import EditProfilePage from './components/profile/EditProfilePage';
+import ChangePasswordPage from './components/profile/ChangePassword';
 
 function NotFound() {
   return <div style={{ padding: '2rem' }}>404 - Page Not Found</div>;
@@ -74,6 +75,7 @@ function App() {
         
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
+        <Route path="/change-password" element={<ChangePasswordPage />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>

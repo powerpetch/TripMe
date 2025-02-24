@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaCamera } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
 import { FaMapMarkerAlt } from "react-icons/fa";
-import { COUNTRY_CODES, COUNTRIES, DAYS, MONTHS, YEARS } from "../../js/mockData";
+import { COUNTRY_CODES, COUNTRIES, DAYS, MONTHS, YEARS, LANGUAGES } from "../../js/mockData";
 
 
 
@@ -11,18 +11,21 @@ function EditProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  // ---------- State เกี่ยวกับ Cover / Avatar ----------
+  //  Cover / Avatar
   const [coverFile, setCoverFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
-  // ref สำหรับ input file (ซ่อน)
+    // สำหรับ Modal ยืนยันลิงก์ Social
+  const [showSocialModal, setShowSocialModal] = useState(false);
+
+
+  // ref สำหรับ input file
   const coverInputRef = useRef(null);
   const avatarInputRef = useRef(null);
 
-  // ---------- ฟิลด์อื่น ๆ ----------
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -48,6 +51,8 @@ function EditProfilePage() {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
 
+  const baseUrl = "http://localhost:5000";
+  
   const avatarURL = user && user.avatar 
   ? `http://localhost:5000${user.avatar}`
   : null;
@@ -55,7 +60,7 @@ const coverURL = user && user.cover
   ? `http://localhost:5000${user.cover}`
   : null;
 
-  // โหลดข้อมูล User จาก Backend (mock)
+  // โหลดข้อมูล User จาก mock
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -68,23 +73,19 @@ const coverURL = user && user.cover
         if (data.user) {
           setUser(data.user);
 
-          // ถ้ามี cover / avatar ใน DB => แสดง preview
-          if (data.user.cover) {
-            setCoverPreview(data.user.cover);
-          }
-          if (data.user.avatar) {
-            setAvatarPreview(data.user.avatar);
-          }
+		  if (data.user.cover) {
+			setCoverPreview(`${baseUrl}${data.user.cover}`);
+		  }
+		  if (data.user.avatar) {
+			setAvatarPreview(`${baseUrl}${data.user.avatar}`);
+		  }
 
-          // Set ฟิลด์อื่น ๆ
           setUsername(data.user.username || "");
           setFirstName(data.user.firstName || "");
           setLastName(data.user.lastName || "");
           setGender(data.user.gender || "N/A");
 
           if (data.user.tel) {
-            // สมมติ user.tel = "+66xxxxxxxx"
-            // ลองหาใน COUNTRY_CODES
             const found = COUNTRY_CODES.find((c) =>
               data.user.tel.startsWith(c.value)
             );
@@ -97,19 +98,17 @@ const coverURL = user && user.cover
               setTel(digits.replace(/\D/g, ""));
             } else {
               // ไม่มี match => fallback
-              setCountryCode("+66"); // หรือจะ set เป็น "" ก็ได้
+              setCountryCode("");
               setTel(data.user.tel.replace(/\D/g, ""));
             }
           } else {
             // ไม่มี tel
             setTel("");
-            setCountryCode("+66");
+            setCountryCode("");
           }
 
           setLanguage(data.user.language || "");
 
-          // ถ้า DB เก็บ dob เป็น "day/month/year"
-          // สมมติ data.user.dob = "5/7/1985"
           if (data.user.dob) {
             const [d, m, y] = data.user.dob.split("/");
             setDobDay(d || "");
@@ -127,6 +126,52 @@ const coverURL = user && user.cover
       })
       .catch(err => console.error(err));
   }, []);
+
+  const actualSave = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const formData = new FormData();
+    formData.append("username", username);
+    formData.append("firstName", firstName);
+    formData.append("lastName", lastName);
+    formData.append("gender", gender);
+    formData.append("tel", countryCode + tel);
+    formData.append("language", language);
+    formData.append("dob", `${dobDay}/${dobMonth}/${dobYear}`);
+    formData.append("twitter", twitter);
+    formData.append("facebook", facebook);
+    formData.append("instagram", instagram);
+    formData.append("country", country);
+    formData.append("city", city);
+
+    if (coverFile) {
+      formData.append("cover", coverFile);
+    }
+    if (avatarFile) {
+      formData.append("avatar", avatarFile);
+    }
+
+    fetch("http://localhost:5000/api/user/update", {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          console.log("Updated user:", data.user);
+          window.location.href = "/profile";
+        } else {
+          console.log("Update failed:", data.message);
+        }
+      })
+      .catch(err => console.error(err));
+  };
+
+  
 
   // --------- Handle Cover Change ---------
   const handleCoverChange = (e) => {
@@ -154,61 +199,27 @@ const coverURL = user && user.cover
     reader.readAsDataURL(file);
   };
 
-  // --------- Tel: รับเฉพาะตัวเลข ---------
+  // --------- Tel : num only ---------
   const handleTelChange = (e) => {
     const val = e.target.value;
     const onlyDigits = val.replace(/\D/g, "");
     setTel(onlyDigits);
   };
 
-  // --------- บันทึก ---------
+  // --------- Save ---------
   const handleSave = () => {
-    console.log("DEBUG country =>", country);
-    console.log("DEBUG city =>", city);
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    const formData = new FormData();
-    formData.append("username", username);
-    formData.append("firstName", firstName);
-    formData.append("lastName", lastName);
-    formData.append("gender", gender);
-    formData.append("tel", countryCode + tel);
-    formData.append("language", language);
-    formData.append("dob", `${dobDay}/${dobMonth}/${dobYear}`);
-    formData.append("twitter", twitter);
-    formData.append("facebook", facebook);
-    formData.append("instagram", instagram);
-    formData.append("country", country);
-    formData.append("city", city);
-
-    // ถ้ามีอัปโหลด cover
-    if (coverFile) {
-      formData.append("cover", coverFile);
+    // ถ้ามีการกรอกลิงก์ social ใด ๆ ให้แสดง modal ยืนยัน
+    if (twitter || facebook || instagram) {
+      setShowSocialModal(true); // อยู่ด้านบน
+    } else {
+      actualSave();
     }
-    // ถ้ามีอัปโหลด avatar
-    if (avatarFile) {
-      formData.append("avatar", avatarFile);
-    }
+  };
 
-    fetch("http://localhost:5000/api/user/update", {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      },
-      body: formData
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-			console.log("Updated user:", data.user);
-			window.location.href = "/profile";
-        }
-		else {
-			console.log("Update failed:", data.message);
-		}
-      })
-      .catch(err => console.error(err));
+  // เมื่อผู้ใช้กดยืนยันใน modal
+  const handleSocialModalConfirm = () => {
+    setShowSocialModal(false);
+    actualSave();
   };
 
   // --------- Cancel ---------
@@ -263,7 +274,7 @@ const coverURL = user && user.cover
           <span className="text-2xl font-bold text-gray-700">Edit Profile</span>
         </div>
 
-        {/* ปุ่ม Save/Cancel */}
+        {/* Save/Cancel */}
         <div className="flex items-center justify-end mb-4">
           <button
             onClick={handleCancel}
@@ -279,7 +290,7 @@ const coverURL = user && user.cover
           </button>
         </div>
 
-        {/* Cover + Avatar layout (ซ้อนกัน) */}
+        {/* Cover + Avatar */}
         <div className="bg-white rounded shadow p-4 mb-6 relative">
           {/* Cover */}
           <div className="relative w-full h-52 bg-gray-200 overflow-hidden rounded-lg">
@@ -388,7 +399,7 @@ const coverURL = user && user.cover
               >
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
-                <option value="N/A">N/A</option>
+                <option value="N/A">Other</option>
               </select>
             </div>
 
@@ -397,12 +408,19 @@ const coverURL = user && user.cover
               <label className="block text-gray-700 mb-1 font-medium">Tel</label>
               <div className="flex space-x-2">
                 <select
-                  className="border p-2 rounded w-28 focus:outline-none focus:ring-2 focus:ring-green-300"
+                  className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300 h-10 overflow-y-auto"
                   value={countryCode}
                   onChange={(e) => setCountryCode(e.target.value)}
+                  style={{ maxHeight: '200px' }}
                 >
                   {COUNTRY_CODES.map((c) => (
-                    <option key={c.value} value={c.value}>{c.label}</option>
+                    <option 
+                      key={c.value} 
+                      value={c.value}
+                      className="py-1"
+                    >
+                      {c.label}
+                    </option>
                   ))}
                 </select>
                 <input
@@ -419,16 +437,20 @@ const coverURL = user && user.cover
             <div>
               <label className="block text-gray-700 mb-1 font-medium">Language</label>
               <select
-                className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
+                className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300 h-10 overflow-y-auto"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
+                style={{ maxHeight: '200px' }}
               >
-                <option value="English">English</option>
-                <option value="Thai">Thai</option>
-                <option value="Spanish">Spanish</option>
-                <option value="Chinese">Chinese</option>
-                <option value="French">French</option>
-                {/* ... เพิ่มได้ตามต้องการ */}
+                {LANGUAGES.map((lang) => (
+                  <option 
+                    key={lang.code} 
+                    value={lang.name}
+                    className="py-1"
+                  >
+                    {lang.name}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -501,7 +523,6 @@ const coverURL = user && user.cover
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Enter your city"
                 />
-                <FaMapMarkerAlt className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
               </div>
             </div>
 
@@ -538,6 +559,32 @@ const coverURL = user && user.cover
                 placeholder="https://instagram.com/username"
               />
             </div>
+
+        	{/* สำหรับยืนยันลิงก์ social */}
+			{showSocialModal && (
+			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+				<div className="bg-white p-6 rounded shadow-md max-w-sm mx-auto">
+					<h3 className="text-lg font-bold mb-2">Please Accept the Terms</h3>
+					<p className="mb-4">
+					Please verify that the links you provided are your own and the information is correct.
+					</p>
+					<div className="flex justify-end">
+						<button
+						onClick={() => setShowSocialModal(false)}
+						className="mr-2 px-4 py-2 border rounded hover:bg-gray-100"
+						>
+						Cancel
+						</button>
+						<button
+						onClick={handleSocialModalConfirm}
+						className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+						>
+						Accept
+						</button>
+					</div>
+				</div>
+			</div>
+			)}
           </div>
         </div>
       </div>

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  FaUserCircle, FaUserAlt, FaUsers, FaCog, FaVideo, FaBookOpen, FaSignOutAlt
+  FaUserCircle, FaUserAlt, FaUsers, FaCog, FaVideo, FaBookOpen, FaSignOutAlt,
+  FaFacebook, FaTwitter, FaInstagram  // นำเข้าไอคอน social
 } from "react-icons/fa";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+// import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { MdAddBox } from "react-icons/md";
+import { FaUnlock } from "react-icons/fa6";
 
 import logoGreen from '../../images/new-logo-green.png';
 import coverimg from '../../images/phd.jpg';
@@ -12,19 +14,21 @@ import coverimg from '../../images/phd.jpg';
 function ProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [userID, setUserID] = useState(null);
-  const [phone, setPhone] = useState(null);
-  const [gender, setGender] = useState(null);
-  const [language, setLanguage] = useState(null);
-  const [country, setCountry] = useState(null);
-  const [city, setCity] = useState(null);
-  const [birthDate, setBirthDate] = useState(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const baseUrl = "http://localhost:5000";
+  // const [avatarPreview, setAvatarPreview] = useState(null);
+  // const [userID, setUserID] = useState(null);
+  // const [phone, setPhone] = useState(null);
+  // const [gender, setGender] = useState(null);
+  // const [language, setLanguage] = useState(null);
+  // const [country, setCountry] = useState(null);
+  // const [city, setCity] = useState(null);
+  // const [birthDate, setBirthDate] = useState(null);
+  // const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      return; // ถ้าไม่มี token => ยังไม่ล็อกอิน
+      return;
     }
     fetch("http://localhost:5000/api/user/profile", {
       method: "GET",
@@ -51,6 +55,9 @@ function ProfilePage() {
     );
   }
 
+  const avatarUrl = user.avatar ? (user.avatar.startsWith("http") ? user.avatar : baseUrl + user.avatar) : null;
+  const coverUrl = user.cover ? (user.cover.startsWith("http") ? user.cover : baseUrl + user.cover) : coverimg;
+
   // ถ้า user ไม่มี avatar => icon แทน
   const avatar = user.avatar || null;
   // ถ้า user ไม่มี cover => placeholder
@@ -58,9 +65,9 @@ function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header (บนสุด) */}
+      {/* Header */}
       <header className="h-16 bg-white shadow px-4 flex items-center justify-between fixed w-full top-0 left-0 z-50">
-        {/* Logo ซ้าย */}
+        {/* Logo */}
         <div className="flex items-center space-x-2">
           <img 
             src={logoGreen}
@@ -70,26 +77,31 @@ function ProfilePage() {
           />
         </div>
 
-        {/* User icon ขวา */}
-        <nav className="flex items-center space-x-6">
-          <div className="flex items-center space-x-2 cursor-default">
+        {/* User icon  */}
+        <nav className="flex items-center space-x-4">
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt="avatar"
+              className="w-8 h-8 rounded-full object-cover"
+            />
+          ) : (
             <FaUserCircle className="text-gray-500 text-2xl" />
-            <span className="text-sm text-gray-700">{user.username}</span>
-          </div>
+          )}
+          <span className="text-gray-700 font-medium">{user.username}</span>
         </nav>
       </header>
 
-      {/* ส่วนเนื้อหาหลัก (เว้น margin-top ให้ Header) */}
+      {/* เนื้อหาหลัก */}
       <div className="pt-20 max-w-7xl mx-auto w-full px-4">
         
-        {/* บรรทัด My Profile ด้านบน */}
         <div className="text-2xl font-bold text-gray-800 mb-4">
           My Profile
         </div>
 
         <div className="flex gap-4">
           
-          {/* คอลัมน์ซ้าย (Sidebar) */}
+          {/* Sidebar */}
           <div className="flex flex-col w-64 space-y-4">
             <div className="bg-gray rounded shadow p-4 flex flex-col space-y-4">
               <h3 className="text-sm font-bold text-gray-500 uppercase">Personal</h3>
@@ -103,10 +115,15 @@ function ProfilePage() {
               </button>
               <button
                 className="flex items-center space-x-2 text-gray-700 hover:text-green-600"
-                onClick={() => navigate('/edit-profile')}
-              >
+                onClick={() => navigate('/edit-profile')}>
                 <FaCog />
                 <span>Edit Profile</span>
+              </button>
+              <button
+                className="flex items-center space-x-2 text-gray-700 hover:text-green-600"
+                onClick={() => navigate('/change-password')}>
+                <FaUnlock />
+                <span>Change password</span>
               </button>
             </div>
             <div className="bg-gray rounded shadow p-4 flex flex-col space-y-4">
@@ -133,14 +150,14 @@ function ProfilePage() {
             </div>
           </div>
 
-          {/* คอลัมน์ขวา (Profile info) */}
+          {/* Profile info */}
           <div className="flex-1 mb-8 bg-white rounded shadow p-4 relative">
             
             {/* Cover */}
             
             <div className="relative w-full h-48 bg-gray-300 overflow-hidden rounded-md">
               <img
-                src={coverImage}
+                src={coverUrl}
                 alt="Cover"
                 className="object-cover w-full h-full"
               />
@@ -148,25 +165,44 @@ function ProfilePage() {
 
             {/* Avatar */}
             <div className="flex items-center space-x-6 px-4 mt-[-20px] relative z-10"> 
+              
               {avatar ? (
-                <div className="w-32 h-32 bg-gray-200 overflow-hidden rounded-full border-4 border-white">
+                <div className="w-32 h-32 bg-gray-200 overflow-hidden rounded-full border- border-white">
                   <img
-                    src={user.avatar}
+                    src={avatarUrl}
                     alt="avatar"
                     className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
-                <FaUserCircle className="text-gray-400 text-[110px] border-4 border-white rounded-full" />
+                <FaUserCircle className="text-gray-400 text-[110px] border-10 border-white rounded-full" />
               )}
 
-              <div className="mt-8">
-                <h2 className="text-2xl font-bold text-gray-700">
-                  {user.username || "No Name"}
-                </h2>
+              <div className="mt-8 flex flex-col">
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-2xl font-bold text-gray-700">
+                    {user.username || "No Name"}
+                  </h2>
+                  {/* แสดงไอคอน social ถ้ามีลิงก์ */}
+                  {user.twitter && (
+                    <a href={user.twitter} target="_blank" rel="noopener noreferrer">
+                      <FaTwitter className="text-blue-500" />
+                    </a>
+                  )}
+                  {user.facebook && (
+                    <a href={user.facebook} target="_blank" rel="noopener noreferrer">
+                      <FaFacebook className="text-blue-700" />
+                    </a>
+                  )}
+                  {user.instagram && (
+                    <a href={user.instagram} target="_blank" rel="noopener noreferrer">
+                      <FaInstagram className="text-pink-500" />
+                    </a>
+                  )}
+                </div>
                 <p className="text-gray-500">{user.email}</p>
                 <p className="text-sm text-gray-400">
-                {user.city || "Unknown City"}, {user.country || "Unknown Country"}
+                  {user.city || "Unknown City"}, {user.country || "Unknown Country"}
                 </p>
               </div>
             </div>
@@ -196,19 +232,6 @@ function ProfilePage() {
               <div className="flex items-center justify-between py-2">
                 <div className="text-gray-600 font-semibold">Language</div>
                 <div className="text-gray-700">{user.language}</div>
-              </div>
-              <hr />
-              <div className="flex items-center justify-between py-2">
-                <div className="text-gray-600 font-semibold">Password</div>
-                <div className="text-gray-700 flex items-center space-x-2">
-                  <span>{showPassword ? user.password : "********"}</span>
-                  <button
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-400 hover:text-green-600 transition-colors"
-                  >
-                    {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
-                  </button>
-                </div>
               </div>
               <hr />
               <div className="flex items-center justify-between py-2">

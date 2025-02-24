@@ -8,12 +8,10 @@ import "./animations.css";
 const AuthPage = () => {
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // state สำหรับ Sign In
+  // sign in
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [showSignInPassword, setShowSignInPassword] = useState(false);
-
-  // state สำหรับ Sign Up
   const [signUpName, setSignUpName] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
@@ -101,11 +99,10 @@ const AuthPage = () => {
       const data = await res.json();
 
       if (res.ok) {
-        // Store user data including password
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify({
           ...data.user,
-          password: signInPassword // Add password to stored user data
+          password: signInPassword 
         }));
         navigate("/");
       } else {
@@ -180,7 +177,7 @@ const AuthPage = () => {
               onChange={(e) => setSignInEmail(e.target.value)}
             />
 
-            {/* Sign In Password + toggle visibility */}
+            {/* Sign In Password */}
             <div className="relative w-full mb-4">
               <input
                 type={showSignInPassword ? "text" : "password"}
@@ -253,7 +250,7 @@ const AuthPage = () => {
               onChange={(e) => setSignUpEmail(e.target.value)}
             />
 
-            {/* Sign Up Password + toggle */}
+            {/* Sign Up Password */}
             <div className="relative w-full mb-2">
               <input
                 type={showSignUpPassword ? "text" : "password"}
@@ -290,7 +287,7 @@ const AuthPage = () => {
             )}
           </div>
 
-          {/* Sliding Overlay (เขียว) */}
+          {/* Sliding Overlay */}
           <div className={`
             absolute w-1/2 h-full right-0 bg-green-600 text-white flex items-center justify-center
             transition-all duration-700 ease-in-out

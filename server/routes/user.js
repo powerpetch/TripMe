@@ -46,8 +46,8 @@ const upload = multer({
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
-      .select('-password') // ไม่ดึง password
-      .lean(); // แปลงเป็น plain object เร็วกว่า
+      .select('-password') // ไม่ดึง password (ดึงมันอันตราย)
+      .lean(); // แปลงเป็น plain object
     
     if (!user) {
       return res.status(404).json({ 
@@ -107,11 +107,11 @@ router.put("/update",
         }
       });
 
-      // อัพเดท password ถ้ามี
-      if (req.body.password) {
-        const hashedPass = await bcrypt.hash(req.body.password, 10);
-        user.password = hashedPass;
-      }
+      // // อัพเดท password
+      // if (req.body.password) {
+      //   const hashedPass = await bcrypt.hash(req.body.password, 10);
+      //   user.password = hashedPass;
+      // }
 
       // จัดการไฟล์เก่าและอัพเดทพาธใหม่
       if (req.files?.avatar) {
@@ -165,5 +165,52 @@ router.put("/update",
     }
   }
 );
+
+router.put("/change-password", authMiddleware, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide oldPassword and newPassword"
+      });
+    }
+
+    // 1. Find the user from userId (at authMiddleware)
+    const user = await User.findById(req.userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // 2. Compare oldPassword with the hashed password in DB
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is incorrect"
+      });
+    }
+
+    // 3. Hash the newPassword and save
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: "Password changed successfully"
+    });
+  } catch (err) {
+    console.error("Change Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+  }
+});
+
 
 module.exports = router;
