@@ -4,6 +4,8 @@ import Select from "react-select";
 import { useNavigate } from 'react-router-dom';
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import logoGreen from '../../images/new-logo-green.png';
+import Header from "../homepage/header/header";
+import MenuBar from "../homepage/menubar";
 
 const CurrencyExchange = () => {
   const [currencies, setCurrencies] = useState([]);
@@ -52,49 +54,9 @@ const CurrencyExchange = () => {
   };
 
   return (
-    <div className="mt-20 min-h-screen flex flex-col bg-green-800">
+    <div className="mt-10 min-h-screen flex flex-col bg-green-800">
       {/* Desktop Header */}
-      <div className="hidden md:block w-full bg-white shadow-md fixed top-0 left-0 z-50">
-        <div className="container mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logoGreen} alt="Logo" className="h-12" />
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/")}>Home</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/translator")}>Translator</button>
-              <button className="text-green-600 font-bold" onClick={() => navigate("/currency")}>Currency</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/map")}>Map</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-              {/* <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/contact")}>Contact</button> */}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Header */}
-      <div className="md:hidden w-full bg-white shadow-md fixed top-0 left-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <img src={logoGreen} alt="Logo" className="h-10" />
-          </div>
-          <button onClick={toggleMenu} className="text-gray-700">
-            {menuOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
-          </button>
-        </div>
-        
-        {menuOpen && (
-          <div className="fixed top-20 left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-4 md:hidden">
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/")}>Home</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/translator")}>Translator</button>
-            <button className="block text-green-600 font-bold w-full text-left px-3 py-2 rounded-md bg-gray-100" onClick={() => navigate("/currency")}>Currency</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/map")}>Map</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-            {/* <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/contact")}>Contact</button> */}
-            <button className="text-white bg-green-500 p-2 rounded-md" onClick={() => navigate("/sign-in")}>Sign In</button>
-          </div>
-        )}
-      </div>
+      <Header />
 
       {/* Main Content */}
       <div className="flex-1 pt-60 p-4">
@@ -175,6 +137,9 @@ const CurrencyExchange = () => {
           </div>
         </div>
       </div>
+
+      {/* Menu mobile */}
+      <MenuBar/>
     </div>
   );
 };

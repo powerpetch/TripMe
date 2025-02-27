@@ -109,10 +109,10 @@ function ProfilePage() {
                 <FaUserAlt />
                 <span>Profile</span>
               </button>
-              <button className="flex items-center space-x-2 text-gray-700 hover:text-green-600">
+              {/* <button className="flex items-center space-x-2 text-gray-700 hover:text-green-600">
                 <FaUsers />
                 <span>Friends</span>
-              </button>
+              </button> */}
               <button
                 className="flex items-center space-x-2 text-gray-700 hover:text-green-600"
                 onClick={() => navigate('/edit-profile')}>

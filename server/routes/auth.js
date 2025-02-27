@@ -1,6 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");      // for random token
+const nodemailer = require("nodemailer"); // for sending email
+
 const User = require("../models/User");
 
 const router = express.Router();
@@ -14,7 +17,7 @@ const generateToken = (userId) => {
   );
 };
 
-// Signup route
+// -------------------- SIGNUP --------------------
 router.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -67,7 +70,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// Signin route
+// -------------------- SIGNIN --------------------
 router.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -121,7 +124,8 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-// Verify token route
+
+// -------------------- VERIFY TOKEN  --------------------
 router.get("/verify", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
@@ -157,6 +161,121 @@ router.get("/verify", async (req, res) => {
     return res.status(401).json({
       success: false,
       message: "Invalid token"
+    });
+  }
+});
+
+// -------------------- FORGOT PASSWORD --------------------
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email is required" 
+      });
+    }
+
+    // หา user จาก email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "No user with that email" 
+      });
+    }
+
+    // create token with 20 random bytes
+    const token = crypto.randomBytes(20).toString("hex");
+
+    // set token expires 15 minutes
+    const expires = Date.now() + 15 * 60 * 1000;
+
+    // save token and expires to user
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = expires;
+    await user.save();
+
+    // create reset link
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    const mailOptions = {
+      to: user.email,
+      from: "no-reply@yourapp.com",
+      subject: "Password Reset",
+      text: `
+        You requested a password reset.
+        Please click this link to reset your password (valid 15 minutes):
+        ${resetLink}
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.json({
+      success: true,
+      message: "Reset link sent to your email"
+    });
+  } catch (err) {
+    console.error("Forgot Password Error:", err);
+    return res.status(500).json({ 
+      success: false,
+      message: "Server Error" 
+    });
+  }
+});
+
+// -------------------- RESET PASSWORD --------------------
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Token and newPassword are required"
+      });
+    }
+
+    // find user with token and not expired
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired token"
+      });
+    }
+
+    // update password
+    const hashedPass = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPass;
+
+    // clear token and expires
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    return res.json({
+      success: true,
+      message: "Password has been reset successfully"
+    });
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error"
     });
   }
 });

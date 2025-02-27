@@ -40,7 +40,16 @@ function ChangePasswordPage() {
         const data = await res.json();
 
         if (res.ok && data.user) {
-          setUser(data.user);
+          // Transform avatar URL if it exists
+          const userWithFullAvatar = {
+            ...data.user,
+            avatar: data.user.avatar 
+              ? data.user.avatar.startsWith('http') 
+                ? data.user.avatar 
+                : `http://localhost:5000${data.user.avatar}`
+              : null
+          };
+          setUser(userWithFullAvatar);
         } else {
           throw new Error(data.message || "Could not fetch user");
         }

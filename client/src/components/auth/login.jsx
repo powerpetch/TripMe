@@ -21,10 +21,10 @@ const AuthPage = () => {
   const [isEmailError, setIsEmailError] = useState(false);
   const [isPasswordError, setIsPasswordError] = useState(false);
   const [isNameError, setIsNameError] = useState(false);
+  const [signUpError, setSignUpError] = useState("");
 
   const navigate = useNavigate();
 
-  const [signUpError, setSignUpError] = useState("");
 
   const handleSignUp = async () => {
     setIsNameError(false);
@@ -69,7 +69,7 @@ const AuthPage = () => {
       } else {
         setIsEmailError(true);
         setIsPasswordError(true);
-        setSignUpError("This email is already registered.");
+        setSignUpError("This username or email is already registered.");
         setTimeout(() => {
           setIsEmailError(false);
           setIsPasswordError(false);
@@ -100,10 +100,20 @@ const AuthPage = () => {
 
       if (res.ok) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify({
-          ...data.user,
-          password: signInPassword 
-        }));
+        localStorage.setItem("user", JSON.stringify({ ...data.user }));
+
+        // เก็บเวลา loginTime (timestamp ปัจจุบัน)
+        localStorage.setItem("loginTime", Date.now().toString());
+
+        // const timeLeft = data.expiresIn * 1000;
+        // setTimeout(() => {
+        //   localStorage.removeItem("token");
+        //   localStorage.removeItem("user");
+        //   localStorage.removeItem("expiresIn");
+        //   localStorage.removeItem("loginTime");
+        //   navigate("/login");
+        // }, timeLeft);
+
         navigate("/");
       } else {
         setIsEmailError(true);
@@ -196,7 +206,10 @@ const AuthPage = () => {
               </button>
             </div>
 
-            <p className="text-gray-600 mb-6 cursor-pointer hover:text-green-600 transition-colors">
+            <p 
+              onClick={() => navigate("/forgot-password")} 
+              className="text-gray-600 mb-6 cursor-pointer hover:text-green-600 transition-colors"
+            >
               Forgot your password?
             </p>
 

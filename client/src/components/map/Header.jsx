@@ -28,22 +28,43 @@ function Header({ onSearchLocation }) {
   };
 
   return (
-    <header className="bg-white shadow py-2 px-4 flex items-center justify-between sticky top-0 z-10">
+    <header
+      className="
+        bg-white shadow py-2 px-4
+        flex flex-col md:flex-row
+        items-center justify-between
+        sticky top-0 z-10
+        space-y-2 md:space-y-0
+      "
+    >
       {/* Logo */}
-      <div className="flex items-center cursor-pointer" onClick={() => navigate('/')}>
+      <div
+        className="flex items-center cursor-pointer"
+        onClick={() => navigate('/')}
+      >
         <img src={logoGreen} alt="Logo" className="h-8 w-auto" />
       </div>
 
       {/* Search Bar */}
-      <form onSubmit={handleSubmit} className="relative w-full max-w-sm ml-4">
-        <div className="
-          flex items-center bg-gray-100
-          border border-transparent
-          focus-within:border-green-500
-          rounded-full px-2 py-1
-          transition-colors
-        " style={{ minWidth: '200px' }}>
-          {/* ไอคอน Search ด้านซ้าย */}
+      <form
+        onSubmit={handleSubmit}
+        className="
+          relative
+          w-full md:max-w-sm
+          md:ml-4
+        "
+      >
+        <div
+          className="
+            flex items-center
+            bg-gray-100
+            border border-transparent
+            focus-within:border-green-500
+            rounded-full px-2 py-1
+            transition-colors
+          "
+        >
+          {/* Search icon */}
           <FaSearch className="text-gray-500 mr-2" />
 
           <div className="flex-1">

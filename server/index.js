@@ -6,7 +6,6 @@ const mongoose = require("mongoose");
 
 // routes
 const authRoutes = require("./routes/auth");
-const tripsRoutes = require("./routes/trips");
 const userRoutes = require("./routes/user");
 
 const app = express();
@@ -20,7 +19,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // use routes
 app.use("/api/auth", authRoutes);
-app.use("/api/trips", tripsRoutes);
 app.use("/api/user", userRoutes);
 
 
@@ -67,6 +65,6 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
     success: false, 
-    message: 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์' 
+    message: 'Server Error' 
   });
 });

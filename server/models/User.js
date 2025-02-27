@@ -64,10 +64,10 @@ const userSchema = new mongoose.Schema({
 
   // Pic
   avatar: {
-    type: String // เก็บ path ของไฟล์
+    type: String // store path of file
   },
   cover: {
-    type: String // เก็บ path ของไฟล์
+    type: String // store path of file
   },
 
   country: {
@@ -87,12 +87,20 @@ const userSchema = new mongoose.Schema({
   updatedAt: { 
     type: Date, 
     default: Date.now 
-  }
+  },
+    // Reset password
+  resetPasswordToken: {
+    type: String
+  },
+  resetPasswordExpires: {
+    type: Date
+  },
+  
 }, {
   timestamps: true // for createdAt and updatedAt automatically
 });
 
-// อัพเดท updatedAt เมื่อมีการแก้ไขข้อมูล
+// update updatedAt when save user
 userSchema.pre('save', function(next) {
   this.updatedAt = new Date();
   next();
