@@ -26,6 +26,7 @@ import MapPage from './components/map/MapPage';
 
 // Trip
 import TripDetail from './components/trip/TripDetail';
+import CreateTrip from './components/tripDetail/CreateTrip'
 
 // เพจใหม่
 import TripTogetherPage from './components/trip/TripTogetherPage'; // <-- สร้างไฟล์ไว้ตามตัวอย่างด้านบน
@@ -68,6 +69,9 @@ function App() {
         <Route path="/currency" element={<Currency />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/login" element={<AuthPage />} />
+        <Route path="/create" element={<CreateTrip />} />
+
+
 
         <Route path="/Trip-tgt" element={<TripTogetherPage />} />
 

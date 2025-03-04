@@ -14,11 +14,12 @@ const app = express();
 
 // middleware
 app.use(express.json()); // to use req.body
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // using tripdetailRoutes
-app.use("/api/trips", tripDetailRoutes)
+app.use("/api", tripDetailRoutes)
 
 
 // use routes
@@ -28,11 +29,11 @@ app.use("/api/user", userRoutes);
 
 // my test to check server running
 app.get("/",(req,res) => {
-  res.send("server is ready")
+  res.send("server is rcceady")
 });
 
 
-//TODO: need a static port 
+//TODO: need a static port o
 function startServer() {
   const PORT = process.env.PORT || 5000;
   
@@ -45,10 +46,10 @@ function startServer() {
     } else {
       console.error('Server error:', err);
     }
-    connectdb();
+   
   });
 
-  // unhandled rejections                     
+  // unhandled rejections                     // oonema na
   process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
     server.close(() => process.exit(1));
@@ -62,7 +63,8 @@ function startServer() {
 }
 
 //starting server
-startServer()
+startServer();
+connectdb();
 
 // connect to MongoDB
 // const DB_URI = process.env.MONGO_URI;
