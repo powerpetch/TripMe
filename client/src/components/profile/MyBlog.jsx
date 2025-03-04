@@ -58,7 +58,7 @@ function MyBlog() {
     },
   ]);
 
-  // ดึง profile user
+  // profile user
   useEffect(() => {
     const fetchUserProfile = async () => {
       const token = localStorage.getItem("token");
@@ -102,7 +102,7 @@ function MyBlog() {
     );
   }
 
-  // Helper สำหรับ render card
+  // render card
   const renderBlogCards = (blogs) => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
@@ -144,7 +144,7 @@ function MyBlog() {
     );
   };
 
-  // สร้าง avatar url (ถ้ามี)
+  // avatar url 
   const avatarUrl = user.avatar
     ? user.avatar.startsWith("http")
       ? user.avatar
@@ -208,7 +208,7 @@ function MyBlog() {
               {user.username || "Unnamed"}
             </h2>
 
-            {/* แสดง location + social */}
+            {/* location + social */}
             <div className="text-sm text-gray-500">
               <p>
                 {user.city || "Unknown City"},{" "}
@@ -296,7 +296,7 @@ function MyBlog() {
           </button>
         </div>
 
-        {/* Show Cards by Tab */}
+        {/* Show Cards */}
         {activeTab === "created"
           ? renderBlogCards(createdBlogs)
           : renderBlogCards(likedBlogs)}
