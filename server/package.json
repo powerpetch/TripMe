@@ -16,7 +16,7 @@
         "framer-motion": "^11.18.2",
         "jquery": "^3.7.1",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.10.1",
+        "mongoose": "^8.11.0",
         "multer": "^1.4.5-lts.1",
         "nodemailer": "^6.10.0",
         "react": "^19.0.0",
@@ -45,7 +45,6 @@
         "eject": "react-scripts eject",
         "start-legacy": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts start"
     },
-    
     "eslintConfig": {
         "extends": [
             "react-app",

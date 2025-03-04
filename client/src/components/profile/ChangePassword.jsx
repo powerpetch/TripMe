@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
 
-
 function ChangePasswordPage() {
   const navigate = useNavigate();
 
@@ -40,7 +39,6 @@ function ChangePasswordPage() {
         const data = await res.json();
 
         if (res.ok && data.user) {
-          // Transform avatar URL if it exists
           const userWithFullAvatar = {
             ...data.user,
             avatar: data.user.avatar 
@@ -101,7 +99,6 @@ function ChangePasswordPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // alert("Password changed successfully!"); // this line i comment to just for testing
         navigate("/profile");
       } else {
         setError(data.message || "Change password failed.");
@@ -135,7 +132,10 @@ function ChangePasswordPage() {
       {/* Header */}
       <header className="h-16 bg-white shadow px-4 flex items-center justify-between fixed w-full top-0 left-0 z-50">
         {/* Logo + Brand */}
-        <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+        <div
+          className="flex items-center cursor-pointer"
+          onClick={() => navigate("/")}
+        >
           <img src={logoGreen} alt="Logo" className="h-8 w-auto" />
         </div>
 
@@ -165,7 +165,9 @@ function ChangePasswordPage() {
             My Profile
           </span>
           <span className="text-2xl text-gray-400">{">"}</span>
-          <span className="text-2xl font-bold text-gray-700">Change password</span>
+          <span className="text-2xl font-bold text-gray-700">
+            Change password
+          </span>
         </div>
 
         {/* Form Container */}
@@ -188,7 +190,6 @@ function ChangePasswordPage() {
                   value={oldPassword}
                   onChange={(e) => setOldPassword(e.target.value)}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-300"
-                  placeholder=""
                   required
                 />
                 <button
@@ -212,7 +213,6 @@ function ChangePasswordPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-300"
-                  placeholder=""
                   required
                   minLength={8}
                 />
@@ -240,7 +240,6 @@ function ChangePasswordPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-300"
-                  placeholder=""
                   required
                 />
                 <button

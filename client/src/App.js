@@ -28,6 +28,7 @@ import MapPage from './components/map/MapPage';
 import ProfilePage from './components/profile/ProfilePage';
 import EditProfilePage from './components/profile/EditProfilePage';
 import ChangePasswordPage from './components/profile/ChangePassword';
+import MyBlog from './components/profile/MyBlog';
 
 // auth
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
@@ -45,6 +46,7 @@ const HomePage = () => {
       <About />
       <VideoSection />
       <Blog />
+      <TravelSection />
       <Testimonial />
       <Tips />
       <Footer />
@@ -74,6 +76,8 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
+
+        <Route path="/my-blog" element={<MyBlog />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
