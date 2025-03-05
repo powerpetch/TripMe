@@ -15,6 +15,7 @@ import logoGreen from '../../images/new-logo-green.png';
 const CreateMyTrip = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   // Form state
   const [country, setCountry] = useState('');
@@ -136,14 +137,9 @@ const CreateMyTrip = () => {
         public_id: null
       }));
       setPhotos([...photos, ...newPhotos]);
-      // newPhotos.forEach(uploadPhoto);
     }
   });
-// //upload photo
-//   const uploadPhoto = async (photo) => {
-//     const formData = new FormData();
-//     formData.append('image', photo.file);
-//   };
+
 
   const removePhoto = (id) => {
     const photoToRemove = photos.find(photo => photo.id === id);
@@ -175,6 +171,7 @@ const CreateMyTrip = () => {
   // Handle form submission
   const handleSubmit = async(e) => {
     e.preventDefault();
+    setLoading(true);
     // console.log({
     //   country,
     //   travelPeriod: { startDate, endDate },
@@ -201,7 +198,7 @@ const CreateMyTrip = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5001/api/create', {
+      const response = await fetch('http://localhost:5001/api/trip', {
         method: 'POST',
         body: formData,
       });
@@ -212,11 +209,13 @@ const CreateMyTrip = () => {
 
       const data = await response.json();
       console.log('Trip created:', data);
+      alert('Trip created successfully!');
     } catch (error) {
       console.error('Error:', error);
+    } finally {
+      setLoading(false); // End the loading state
     }
   };
-    // alert('Trip created successfully!');
     // Reset form or navigate to another page
 
 
@@ -314,7 +313,7 @@ const CreateMyTrip = () => {
             </button>
             <button 
               onClick={() => setActiveSection('gallery')}
-              className={`px-4 py-2 rounded-full ${activeSection === 'gallery' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'} hover:bg-gray-300`}
+              className={`px-4 py-2 rounded-full ${activeSection === 'gallery' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700  hover:bg-gray-300'}`}
             >
               Gallery
             </button>
@@ -814,10 +813,10 @@ const CreateMyTrip = () => {
                   </button>
                 ) : (
                   <button
-                    type="submit" // This button should submit the form
+                    type="submit" disabled={loading}// This button should submit the form
                     className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
                   >
-                    Save Trip
+                  {loading ? 'Creating Trip...' : 'Save Trip'}
                   </button>
                 )}
               </div>

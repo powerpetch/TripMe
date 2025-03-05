@@ -19,7 +19,7 @@ app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // using tripdetailRoutes
-app.use("/api", tripDetailRoutes)
+app.use("/api/trip", tripDetailRoutes)
 
 
 // use routes
@@ -29,7 +29,7 @@ app.use("/api/user", userRoutes);
 
 // my test to check server running
 app.get("/",(req,res) => {
-  res.send("server is rcceady")
+  res.send("server is ready")
 });
 
 
