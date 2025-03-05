@@ -263,3 +263,7 @@ h6 {
   margin: auto;
   width: 25% ;
 }
+
+.custom-datepicker {
+  caret-color: transparent;
+}

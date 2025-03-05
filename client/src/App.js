@@ -25,9 +25,13 @@ import Translator from './components/translator/translator';
 import Currency from './components/currency/currency';
 import MapPage from './components/map/MapPage';
 
+import CreateTrip from './components/tripDetail/CreateTrip'
+
+
 import ProfilePage from './components/profile/ProfilePage';
 import EditProfilePage from './components/profile/EditProfilePage';
 import ChangePasswordPage from './components/profile/ChangePassword';
+import MyBlog from './components/profile/MyBlog';
 
 // auth
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
@@ -45,10 +49,11 @@ const HomePage = () => {
       <About />
       <VideoSection />
       <Blog />
+      <TravelSection />
       <Testimonial />
       <Tips />
       <Footer />
-      <MenuBar />
+      {/* <MenuBar /> */}
     </>
   );
 };
@@ -67,6 +72,10 @@ function App() {
         <Route path="/currency" element={<Currency />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/login" element={<AuthPage />} />
+        <Route path="/create" element={<CreateTrip />} />
+
+
+
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -74,6 +83,8 @@ function App() {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
+
+        <Route path="/my-blog" element={<MyBlog />} />
         
         <Route path="*" element={<NotFound />} />
       </Routes>

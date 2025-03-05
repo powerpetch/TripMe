@@ -263,12 +263,12 @@ function Translator() {
 
 
       {/* ---------------- Mobile Bottom Navigation ---------------- */}
-      <MenuBar
+      {/* <MenuBar
         currentUser={currentUser}
         setCurrentUser={setCurrentUser}
         handleLogout={handleLogout}
         navigate={navigate}
-      />
+      /> */}
     </div>
   );
 }

@@ -13,113 +13,210 @@ const generateToken = (userId) => {
   return jwt.sign(
     { userId },
     process.env.JWT_SECRET,
-    { expiresIn: '1h' }
+    { expiresIn: '3h' }
   );
 };
 
-// -------------------- SIGNUP --------------------
+// -------------------- SIGNUP (ส่ง OTP) --------------------
 router.post("/signup", async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    
-    // Validate input
     if (!username || !email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Please fill all fields" 
+        message: "Please fill all fields",
       });
     }
 
-    // Check existing user
-    const exist = await User.findOne({ $or: [{ username }, { email }] });
+    // เช็คซ้ำ
+    const exist = await User.findOne({
+      $or: [{ username }, { email }],
+    });
     if (exist) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Username or Email already exists" 
+        message: "Username or Email already exists",
       });
     }
 
-    // Create new user
+    // สร้าง user (verifiedEmail = false)
     const hashedPass = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
+    const user = new User({
       username,
       email,
-      password: hashedPass
+      password: hashedPass,
+      verifiedEmail: false,
     });
 
-    // Generate token
-    const token = generateToken(newUser._id);
+    // สร้าง OTP 6 หลัก
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    // กำหนดวันหมดอายุ (10 นาที)
+    const otpExpires = Date.now() + 10 * 60 * 1000;
 
-    return res.status(201).json({
-      success: true,
-      message: "Sign up success",
-      token,
-      expiresIn: 3600,
-      user: {
-        _id: newUser._id,
-        username: newUser.username,
-        email: newUser.email
+    user.verifyEmailOTP = otp;
+    user.verifyEmailOTPExpires = otpExpires;
+
+    await user.save();
+
+    // ส่งอีเมล OTP
+    const transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
       }
+    });
+
+    const mailOptions = {
+      to: user.email,
+      from: "no-reply@yourapp.com",
+      subject: "Email Verification OTP",
+      text: `
+        Hello ${user.username},
+
+        Your OTP for verifying your email is: ${otp}
+        This code will expire in 10 minutes.
+
+        Thank you.
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+
+    return res.json({
+      success: true,
+      message: "OTP has been sent to your email. Please verify to complete sign-up.",
     });
   } catch (err) {
     console.error("Signup Error:", err);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: "Server Error" 
+      message: "Server Error",
     });
   }
 });
+
+// -------------------- VERIFY EMAIL OTP --------------------
+router.post("/verify-email-otp", async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and OTP are required",
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "No user found with this email",
+      });
+    }
+
+    if (user.verifiedEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "This email is already verified",
+      });
+    }
+
+    if (user.verifyEmailOTP !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+    if (Date.now() > user.verifyEmailOTPExpires) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired",
+      });
+    }
+
+    // ยืนยันสำเร็จ
+    user.verifiedEmail = true;
+    user.verifyEmailOTP = undefined;
+    user.verifyEmailOTPExpires = undefined;
+    await user.save();
+
+    // จะส่ง token กลับให้ก็ได้ หรือให้ user ไป Sign In
+    const token = generateToken(user._id);
+
+    return res.json({
+      success: true,
+      message: "Email verified successfully. You can now sign in.",
+      token,
+      expiresIn: 3600,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("VerifyEmailOTP Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Server Error",
+    });
+  }
+});
+
 
 // -------------------- SIGNIN --------------------
 router.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    // Validate input
     if (!email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Please fill all fields" 
+        message: "Please fill all fields",
       });
     }
 
-    // Find user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Invalid credentials" 
+        message: "Invalid credentials",
       });
     }
 
-    // Verify password
+    // บังคับให้ต้อง verifiedEmail ก่อน
+    if (!user.verifiedEmail) {
+      return res.status(401).json({
+        success: false,
+        message: "Please verify your email first",
+      });
+    }
+
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "Invalid credentials" 
+        message: "Invalid credentials",
       });
     }
 
-    // Generate token
     const token = generateToken(user._id);
-
     return res.status(200).json({
       success: true,
       message: "Sign in success",
       token,
-      expiresIn: 3600, // 1 hour in seconds, can add more what do u guys think?
+      expiresIn: 3600,
       user: {
         _id: user._id,
         username: user.username,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (err) {
     console.error("Signin Error:", err);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: "Server Error" 
+      message: "Server Error",
     });
   }
 });

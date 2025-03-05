@@ -2,83 +2,65 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaCamera } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
-import { FaMapMarkerAlt } from "react-icons/fa";
 import { COUNTRY_CODES, COUNTRIES, DAYS, MONTHS, YEARS, LANGUAGES } from "../../js/mockData";
-
-
 
 function EditProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
 
-  //  Cover / Avatar
   const [coverFile, setCoverFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
 
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
 
-    // สำหรับ Modal ยืนยันลิงก์ Social
+  // Modal ลิงก์ Social
   const [showSocialModal, setShowSocialModal] = useState(false);
 
-
-  // ref สำหรับ input file
+  // file refs
   const coverInputRef = useRef(null);
   const avatarInputRef = useRef(null);
 
+  // user fields
   const [username, setUsername] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [gender, setGender] = useState("N/A");
-
-  // Tel + Country code
   const [countryCode, setCountryCode] = useState("+66");
-  const [tel, setTel] = useState(""); // รับเฉพาะตัวเลข
-
-  // Language
+  const [tel, setTel] = useState("");
   const [language, setLanguage] = useState("English");
-
-  // Date of Birth
   const [dobDay, setDobDay] = useState("1");
   const [dobMonth, setDobMonth] = useState("1");
   const [dobYear, setDobYear] = useState("1990");
-
-  // Social
   const [twitter, setTwitter] = useState("");
   const [facebook, setFacebook] = useState("");
   const [instagram, setInstagram] = useState("");
-
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
 
   const baseUrl = "http://localhost:5000";
-  
-  const avatarURL = user && user.avatar 
-  ? `http://localhost:5000${user.avatar}`
-  : null;
-const coverURL = user && user.cover
-  ? `http://localhost:5000${user.cover}`
-  : null;
 
-  // โหลดข้อมูล User จาก mock
+  const avatarURL = user && user.avatar ? `${baseUrl}${user.avatar}` : null;
+  const coverURL = user && user.cover ? `${baseUrl}${user.cover}` : null;
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
 
     fetch("http://localhost:5000/api/user/profile", {
-      headers: { "Authorization": `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.user) {
           setUser(data.user);
 
-		  if (data.user.cover) {
-			setCoverPreview(`${baseUrl}${data.user.cover}`);
-		  }
-		  if (data.user.avatar) {
-			setAvatarPreview(`${baseUrl}${data.user.avatar}`);
-		  }
+          if (data.user.cover) {
+            setCoverPreview(`${baseUrl}${data.user.cover}`);
+          }
+          if (data.user.avatar) {
+            setAvatarPreview(`${baseUrl}${data.user.avatar}`);
+          }
 
           setUsername(data.user.username || "");
           setFirstName(data.user.firstName || "");
@@ -90,19 +72,14 @@ const coverURL = user && user.cover
               data.user.tel.startsWith(c.value)
             );
             if (found) {
-              // setCountryCode เป็นค่านั้น
               setCountryCode(found.value);
-              // ตัด prefix ออก
               const digits = data.user.tel.slice(found.value.length);
-              // ตัดเครื่องหมาย + ออกซ้ำ ถ้ามี
               setTel(digits.replace(/\D/g, ""));
             } else {
-              // ไม่มี match => fallback
               setCountryCode("");
               setTel(data.user.tel.replace(/\D/g, ""));
             }
           } else {
-            // ไม่มี tel
             setTel("");
             setCountryCode("");
           }
@@ -119,12 +96,11 @@ const coverURL = user && user.cover
           setTwitter(data.user.twitter || "");
           setFacebook(data.user.facebook || "");
           setInstagram(data.user.instagram || "");
-
           setCountry(data.user.country || "");
           setCity(data.user.city || "");
         }
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   }, []);
 
   const actualSave = () => {
@@ -154,26 +130,20 @@ const coverURL = user && user.cover
 
     fetch("http://localhost:5000/api/user/update", {
       method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      },
-      body: formData
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (data.success) {
-          console.log("Updated user:", data.user);
           window.location.href = "/profile";
         } else {
           console.log("Update failed:", data.message);
         }
       })
-      .catch(err => console.error(err));
+      .catch((err) => console.error(err));
   };
 
-  
-
-  // --------- Handle Cover Change ---------
   const handleCoverChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -186,7 +156,6 @@ const coverURL = user && user.cover
     reader.readAsDataURL(file);
   };
 
-  // --------- Handle Avatar Change ---------
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -199,30 +168,26 @@ const coverURL = user && user.cover
     reader.readAsDataURL(file);
   };
 
-  // --------- Tel : num only ---------
   const handleTelChange = (e) => {
     const val = e.target.value;
     const onlyDigits = val.replace(/\D/g, "");
     setTel(onlyDigits);
   };
 
-  // --------- Save ---------
   const handleSave = () => {
-    // ถ้ามีการกรอกลิงก์ social ใด ๆ ให้แสดง modal ยืนยัน
+    // ถ้ามีกรอก social link => ยืนยัน
     if (twitter || facebook || instagram) {
-      setShowSocialModal(true); // อยู่ด้านบน
+      setShowSocialModal(true);
     } else {
       actualSave();
     }
   };
 
-  // เมื่อผู้ใช้กดยืนยันใน modal
   const handleSocialModalConfirm = () => {
     setShowSocialModal(false);
     actualSave();
   };
 
-  // --------- Cancel ---------
   const handleCancel = () => {
     navigate("/profile");
   };
@@ -230,7 +195,9 @@ const coverURL = user && user.cover
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-600 text-lg">No user found. Please Sign In first.</p>
+        <p className="text-gray-600 text-lg">
+          No user found. Please Sign In first.
+        </p>
       </div>
     );
   }
@@ -271,7 +238,9 @@ const coverURL = user && user.cover
             My Profile
           </span>
           <span className="text-2xl text-gray-400">{">"}</span>
-          <span className="text-2xl font-bold text-gray-700">Edit Profile</span>
+          <span className="text-2xl font-bold text-gray-700">
+            Edit Profile
+          </span>
         </div>
 
         {/* Save/Cancel */}
@@ -295,16 +264,24 @@ const coverURL = user && user.cover
           {/* Cover */}
           <div className="relative w-full h-52 bg-gray-200 overflow-hidden rounded-lg">
             {coverPreview ? (
-              <img src={coverPreview} alt="cover preview" className="object-cover w-full h-full" />
+              <img
+                src={coverPreview}
+                alt="cover preview"
+                className="object-cover w-full h-full"
+              />
             ) : coverURL ? (
-              <img src={coverURL} alt="cover" className="object-cover w-full h-full" />
+              <img
+                src={coverURL}
+                alt="cover"
+                className="object-cover w-full h-full"
+              />
             ) : (
               <div className="text-gray-500 flex items-center justify-center h-full text-lg">
                 No Cover
               </div>
             )}
 
-            {/* ไอคอนกล้องบน cover */}
+            {/* camera icon */}
             <div
               className="absolute top-3 right-3 bg-white rounded-full p-2 cursor-pointer hover:bg-gray-100 shadow"
               onClick={() => coverInputRef.current.click()}
@@ -324,15 +301,22 @@ const coverURL = user && user.cover
           <div className="flex items-center px-4 mt-[-48px] relative z-10">
             <div className="relative w-28 h-28 rounded-full border-4 border-white overflow-hidden bg-gray-200 shadow-lg">
               {avatarPreview ? (
-                <img src={avatarPreview} alt="avatar preview" className="object-cover w-full h-full" />
+                <img
+                  src={avatarPreview}
+                  alt="avatar preview"
+                  className="object-cover w-full h-full"
+                />
               ) : avatarURL ? (
-                <img src={avatarURL} alt="avatar" className="object-cover w-full h-full" />
+                <img
+                  src={avatarURL}
+                  alt="avatar"
+                  className="object-cover w-full h-full"
+                />
               ) : (
-                <div className="absolute top-[-5px] left-[-8px]"> {/* Added positioning */}
-                <FaUserCircle className="text-gray-400 text-[120px]" /> {/* Adjusted size */}
-              </div>
+                <div className="absolute top-[-5px] left-[-8px]">
+                  <FaUserCircle className="text-gray-400 text-[120px]" />
+                </div>
               )}
-              {/* ไอคอนกล้องบน avatar */}
               <div
                 className="absolute bottom-2 right-2 bg-white rounded-full p-2 cursor-pointer hover:bg-gray-100 shadow "
                 onClick={() => avatarInputRef.current.click()}
@@ -353,12 +337,15 @@ const coverURL = user && user.cover
           </div>
         </div>
 
-        {/* ฟอร์มข้อมูล */}
+        {/* Form */}
         <div className="bg-white rounded shadow p-6">
-          <div className="grid grid-cols-2 gap-6">
+          {/* grid => responsive */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Username */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Username</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Username
+              </label>
               <input
                 type="text"
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -369,7 +356,9 @@ const coverURL = user && user.cover
 
             {/* First Name */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">First Name</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                First Name
+              </label>
               <input
                 type="text"
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -380,7 +369,9 @@ const coverURL = user && user.cover
 
             {/* Last Name */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Last Name</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Last Name
+              </label>
               <input
                 type="text"
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -391,7 +382,9 @@ const coverURL = user && user.cover
 
             {/* Gender */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Gender</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Gender
+              </label>
               <select
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
                 value={gender}
@@ -403,89 +396,88 @@ const coverURL = user && user.cover
               </select>
             </div>
 
-            {/* Tel + Country Code */}
+            {/* Tel */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Tel</label>
-              <div className="flex space-x-2">
+              <label className="block text-gray-700 mb-1 font-medium">
+                Tel
+              </label>
+              <div className="flex flex-col md:flex-row md:items-center md:space-x-2">
                 <select
-                  className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300 h-10 overflow-y-auto"
+                  className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300 mb-2 md:mb-0 md:w-40"
                   value={countryCode}
                   onChange={(e) => setCountryCode(e.target.value)}
-                  style={{ maxHeight: '200px' }}
                 >
                   {COUNTRY_CODES.map((c) => (
-                    <option 
-                      key={c.value} 
-                      value={c.value}
-                      className="py-1"
-                    >
+                    <option key={c.value} value={c.value}>
                       {c.label}
                     </option>
                   ))}
                 </select>
                 <input
                   type="text"
-                  className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
+                  className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300 w-full"
                   value={tel}
                   onChange={handleTelChange}
-                  placeholder=""
+                  placeholder="Enter phone number"
                 />
               </div>
             </div>
 
             {/* Language */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Language</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Language
+              </label>
               <select
-                className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300 h-10 overflow-y-auto"
+                className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                style={{ maxHeight: '200px' }}
               >
                 {LANGUAGES.map((lang) => (
-                  <option 
-                    key={lang.code} 
-                    value={lang.name}
-                    className="py-1"
-                  >
+                  <option key={lang.code} value={lang.name}>
                     {lang.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Date of Birth */}
+            {/* DOB */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Date of Birth</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Date of Birth
+              </label>
               <div className="flex space-x-2">
-                {/* Day */}
                 <select
                   className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
                   value={dobDay}
                   onChange={(e) => setDobDay(e.target.value)}
                 >
                   {DAYS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
                   ))}
                 </select>
-                {/* Month */}
                 <select
                   className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
                   value={dobMonth}
                   onChange={(e) => setDobMonth(e.target.value)}
                 >
                   {MONTHS.map((m) => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
                   ))}
                 </select>
-                {/* Year */}
                 <select
                   className="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
                   value={dobYear}
                   onChange={(e) => setDobYear(e.target.value)}
                 >
                   {YEARS.map((y) => (
-                    <option key={y} value={y}>{y}</option>
+                    <option key={y} value={y}>
+                      {y}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -515,20 +507,20 @@ const coverURL = user && user.cover
               <label className="block text-gray-700 mb-1 font-medium">
                 City
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  className="border w-full p-2 pl-8 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  placeholder="Enter your city"
-                />
-              </div>
+              <input
+                type="text"
+                className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Enter your city"
+              />
             </div>
 
             {/* Twitter */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Twitter</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Twitter
+              </label>
               <input
                 type="text"
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -537,9 +529,12 @@ const coverURL = user && user.cover
                 placeholder="https://twitter.com/username"
               />
             </div>
+
             {/* Facebook */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Facebook</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Facebook
+              </label>
               <input
                 type="text"
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -548,9 +543,12 @@ const coverURL = user && user.cover
                 placeholder="https://facebook.com/username"
               />
             </div>
+
             {/* Instagram */}
             <div>
-              <label className="block text-gray-700 mb-1 font-medium">Instagram</label>
+              <label className="block text-gray-700 mb-1 font-medium">
+                Instagram
+              </label>
               <input
                 type="text"
                 className="border w-full p-2 rounded focus:outline-none focus:ring-2 focus:ring-green-300"
@@ -559,35 +557,36 @@ const coverURL = user && user.cover
                 placeholder="https://instagram.com/username"
               />
             </div>
-
-        	{/* สำหรับยืนยันลิงก์ social */}
-			{showSocialModal && (
-			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-				<div className="bg-white p-6 rounded shadow-md max-w-sm mx-auto">
-					<h3 className="text-lg font-bold mb-2">Please Accept the Terms</h3>
-					<p className="mb-4">
-					Please verify that the links you provided are your own and the information is correct.
-					</p>
-					<div className="flex justify-end">
-						<button
-						onClick={() => setShowSocialModal(false)}
-						className="mr-2 px-4 py-2 border rounded hover:bg-gray-100"
-						>
-						Cancel
-						</button>
-						<button
-						onClick={handleSocialModalConfirm}
-						className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-						>
-						Accept
-						</button>
-					</div>
-				</div>
-			</div>
-			)}
           </div>
         </div>
       </div>
+
+      {/* Modal สำหรับลิงก์ social */}
+      {showSocialModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded shadow-md max-w-sm mx-auto">
+            <h3 className="text-lg font-bold mb-2">Please Accept the Terms</h3>
+            <p className="mb-4">
+              Please verify that the links you provided are your own and the
+              information is correct.
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowSocialModal(false)}
+                className="mr-2 px-4 py-2 border rounded hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSocialModalConfirm}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

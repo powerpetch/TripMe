@@ -6,53 +6,44 @@ import "./background.css";
 import "./animations.css";
 
 const AuthPage = () => {
+  const navigate = useNavigate();
+
   const [isSignUp, setIsSignUp] = useState(false);
 
-  // sign in
+  // Sign In
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
   const [showSignInPassword, setShowSignInPassword] = useState(false);
+
+  // Sign Up
   const [signUpName, setSignUpName] = useState("");
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
-  // const [setError] = useState("");
 
+  // Errors
   const [isEmailError, setIsEmailError] = useState(false);
   const [isPasswordError, setIsPasswordError] = useState(false);
-  const [isNameError, setIsNameError] = useState(false);
   const [signUpError, setSignUpError] = useState("");
 
-  const navigate = useNavigate();
+  // OTP steps
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
 
-
-  const handleSignUp = async () => {
-    setIsNameError(false);
+  // -------------- Request OTP --------------
+  const handleRequestOtp = async () => {
     setIsEmailError(false);
-    setIsPasswordError(false);
     setSignUpError("");
 
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(signUpEmail)) {
-      setIsEmailError(true);
-      setTimeout(() => setIsEmailError(false), 500);
+    // เบื้องต้น เช็คอีเมล + password + name
+    if (!signUpEmail || signUpName.length < 3 || signUpPassword.length < 8) {
+      setSignUpError("Please fill all fields correctly before requesting OTP.");
       return;
     }
-  
-    // Validate password
-    if (signUpPassword.length < 8 || signUpPassword.includes(' ')) {
-      setIsPasswordError(true);
-      setTimeout(() => setIsPasswordError(false), 500);
-      return;
-    }
-  
-    // Validate username
-    if (signUpName.length < 3) {
-      setIsEmailError(true);
-      setTimeout(() => setIsEmailError(false), 500);
-      return;
-    }
+
     try {
+      // ใช้ /signup ในการสร้าง user + ส่ง OTP
       const res = await fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,29 +54,60 @@ const AuthPage = () => {
         })
       });
       const data = await res.json();
-      if (res.ok) {
-        console.log("New user:", data.user);
-        setIsSignUp(false);
+      if (res.ok && data.success) {
+        setIsOtpSent(true);
+        setSignUpError("");
+        // alert("OTP has been sent. Please check your email.");
       } else {
-        setIsEmailError(true);
-        setIsPasswordError(true);
-        setSignUpError("This username or email is already registered.");
-        setTimeout(() => {
-          setIsEmailError(false);
-          setIsPasswordError(false);
-      }, 500);
+        setSignUpError(data.message || "Failed to request OTP");
       }
     } catch (err) {
       console.error(err);
-      setIsEmailError(true);
-      setIsPasswordError(true);
-      setTimeout(() => {
-        setIsEmailError(false);
-        setIsPasswordError(false);
-      }, 500);
+      setSignUpError("Server error requesting OTP");
     }
   };
 
+  // -------------- Verify OTP --------------
+  const handleVerifyOtp = async () => {
+    if (!signUpEmail || !otp) {
+      setSignUpError("Please input your Email and OTP");
+      return;
+    }
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/verify-email-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: signUpEmail, otp })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // สำเร็จ => OTP ถูกต้อง => verifiedEmail = true
+        setIsOtpVerified(true);
+        // alert("Email verified. Now you can sign in or use your account");
+      } else {
+        setSignUpError(data.message || "Invalid OTP");
+      }
+    } catch (err) {
+      console.error(err);
+      setSignUpError("Error verifying OTP");
+    }
+  };
+
+  // -------------- Sign Up (final) --------------
+  // ในที่นี้ ถ้า OTP ยังไม่ verify => ไม่ให้ sign up
+  // แต่จริงๆ user ถูกสร้างใน DB แล้ว => signUp = "finish"
+  // (หรือจะไม่ต้องมีปุ่มนี้ก็ได้ ถ้า verify OTP = sign up สำเร็จ)
+  const handleSignUpFinal = () => {
+    if (!isOtpVerified) {
+      setSignUpError("Please verify OTP first.");
+      return;
+    }
+    // ถ้า otpVerified = true => แปลว่า user ใช้อีเมล + pass + OTP สำเร็จ => เข้า sign in ได้เลย
+    // alert("Your email is verified. You can now Sign In.");
+    setIsSignUp(false); // กลับไปหน้า sign in
+  };
+
+  // -------------- Sign In --------------
   const handleSignIn = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/auth/signin", {
@@ -98,41 +120,22 @@ const AuthPage = () => {
       });
       const data = await res.json();
 
-      if (res.ok) {
+      if (res.ok && data.success) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify({ ...data.user }));
-
-        // เก็บเวลา loginTime (timestamp ปัจจุบัน)
+        localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("loginTime", Date.now().toString());
-
-        // const timeLeft = data.expiresIn * 1000;
-        // setTimeout(() => {
-        //   localStorage.removeItem("token");
-        //   localStorage.removeItem("user");
-        //   localStorage.removeItem("expiresIn");
-        //   localStorage.removeItem("loginTime");
-        //   navigate("/login");
-        // }, timeLeft);
-
         navigate("/");
       } else {
         setIsEmailError(true);
         setIsPasswordError(true);
-        setTimeout(() => {
-          setIsEmailError(false);
-          setIsPasswordError(false);
-        }, 500);
+        // alert(data.message || "Sign In Error");
       }
-      } catch (err) {
-        console.error(err);
-        setIsEmailError(true);
-        setIsPasswordError(true);
-        setTimeout(() => {
-          setIsEmailError(false);
-          setIsPasswordError(false);
-        }, 500);
-      }
-    };
+    } catch (err) {
+      console.error(err);
+      setIsEmailError(true);
+      setIsPasswordError(true);
+    }
+  };
 
   return (
     <div className="area">
@@ -147,10 +150,10 @@ const AuthPage = () => {
           {/* ปุ่มปิด */}
           <button
             onClick={() => navigate("/")}
-            className={`absolute top-4 left-4 z-30 transition-colors duration-300
-            ${isSignUp 
-              ? "text-white hover:text-green-200" 
-              : "text-green-600 hover:text-green-800"}`}
+            className={`
+              absolute top-4 left-4 z-30 transition-colors duration-300
+              ${isSignUp ? "text-white hover:text-green-200" : "text-green-600 hover:text-green-800"}
+            `}
           >
             <FaTimes size={24} />
           </button>
@@ -162,38 +165,25 @@ const AuthPage = () => {
             ${isSignUp ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"}
           `}>
             <h2 className="text-3xl font-bold text-green-600 mb-6">Welcome Back</h2>
-
-            <div className="flex gap-4 mb-6">
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-100 hover:border-green-500 transition-colors">
-                <FaFacebook className="text-green-600 text-xl" />
-              </button>
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-100 hover:border-green-500 transition-colors">
-                <FaGoogle className="text-green-600 text-xl" />
-              </button>
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-100 hover:border-green-500 transition-colors">
-                <FaLinkedin className="text-green-600 text-xl" />
-              </button>
-            </div>
-
-            <p className="text-gray-600 mb-6">or use your email account:</p>
-
-            {/* Sign In Email */}
             <input
               type="email"
               placeholder="Email"
-              className={`w-full p-3 mb-4 border-2 rounded-lg focus:outline-none transition-colors
-                ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}`}
+              className={`
+                w-full p-3 mb-4 border-2 rounded-lg focus:outline-none transition-colors
+                ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
+              `}
               value={signInEmail}
               onChange={(e) => setSignInEmail(e.target.value)}
             />
 
-            {/* Sign In Password */}
             <div className="relative w-full mb-4">
               <input
                 type={showSignInPassword ? "text" : "password"}
                 placeholder="Password"
-                className={`w-full p-3 pl-10 pr-10 border-2 rounded-lg focus:outline-none transition-colors
-                  ${isPasswordError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}`}
+                className={`
+                  w-full p-3 pl-10 pr-10 border-2 rounded-lg focus:outline-none transition-colors
+                  ${isPasswordError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
+                `}
                 value={signInPassword}
                 onChange={(e) => setSignInPassword(e.target.value)}
               />
@@ -206,14 +196,13 @@ const AuthPage = () => {
               </button>
             </div>
 
-            <p 
-              onClick={() => navigate("/forgot-password")} 
+            <p
+              onClick={() => navigate("/forgot-password")}
               className="text-gray-600 mb-6 cursor-pointer hover:text-green-600 transition-colors"
             >
               Forgot your password?
             </p>
 
-            {/* ปุ่ม Sign In */}
             <button
               onClick={handleSignIn}
               className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
@@ -229,47 +218,67 @@ const AuthPage = () => {
             ${isSignUp ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
           `}>
             <h2 className="text-3xl font-bold text-green-600 mb-6">Create Account</h2>
-
-            <div className="flex gap-4 mb-4">
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-100 hover:border-green-500 transition-colors">
-                <FaFacebook className="text-green-600 text-xl" />
-              </button>
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-100 hover:border-green-500 transition-colors">
-                <FaGoogle className="text-green-600 text-xl" />
-              </button>
-              <button className="flex items-center justify-center w-12 h-12 rounded-full border-2 border-green-100 hover:border-green-500 transition-colors">
-                <FaLinkedin className="text-green-600 text-xl" />
-              </button>
-            </div>
-
-            <p className="text-gray-600 mb-6">or use your email for registration:</p>
-
-            {/* Sign Up Name */}
+            
+            {/* Name */}
             <input
               type="text"
               placeholder="Name"
-              className={`w-full p-3 mb-3 border-2 rounded-lg focus:outline-none transition-colors
-                ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}`}
+              className={`
+                w-full p-3 mb-3 border-2 rounded-lg focus:outline-none transition-colors
+                ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
+              `}
               value={signUpName}
               onChange={(e) => setSignUpName(e.target.value)}
             />
-            {/* Sign Up Email */}
-            <input
-              type="email"
-              placeholder="Email"
-              className={`w-full p-3 mb-3 border-2 rounded-lg focus:outline-none transition-colors
-                ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}`}
-              value={signUpEmail}
-              onChange={(e) => setSignUpEmail(e.target.value)}
-            />
 
-            {/* Sign Up Password */}
+            {/* Email + Button Get OTP */}
+            <div className="flex items-center space-x-2 mb-3">
+              <input
+                type="email"
+                placeholder="Email"
+                className={`
+                  flex-1 p-3 border-2 rounded-lg focus:outline-none transition-colors
+                  ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
+                `}
+                value={signUpEmail}
+                onChange={(e) => setSignUpEmail(e.target.value)}
+              />
+              <button
+                onClick={handleRequestOtp}
+                className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Get OTP
+              </button>
+            </div>
+
+            {/* ถ้า OTP ถูกส่งแล้ว => โชว์ช่องกรอก OTP */}
+            {isOtpSent && (
+              <div className="flex items-center space-x-2 mb-3">
+                <input
+                  type="text"
+                  placeholder="OTP"
+                  className="p-3 border-2 rounded-lg flex-1"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                />
+                <button
+                  onClick={handleVerifyOtp}
+                  className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                >
+                  Verify
+                </button>
+              </div>
+            )}
+
+            {/* Password */}
             <div className="relative w-full mb-2">
               <input
                 type={showSignUpPassword ? "text" : "password"}
                 placeholder="Password"
-                className={`w-full p-3 border-2 rounded-lg focus:outline-none transition-colors
-                  ${isPasswordError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}`}
+                className={`
+                  w-full p-3 border-2 rounded-lg focus:outline-none transition-colors
+                  ${isPasswordError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
+                `}
                 value={signUpPassword}
                 onChange={(e) => setSignUpPassword(e.target.value)}
               />
@@ -283,18 +292,25 @@ const AuthPage = () => {
             </div>
             <p className="text-gray-500 text-[10px] mb-4">
               Password must be at least 8 characters long with no spaces
-          </p>
-            {/* ปุ่ม Sign Up */}
+            </p>
+            
+            {/* ปุ่ม Sign Up -> ต้องให้ OTP verify ก่อนถึงจะผ่าน */}
             <button
-              onClick={handleSignUp}
+              onClick={() => {
+                if (!isOtpVerified) {
+                  setSignUpError("Please verify OTP first.");
+                  return;
+                }
+                // alert("Your email is verified. You can now sign in.");
+                setIsSignUp(false);
+              }}
               className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold mb-3"
             >
               SIGN UP
             </button>
 
-            {/* Sign Up Error Message */}
             {signUpError && (
-              <div className=" text-red-500 text-xs">
+              <div className="text-red-500 text-xs">
                 {signUpError}
               </div>
             )}
@@ -345,4 +361,3 @@ const AuthPage = () => {
 };
 
 export default AuthPage;
-
