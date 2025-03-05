@@ -7,7 +7,7 @@ import 'bxslider/dist/jquery.bxslider.min.css';
 import 'wowjs/css/libs/animate.css';
 import './App.css';
 
-// import ส่วนต่าง ๆ
+// import homepage components
 import Header from './components/homepage/header/header';
 import Banner from './components/homepage/banner/banner';
 import About from './components/homepage/about/about';
@@ -19,7 +19,7 @@ import Tips from './components/homepage/tips';
 import Footer from './components/homepage/footer/footer';
 import MenuBar from './components/homepage/menubar';
 
-// Auth / Map / อื่น ๆ
+// Auth / Map / 
 import AuthPage from './components/auth/login';
 import Translator from './components/translator/translator';
 import Currency from './components/currency/currency';
@@ -73,9 +73,6 @@ function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/create" element={<CreateTrip />} />
-
-
-
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

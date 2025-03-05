@@ -12,6 +12,8 @@ import { FaCalendarAlt } from 'react-icons/fa';
 import "react-datepicker/dist/react-datepicker.css";
 import logoGreen from '../../images/new-logo-green.png';
 
+import Header from '../homepage/header/header';
+
 const CreateMyTrip = () => {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -227,8 +229,9 @@ const CreateMyTrip = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-green-50">
+      <Header />
       {/* Desktop Header */}
-      <div className="hidden md:block w-full bg-white shadow-md fixed top-0 left-0 z-50">
+      {/* <div className="hidden md:block w-full bg-white shadow-md fixed top-0 left-0 z-50">
         <div className="container mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
@@ -243,10 +246,10 @@ const CreateMyTrip = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Mobile Header */}
-      <div className="md:hidden w-full bg-white shadow-md fixed top-0 left-0 z-50">
+      {/* <div className="md:hidden w-full bg-white shadow-md fixed top-0 left-0 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
             <img src={logoGreen} alt="Logo" className="h-10" />
@@ -266,7 +269,7 @@ const CreateMyTrip = () => {
             <button className="text-white bg-green-500 p-2 rounded-md" onClick={() => navigate("/sign-in")}>Sign In</button>
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex-1 pt-20 p-4 mt-20">

@@ -251,7 +251,7 @@ function MyBlog() {
 
           {/* Create */}
           <button
-            // onClick={() => alert("Go to create blog form")}
+            onClick={() => navigate("/create")}
             className="
               mt-4 sm:mt-0 sm:ml-auto
               px-4 py-2 

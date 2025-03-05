@@ -9,9 +9,13 @@ const User = require("../models/User");
 const router = express.Router();
 
 // Token generation with 1 hour expiration, i set default to 1 hour can change if needed
-const generateToken = (userId) => {
+const generateToken = (user) => {
   return jwt.sign(
-    { userId },
+    {
+      id: user._id,
+      username: user.username,
+      avatar: user.avatar,
+    },
     process.env.JWT_SECRET,
     { expiresIn: '3h' }
   );
@@ -142,7 +146,7 @@ router.post("/verify-email-otp", async (req, res) => {
     await user.save();
 
     // จะส่ง token กลับให้ก็ได้ หรือให้ user ไป Sign In
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     return res.json({
       success: true,
@@ -200,7 +204,7 @@ router.post("/signin", async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
     return res.status(200).json({
       success: true,
       message: "Sign in success",

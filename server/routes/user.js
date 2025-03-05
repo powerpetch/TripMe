@@ -2,52 +2,32 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/auth");
 const User = require("../models/User");
-const path = require("path");
-const fs = require("fs").promises;
 const bcrypt = require("bcrypt");
-
-// for file upload
 const multer = require("multer");
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads');
-    try {
-      await fs.access(uploadDir);
-    } catch {
-      await fs.mkdir(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const ext = path.extname(file.originalname);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("../config/cloudinary");
+
+// ตั้งค่า CloudinaryStorage สำหรับ multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'profile_images', // ชื่อ folder ที่จะเก็บใน Cloudinary
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif']
   }
 });
 
-const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'), false);
-  }
-};
-
+// ตั้งค่า multer โดยใช้ Cloudinary storage
 const upload = multer({ 
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  }
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 } // จำกัดขนาดไฟล์ 5MB
 });
 
-// use data from authMiddleware from token 
+// GET profile route
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
       .select('-password') // ไม่ส่ง password กลับ
-      .lean(); // convert to plain JS object
+      .lean(); // แปลงเป็น plain JS object
     
     if (!user) {
       return res.status(404).json({ 
@@ -56,14 +36,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
       });
     }
 
-    // convert path to URL for images
-    if (user.avatar) {
-      user.avatar = `/uploads/${path.basename(user.avatar)}`;
-    }
-    if (user.cover) {
-      user.cover = `/uploads/${path.basename(user.cover)}`;
-    }
-
+    // เมื่อใช้ Cloudinary ไฟล์ที่เก็บจะเป็น URL อยู่แล้ว
     return res.json({ success: true, user });
   } catch (err) {
     console.error("Error fetching user:", err);
@@ -74,7 +47,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
   }
 });
 
-// update user profile
+// UPDATE user profile route (ใช้ Cloudinary สำหรับอัปโหลด avatar และ cover)
 router.put("/update", 
   authMiddleware, 
   upload.fields([
@@ -83,10 +56,6 @@ router.put("/update",
   ]), 
   async (req, res) => {
     try {
-      console.log("DEBUG: req.body =>", req.body);
-      console.log("DEBUG: country =>", req.body.country);
-      console.log("DEBUG: city =>", req.body.city);
-
       const user = await User.findById(req.userId);
       if (!user) {
         return res.status(404).json({
@@ -95,66 +64,35 @@ router.put("/update",
         });
       }
 
-      // update fields
+      // อัปเดตฟิลด์ทั่วไปจาก req.body
       const updateFields = [
         "username", "firstName", "lastName", "gender", "tel", 
         "language", "dob", "country", "city", "twitter", "facebook", "instagram"
       ];
-
       updateFields.forEach(field => {
         if (req.body[field] !== undefined) {
           user[field] = req.body[field];
         }
       });
 
-      // // update password
-      // if (req.body.password) {
-      //   const hashedPass = await bcrypt.hash(req.body.password, 10);
-      //   user.password = hashedPass;
-      // }
-
-      // manage file uploads and deletions
+      // อัปเดตรูปจาก Cloudinary (URL จะได้จาก req.files)
       if (req.files?.avatar) {
-        if (user.avatar) {
-          try {
-            await fs.unlink(path.join(process.cwd(), user.avatar));
-          } catch (err) {
-            console.error('Error deleting old avatar:', err);
-          }
-        }
-        user.avatar = req.files.avatar[0].path;
+        user.avatar = req.files.avatar[0].path; // path เป็น URL ที่ Cloudinary ส่งกลับมา
       }
-
       if (req.files?.cover) {
-        if (user.cover) {
-          try {
-            await fs.unlink(path.join(process.cwd(), user.cover));
-          } catch (err) {
-            console.error('Error deleting old cover:', err);
-          }
-        }
         user.cover = req.files.cover[0].path;
       }
 
       await user.save();
 
-      // send response with using password
+      // prepare response โดยลบ password
       const userResponse = user.toObject();
       delete userResponse.password;
-
-      // convert path to URL for images
-      if (userResponse.avatar) {
-        userResponse.avatar = `/uploads/${path.basename(userResponse.avatar)}`;
-      }
-      if (userResponse.cover) {
-        userResponse.cover = `/uploads/${path.basename(userResponse.cover)}`;
-      }
 
       return res.json({ 
         success: true, 
         user: userResponse
       });
-
     } catch (err) {
       console.error("Error updating user:", err);
       return res.status(500).json({ 
@@ -176,7 +114,7 @@ router.put("/change-password", authMiddleware, async (req, res) => {
       });
     }
 
-    // 1. Find the user from userId (at authMiddleware)
+    // หา user จาก userId (จาก authMiddleware)
     const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({
@@ -185,7 +123,7 @@ router.put("/change-password", authMiddleware, async (req, res) => {
       });
     }
 
-    // 2. Compare oldPassword with the hashed password in DB
+    // เปรียบเทียบรหัสผ่านเก่ากับรหัสผ่านที่เข้ารหัสใน DB
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({
@@ -194,7 +132,7 @@ router.put("/change-password", authMiddleware, async (req, res) => {
       });
     }
 
-    // 3. Hash the newPassword and save
+    // เข้ารหัสรหัสผ่านใหม่และบันทึก
     const hashed = await bcrypt.hash(newPassword, 10);
     user.password = hashed;
     await user.save();
@@ -211,6 +149,5 @@ router.put("/change-password", authMiddleware, async (req, res) => {
     });
   }
 });
-
 
 module.exports = router;

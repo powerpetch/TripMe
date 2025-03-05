@@ -40,8 +40,14 @@ function EditProfilePage() {
 
   const baseUrl = "http://localhost:5000";
 
-  const avatarURL = user && user.avatar ? `${baseUrl}${user.avatar}` : null;
-  const coverURL = user && user.cover ? `${baseUrl}${user.cover}` : null;
+  const avatarURL = user && user.avatar 
+  ? (user.avatar.startsWith("http") ? user.avatar : `${baseUrl}${user.avatar}`)
+  : null;
+
+const coverURL = user && user.cover 
+  ? (user.cover.startsWith("http") ? user.cover : `${baseUrl}${user.cover}`)
+  : null;
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -56,10 +62,18 @@ function EditProfilePage() {
           setUser(data.user);
 
           if (data.user.cover) {
-            setCoverPreview(`${baseUrl}${data.user.cover}`);
+            setCoverPreview(
+              data.user.cover.startsWith("http")
+                ? data.user.cover
+                : `${baseUrl}${data.user.cover}`
+            );
           }
           if (data.user.avatar) {
-            setAvatarPreview(`${baseUrl}${data.user.avatar}`);
+            setAvatarPreview(
+              data.user.avatar.startsWith("http")
+                ? data.user.avatar
+                : `${baseUrl}${data.user.avatar}`
+            );
           }
 
           setUsername(data.user.username || "");
