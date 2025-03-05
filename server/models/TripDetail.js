@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const tripSchema = new mongoose.Schema({
+  userId: {
+    type: String
+  },
   country: {
     type: String,
   },

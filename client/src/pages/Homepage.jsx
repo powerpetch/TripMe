@@ -51,13 +51,13 @@ function EditProfilePage() {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
 
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = `${process.env.REACT_APP_API_BASE_URL}`;
   
   const avatarURL = user && user.avatar 
-  ? `http://localhost:5000${user.avatar}`
+  ? `${process.env.REACT_APP_API_BASE_URL}${user.avatar}`
   : null;
 const coverURL = user && user.cover
-  ? `http://localhost:5000${user.cover}`
+  ? `${process.env.REACT_APP_API_BASE_URL}${user.cover}`
   : null;
 
   // โหลดข้อมูล User จาก mock
@@ -65,7 +65,7 @@ const coverURL = user && user.cover
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { "Authorization": `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -152,7 +152,7 @@ const coverURL = user && user.cover
       formData.append("avatar", avatarFile);
     }
 
-    fetch("http://localhost:5000/api/user/update", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/update`, {
       method: "PUT",
       headers: {
         "Authorization": `Bearer ${token}`

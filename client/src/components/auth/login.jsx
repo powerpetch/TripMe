@@ -44,7 +44,7 @@ const AuthPage = () => {
 
     try {
       // ใช้ /signup ในการสร้าง user + ส่ง OTP
-      const res = await fetch("http://localhost:5000/api/auth/signup", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -74,7 +74,7 @@ const AuthPage = () => {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/api/auth/verify-email-otp", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/verify-email-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: signUpEmail, otp })
@@ -110,7 +110,7 @@ const AuthPage = () => {
   // -------------- Sign In --------------
   const handleSignIn = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signin", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/signin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

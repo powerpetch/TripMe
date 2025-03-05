@@ -38,7 +38,7 @@ function EditProfilePage() {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
 
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = `${process.env.REACT_APP_API_BASE_URL}`;
 
   const avatarURL = user && user.avatar ? `${baseUrl}${user.avatar}` : null;
   const coverURL = user && user.cover ? `${baseUrl}${user.cover}` : null;
@@ -47,7 +47,7 @@ function EditProfilePage() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -128,7 +128,7 @@ function EditProfilePage() {
       formData.append("avatar", avatarFile);
     }
 
-    fetch("http://localhost:5000/api/user/update", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/update`, {
       method: "PUT",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,

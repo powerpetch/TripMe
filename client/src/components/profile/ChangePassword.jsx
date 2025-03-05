@@ -29,9 +29,9 @@ function ChangePasswordPage() {
         navigate("/login");
         return;
       }
-
+      
       try {
-        const res = await fetch("http://localhost:5000/api/user/profile", {
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -44,7 +44,7 @@ function ChangePasswordPage() {
             avatar: data.user.avatar 
               ? data.user.avatar.startsWith('http') 
                 ? data.user.avatar 
-                : `http://localhost:5000${data.user.avatar}`
+                : `${process.env.REACT_APP_API_BASE_URL}${data.user.avatar}`
               : null
           };
           setUser(userWithFullAvatar);
@@ -84,7 +84,7 @@ function ChangePasswordPage() {
 
     // Make request to change password
     try {
-      const res = await fetch("http://localhost:5000/api/user/change-password", {
+      const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/change-password`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
