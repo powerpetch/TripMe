@@ -8,6 +8,7 @@ import {
   FaInstagram,
 } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
+import Header from "../homepage/header/OtherHeader";
 
 function MyBlog() {
   const navigate = useNavigate();
@@ -154,30 +155,9 @@ function MyBlog() {
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
-      <header className="h-16 bg-white shadow px-4 flex items-center justify-between fixed w-full top-0 left-0 z-50">
-        <div className="flex items-center">
-          <img
-            src={logoGreen}
-            alt="Logo"
-            className="h-8 cursor-pointer"
-            onClick={() => navigate("/")}
-          />
-        </div>
+      <Header user={user} avatarUrl={avatarUrl} />
 
-        <nav className="flex items-center space-x-4">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt="avatar"
-              className="w-8 h-8 rounded-full object-cover"
-            />
-          ) : (
-            <FaUserCircle className="text-gray-500 text-2xl" />
-          )}
-          <span className="text-gray-700 font-medium">{user.username}</span>
-        </nav>
-      </header>
-
+      {/* Content */}
       <div className="pt-20 max-w-5xl mx-auto w-full px-4">
         {/* breadcrumb / heading */}
         <div className="flex items-center space-x-2 mb-6">

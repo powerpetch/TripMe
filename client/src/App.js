@@ -33,6 +33,8 @@ import EditProfilePage from './components/profile/EditProfilePage';
 import ChangePasswordPage from './components/profile/ChangePassword';
 import MyBlog from './components/profile/MyBlog';
 
+import PublicProfilePage from './components/profile/PublicProfilePage';
+
 // auth
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 import ResetPasswordPage from './components/auth/ResetPasswordPage';
@@ -81,6 +83,7 @@ function App() {
         <Route path="/edit-profile" element={<EditProfilePage />} />
         <Route path="/change-password" element={<ChangePasswordPage />} />
 
+        <Route path="/users/:username" element={<PublicProfilePage />} />
         <Route path="/my-blog" element={<MyBlog />} />
         
         <Route path="*" element={<NotFound />} />

@@ -141,6 +141,10 @@ function ChangePasswordPage() {
 
         {/* User Info */}
         <nav className="flex items-center space-x-4">
+        <button 
+            onClick={() => navigate('/profile')}
+            className="flex items-center space-x-2 hover:bg-gray-100 px-3 py-1 rounded-full transition-colors"
+          >
           {user.avatar ? (
             <img
               src={user.avatar}
@@ -151,6 +155,7 @@ function ChangePasswordPage() {
             <FaUserCircle className="text-gray-500 text-2xl" />
           )}
           <span className="text-gray-700 font-medium">{user.username}</span>
+        </button>
         </nav>
       </header>
 

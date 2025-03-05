@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import { useDropzone } from 'react-dropzone';
+import Header2 from '../homepage/header/OtherHeader';
 // import { format } from 'date-fns';
 import { 
   Menu, X, MapPin, Building, Bus, 
@@ -15,9 +16,47 @@ import logoGreen from '../../images/new-logo-green.png';
 import Header from '../homepage/header/header';
 
 const CreateMyTrip = () => {
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // state for user
+  const [avatarURL, setAvatarURL] = useState(null);
+
+  useEffect(() => {
+    // ดึง token
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    // เรียก API เพื่อนำข้อมูล user (รวม avatar) มาใช้
+    fetch("http://localhost:5000/api/user/profile", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setUser(data.user);
+          // ตรวจสอบ avatar
+          if (data.user.avatar) {
+            if (data.user.avatar.startsWith("http")) {
+              setAvatarURL(data.user.avatar);
+            } else {
+              setAvatarURL(`http://localhost:5000${data.user.avatar}`);
+            }
+          }
+        } else {
+          throw new Error(data.message || "Could not fetch user profile");
+        }
+      })
+      .catch((err) => {
+        console.error("Fetch user error:", err);
+        navigate("/login");
+      });
+  }, [navigate]);
   
   // Form state
   const [country, setCountry] = useState('');
@@ -227,49 +266,11 @@ const CreateMyTrip = () => {
     return sum + amount;
   }, 0);
 
+  
+
   return (
     <div className="min-h-screen flex flex-col bg-green-50">
-      <Header />
-      {/* Desktop Header */}
-      {/* <div className="hidden md:block w-full bg-white shadow-md fixed top-0 left-0 z-50">
-        <div className="container mx-auto px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-              <img src={logoGreen} alt="Logo" className="h-12" />
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/")}>Home</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/translator")}>Translator</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/currency")}>Currency</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/map")}>Map</button>
-              <button className="text-gray-700 hover:text-green-600" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Mobile Header */}
-      {/* <div className="md:hidden w-full bg-white shadow-md fixed top-0 left-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
-            <img src={logoGreen} alt="Logo" className="h-10" />
-          </div>
-          <button onClick={toggleMenu} className="text-gray-700">
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-        
-        {menuOpen && (
-          <div className="fixed top-16 left-0 w-full bg-white shadow-md p-4 flex flex-col space-y-4 md:hidden z-50">
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/")}>Home</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/translator")}>Translator</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/currency")}>Currency</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/map")}>Map</button>
-            <button className="block text-gray-700 w-full text-left px-3 py-2 rounded-md hover:bg-gray-100" onClick={() => navigate("/trip-tgt")}>Trip-tgt</button>
-            <button className="text-white bg-green-500 p-2 rounded-md" onClick={() => navigate("/sign-in")}>Sign In</button>
-          </div>
-        )}
-      </div> */}
+      <Header2 user={user} avatarUrl={avatarURL} />
 
       {/* Main Content */}
       <div className="flex-1 pt-20 p-4 mt-20">

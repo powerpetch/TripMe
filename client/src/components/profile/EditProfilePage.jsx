@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaCamera } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
 import { COUNTRY_CODES, COUNTRIES, DAYS, MONTHS, YEARS, LANGUAGES } from "../../js/mockData";
+import Header from "../homepage/header/OtherHeader";
 
 function EditProfilePage() {
   const navigate = useNavigate();
@@ -219,28 +220,7 @@ const coverURL = user && user.cover
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
-      <header className="h-16 bg-white shadow px-4 flex items-center justify-between fixed w-full top-0 left-0 z-50">
-        <div className="flex items-center">
-          <img
-            src={logoGreen}
-            alt="Logo"
-            className="h-8 cursor-pointer"
-            onClick={() => navigate("/")}
-          />
-        </div>
-        <nav className="flex items-center space-x-4">
-          {avatarPreview ? (
-            <img
-              src={avatarPreview}
-              alt="avatar"
-              className="w-8 h-8 rounded-full object-cover"
-            />
-          ) : (
-            <FaUserCircle className="text-gray-500 text-2xl" />
-          )}
-          <span className="text-gray-700 font-medium">{user.username}</span>
-        </nav>
-      </header>
+      <Header user={user} avatarUrl={avatarURL} />
 
       <div className="pt-20 max-w-5xl mx-auto w-full px-4">
         {/* Title */}
