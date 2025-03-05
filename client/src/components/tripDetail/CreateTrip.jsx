@@ -198,7 +198,7 @@ const CreateMyTrip = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5001/api/trip', {
+      const response = await fetch('http://localhost:5001/api/trips', {
         method: 'POST',
         body: formData,
       });
