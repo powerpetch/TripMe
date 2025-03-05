@@ -6,7 +6,7 @@ const path = require("path");
 const fs = require("fs").promises;
 const bcrypt = require("bcrypt");
 
-// สำหรับอัปโหลดไฟล์รูป
+// for file upload
 const multer = require("multer");
 const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
@@ -42,12 +42,12 @@ const upload = multer({
   }
 });
 
-// ดึงข้อมูล user จาก userId ใน token
+// use data from authMiddleware from token 
 router.get("/profile", authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.userId)
-      .select('-password') // ไม่ดึง password (ดึงมันอันตราย)
-      .lean(); // แปลงเป็น plain object
+      .select('-password') // ไม่ส่ง password กลับ
+      .lean(); // convert to plain JS object
     
     if (!user) {
       return res.status(404).json({ 
@@ -56,7 +56,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
       });
     }
 
-    // แปลง path เป็น URL สำหรับรูปภาพ
+    // convert path to URL for images
     if (user.avatar) {
       user.avatar = `/uploads/${path.basename(user.avatar)}`;
     }
@@ -74,7 +74,7 @@ router.get("/profile", authMiddleware, async (req, res) => {
   }
 });
 
-// แก้ไขข้อมูล user
+// update user profile
 router.put("/update", 
   authMiddleware, 
   upload.fields([
@@ -95,7 +95,7 @@ router.put("/update",
         });
       }
 
-      // อัพเดทข้อมูลพื้นฐาน
+      // update fields
       const updateFields = [
         "username", "firstName", "lastName", "gender", "tel", 
         "language", "dob", "country", "city", "twitter", "facebook", "instagram"
@@ -107,13 +107,13 @@ router.put("/update",
         }
       });
 
-      // // อัพเดท password
+      // // update password
       // if (req.body.password) {
       //   const hashedPass = await bcrypt.hash(req.body.password, 10);
       //   user.password = hashedPass;
       // }
 
-      // จัดการไฟล์เก่าและอัพเดทพาธใหม่
+      // manage file uploads and deletions
       if (req.files?.avatar) {
         if (user.avatar) {
           try {
@@ -138,11 +138,11 @@ router.put("/update",
 
       await user.save();
 
-      // ส่งข้อมูลกลับโดยไม่มี password
+      // send response with using password
       const userResponse = user.toObject();
       delete userResponse.password;
 
-      // แปลง path เป็น URL สำหรับรูปภาพ
+      // convert path to URL for images
       if (userResponse.avatar) {
         userResponse.avatar = `/uploads/${path.basename(userResponse.avatar)}`;
       }

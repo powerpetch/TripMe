@@ -1,6 +1,5 @@
-// client/src/components/header/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../../../images/new-logo.png';
 import logoGreen from '../../../images/new-logo-green.png';
 import { AiOutlineMenu, AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
@@ -13,14 +12,21 @@ const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // เก็บ user (ถ้ามี)
+  const location = useLocation();
+  const isHome = location.pathname === "/";
   const [currentUser, setCurrentUser] = useState(null);
   // toggle dropdown
   const [showUserMenu, setShowUserMenu] = useState(false);
-
+  const [showMobileProfileMenu, setShowMobileProfileMenu] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!isHome) {
+      // หน้าอื่น => ไม่ต้องฟัง scroll, setScrolled(true) ไปเลย
+      setScrolled(true);
+      return;
+    }
+    
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
     };
@@ -28,12 +34,48 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // โหลด user จาก localStorage
+  // load user from localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
     }
+  }, []);
+
+  // // logout after token expires (1 hour)
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   const storedUser = localStorage.getItem("user");
+  //   const expiresIn = localStorage.getItem("expiresIn");
+  //   const loginTime = localStorage.getItem("loginTime");
+  
+  //   if (token && storedUser && expiresIn && loginTime) {
+  //     const now = Date.now();
+  //     const diff = now - parseInt(loginTime, 10);
+  //     const timeLeft = parseInt(expiresIn, 10) * 1000 - diff;
+  
+  //     if (timeLeft <= 0) {
+  //       handleLogout();
+  //     } else {
+  //       setTimeout(() => {
+  //         handleLogout();
+  //       }, timeLeft);
+  //     }
+  //   }
+  // }, []);
+  
+  // logout after 1 hour if not active
+  useEffect(() => {
+    const loginTime = localStorage.getItem("loginTime");
+    if (!loginTime) return;
+
+    const now = Date.now();
+    const diff = now - parseInt(loginTime, 10); 
+    const oneHour = 60 * 60 * 1000; 
+
+    if (diff > oneHour) {
+      handleLogout();
+    } 
   }, []);
 
   useEffect(() => {
@@ -69,6 +111,8 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    // localStorage.removeItem("expiresIn");
+    localStorage.removeItem("loginTime");
     setCurrentUser(null);
     navigate("/");
   };
@@ -81,7 +125,7 @@ const Header = () => {
         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
         onClick={() => {
           setShowUserMenu(false);
-          navigate("/profile"); // <-- ไปหน้าโปรไฟล์
+          navigate("/profile");
         }}
       >
         Profile
@@ -90,7 +134,7 @@ const Header = () => {
         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
         onClick={() => {
           setShowUserMenu(false);
-          navigate("/change-password"); // ตัวอย่าง
+          navigate("/change-password");
         }}
       >
         Change Password
@@ -99,7 +143,7 @@ const Header = () => {
         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
         onClick={() => {
           setShowUserMenu(false);
-          navigate("/edit-profile"); // ตัวอย่าง
+          navigate("/edit-profile");
         }}
       >
         Edit Profile
@@ -145,7 +189,7 @@ const Header = () => {
             <li className="nav-item"><Link className="nav-link" to="/Trip-tgt">Trip-tgt</Link></li>
           </ul>
 
-          {/* ถ้าไม่มี user => Sign In */}
+          {/* if not signin yet user => Sign In */}
           {!currentUser && (
             <button
               onClick={() => navigate('/login')}
@@ -167,7 +211,7 @@ const Header = () => {
             </button>
           )}
 
-          {/* ถ้ามี user => icon user + dropdown */}
+          {/* have user => icon user + dropdown */}
           {currentUser && (
             <div className="relative ml-4">
               <button
@@ -244,7 +288,7 @@ const Header = () => {
         <Link className="text-lg text-white" to="/Map" onClick={() => setMenuOpen(false)}>Map</Link>
         <Link className="text-lg text-white" to="/Trip-tgt" onClick={() => setMenuOpen(false)}>Trip-tgt</Link>
 
-        {/* ถ้าไม่มี user => button Sign In (mobile) */}
+        {/* not sg user => button Sign In (mobile) */}
         {!currentUser && (
           <button
             onClick={() => {
@@ -268,20 +312,79 @@ const Header = () => {
           </button>
         )}
 
-        {/* ถ้า login => แสดง user + logout (mobile) */}
+        {/* Mobile Menu - User Profile Section */}
         {currentUser && (
           <>
-            <div className="flex items-center">
-              <FaUserCircle className="text-white text-2xl mr-2" />
-              <span>{currentUser.email}</span>
+            {/* User Info Button - Clickable to show/hide options */}
+            <div 
+              onClick={() => setShowMobileProfileMenu(!showMobileProfileMenu)}
+              className="flex items-center space-x-3 cursor-pointer hover:bg-gray-800 p-2 rounded-lg"
+            >
+              {currentUser.avatar ? (
+                <img
+                  src={
+                    currentUser.avatar.startsWith("http")
+                      ? currentUser.avatar
+                      : `http://localhost:5000${currentUser.avatar}`
+                  }
+                  alt="Profile"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <FaUserCircle className="text-white text-3xl" />
+              )}
+              <div className="flex flex-col flex-grow">
+                <span className="font-medium">{currentUser.username}</span>
+                <span className="text-sm text-gray-300">{currentUser.email}</span>
+              </div>
+              <span className={`transform transition-transform ${showMobileProfileMenu ? 'rotate-180' : ''}`}>
+                ▼
+              </span>
             </div>
+
+            {/* Profile Navigation Options - Shows when clicked */}
+            <div 
+              className={`
+                overflow-hidden transition-all duration-300 ease-in-out
+                ${showMobileProfileMenu ? 'max-h-48 opacity-100' : 'max-h-0 opacity-0'}
+              `}
+            >
+              <div className="border-t border-gray-700 pt-4 mt-2 space-y-1">
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/profile");
+                  }}
+                  className="w-full text-left py-3 px-4 hover:bg-gray-800 transition-colors rounded"
+                >
+                  Profile
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/edit-profile");
+                  }}
+                  className="w-full text-left py-3 px-4 hover:bg-gray-800 transition-colors rounded"
+                >
+                  Edit Profile
+                </button>
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    navigate("/change-password");
+                  }}
+                  className="w-full text-left py-3 px-4 hover:bg-gray-800 transition-colors rounded"
+                >
+                  Change Password
+                </button>
+              </div>
+            </div>
+
+            {/* Logout Button */}
             <button
               onClick={() => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                setCurrentUser(null);
+                handleLogout();
                 setMenuOpen(false);
-                navigate("/");
               }}
               className="px-4 py-2 mt-4 border-2 border-white rounded-full text-white hover:bg-white hover:text-green-600 transition-colors"
             >

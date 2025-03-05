@@ -2,6 +2,7 @@ import React from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
+
 // Import images
 import icon1 from "../../assets/icon1.webp";
 import icon2 from "../../assets/icon2.webp";

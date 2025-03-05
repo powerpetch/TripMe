@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from './Header';
 import Map from './Map';
 import SidePanel from './SidePanel';
+import MenuBar from '../homepage/menubar';
 
 import { FaUtensils, FaHotel, FaCamera, FaLandmark, FaBus } from 'react-icons/fa';
 import { MdLocalPharmacy, MdLocalAtm } from 'react-icons/md';
@@ -81,7 +82,6 @@ function MapPage() {
     });
   }, [isPanelOpen, selectedCategory, coordinates]);
 
-  // fetchPlaceDetails
   const fetchPlaceDetails = (place) => {
     if (!mapRef.current || !place?.place_id) return;
     const service = new window.google.maps.places.PlacesService(mapRef.current);
@@ -99,7 +99,6 @@ function MapPage() {
     });
   };
 
-  // เมื่อคลิกในลิสต์
   const handleSelectPlaceInList = (place) => {
     setSelectedPlace(place);
     setShowAllMarkers(false);
@@ -107,32 +106,26 @@ function MapPage() {
     fetchPlaceDetails(place);
   };
 
-  // แสดงพินทั้งหมด
   const handleShowAllMarkers = () => {
     setShowAllMarkers(true);
     setSelectedPlace(null);
     setDetailedPlace(null);
   };
 
-  // กลับจากข้อมูลละเอียด
   const handleBackToList = () => {
     setDetailedPlace(null);
   };
 
   const handleSearchLocation = (place) => {
-    // 1. pan map
     const lat = place.geometry.location.lat();
     const lng = place.geometry.location.lng();
     setCoordinates({ lat, lng });
 
-    // 2. สร้าง marker เฉพาะจุด
     setSelectedPlace(place);
     setShowAllMarkers(false);
-    // 3. fetch details => setDetailedPlace
     setDetailedPlace(null);
     fetchPlaceDetails(place);
 
-    // 4. เปิด panel เพื่อให้เห็นข้อมูล
     setIsPanelOpen(true);
   };
 
@@ -141,8 +134,12 @@ function MapPage() {
       <Header onSearchLocation={handleSearchLocation} />
 
       <div className="relative flex-1">
-        {/* Category */}
-        <div className="absolute top-4 left-4 flex space-x-2 z-20">
+        {/* Category Buttons */}
+        <div className="
+          absolute top-4 left-4
+          flex flex-wrap items-center
+          gap-2 z-20
+        ">
           {categories.map((cat) => (
             <button
               key={cat.key}
@@ -184,6 +181,7 @@ function MapPage() {
           onBackToList={handleBackToList}
         />
       </div>
+      <MenuBar />
     </div>
   );
 }

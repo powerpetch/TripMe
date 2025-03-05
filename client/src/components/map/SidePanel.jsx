@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
-import { IoCall } from "react-icons/io5";
+import React, { useState, useRef } from 'react';
+import useIsMobile from './useIsMobile';
+import { IoCall, IoClose } from "react-icons/io5";
 import { MdAccessTime } from "react-icons/md";
-import { FaStar } from "react-icons/fa";
-import { FaStarHalfAlt } from "react-icons/fa";
-import { IoClose } from "react-icons/io5";
-import { FaSearchLocation } from "react-icons/fa";
+import { FaStar, FaStarHalfAlt, FaSearchLocation } from "react-icons/fa";
 
 const StarRating = ({ rating }) => {
   const stars = [];
   const totalStars = 5;
-  
   for (let i = 0; i < totalStars; i++) {
     if (rating >= i + 1) {
       stars.push(<FaStar key={i} className="text-yellow-400" />);
@@ -19,12 +16,7 @@ const StarRating = ({ rating }) => {
       stars.push(<FaStar key={i} className="text-gray-300" />);
     }
   }
-
-  return (
-    <div className="flex items-center gap-1">
-      {stars}
-    </div>
-  );
+  return <div className="flex items-center gap-1">{stars}</div>;
 };
 
 function PlaceList({ places, onSelectPlaceInList }) {
@@ -58,9 +50,7 @@ function PlaceList({ places, onSelectPlaceInList }) {
 function DetailedInfo({ place, onBackToList }) {
   const [showHours, setShowHours] = useState(false);
 
-  const toggleHours = () => {
-    setShowHours((prev) => !prev);
-  };
+  const toggleHours = () => setShowHours((prev) => !prev);
 
   return (
     <div className="p-3 overflow-auto h-full">
@@ -70,21 +60,17 @@ function DetailedInfo({ place, onBackToList }) {
       >
         &larr; Back to List
       </button>
-
       <h3 className="text-lg font-semibold text-green-700 mb-2">
         {place.name}
       </h3>
-
       {place.formatted_address && (
         <p className="text-sm text-gray-700 mb-1 flex items-center">
           <span className="font-semibold text-gray-600 mr-2 flex items-center gap-1">
-            <FaSearchLocation className="text-base" />
-            :
+            <FaSearchLocation className="text-base" />:
           </span>
           {place.formatted_address}
         </p>
       )}
-
       {place.formatted_phone_number && (
         <p className="text-sm text-gray-700 mb-1 flex items-center">
           <span className="font-semibold text-gray-600 mr-2 flex items-center gap-1">
@@ -94,7 +80,6 @@ function DetailedInfo({ place, onBackToList }) {
           {place.formatted_phone_number}
         </p>
       )}
-
       {place.rating && (
         <p className="text-yellow-600 mb-2 flex items-center">
           <span className="font-semibold text-gray-600 mr-2">Rating:</span>
@@ -102,7 +87,6 @@ function DetailedInfo({ place, onBackToList }) {
           <span className="ml-2 text-sm">({place.rating})</span>
         </p>
       )}
-
       {place.opening_hours && (
         <div className="mb-3">
           <button
@@ -112,7 +96,6 @@ function DetailedInfo({ place, onBackToList }) {
             <span className="mr-1"><MdAccessTime /></span>
             {showHours ? 'Hide opening time' : 'See opening time'}
           </button>
-
           {showHours && place.opening_hours.weekday_text && (
             <div className="mt-1 ml-6 text-gray-600 text-sm space-y-1">
               {place.opening_hours.weekday_text.map((line, i) => (
@@ -122,9 +105,7 @@ function DetailedInfo({ place, onBackToList }) {
           )}
         </div>
       )}
-
       <hr className="my-3 border-gray-600" />
-
       <p className="font-semibold text-green-700 mb-2">Images:</p>
       {(!place.photos || place.photos.length === 0) && (
         <p className="text-gray-500 text-sm">No images</p>
@@ -157,14 +138,61 @@ export default function SidePanel({
   onShowAllMarkers,
   onBackToList
 }) {
+  const isMobile = useIsMobile(768);
+
+  // ----- Drag Resize Logic -----
+  const [panelWidth, setPanelWidth] = useState(
+    isMobile ? window.innerWidth * 0.7 : 384
+  );
+  const isResizing = useRef(false);
+
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    e.preventDefault();
+    isResizing.current = true;
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isResizing.current) return;
+    const touch = e.touches[0];
+    let newWidth = touch.clientX;
+    if (newWidth < 200) newWidth = 200;
+    if (newWidth > 600) newWidth = 600;
+    setPanelWidth(newWidth);
+  };
+
+  const handleTouchEnd = () => {
+    isResizing.current = false;
+    window.removeEventListener("touchmove", handleTouchMove);
+    window.removeEventListener("touchend", handleTouchEnd);
+  };
+
+  // ----- Collapse Logic (ย่อ/ขยาย) -----
+  const [collapsed, setCollapsed] = useState(false);
+  const collapsedWidth = 30; // px
+
+  let transformStyle = 'translateX(-100%)';
+  if (isOpen) {
+    transformStyle = collapsed
+      ? `translateX(-${panelWidth - collapsedWidth}px)`
+      : 'translateX(0)';
+  }
+
   return (
     <div
-      className={`
-        absolute top-0 left-0 h-full w-96 bg-green-50 shadow-2xl border-r border-green-200
-        z-30 transform transition-transform duration-300
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}
+      className="
+        absolute top-0 left-0 h-full
+        bg-green-50 shadow-2xl border-r border-green-200 z-30
+        transition-transform duration-300 ease-in-out
+      "
+      style={{
+        width: isMobile ? panelWidth : 384,
+        transform: transformStyle
+      }}
     >
+      {/* Panel Header */}
       <div className="flex items-center justify-between p-4 bg-green-100 border-b border-green-200">
         <h2 className="font-bold text-green-800 text-base">Results</h2>
         <button
@@ -175,24 +203,61 @@ export default function SidePanel({
         </button>
       </div>
 
-      <div className="h-[calc(100%-4rem)] overflow-y-auto">
-        {detailedPlace ? (
-          <DetailedInfo place={detailedPlace} onBackToList={onBackToList} />
-        ) : (
-          <>
-            <div className="p-3 border-b border-green-100">
-              <button
-                onClick={onShowAllMarkers}
-                className="text-green-600 text-sm hover:underline font-medium"
-              >
-                Show All Markers
-              </button>
-            </div>
-            <PlaceList
-              places={places}
-              onSelectPlaceInList={onSelectPlaceInList}
-            />
-          </>
+      {/* container: out overflow-visible, in overflow-y-auto */}
+      <div className="relative overflow-visible h-[calc(100%-4rem)]">
+        {/* inside => scroll only content */}
+        <div className="h-full overflow-y-auto">
+          {detailedPlace ? (
+            <DetailedInfo place={detailedPlace} onBackToList={onBackToList} />
+          ) : (
+            <>
+              <div className="p-3 border-b border-green-100">
+                <button
+                  onClick={onShowAllMarkers}
+                  className="text-green-600 text-sm hover:underline font-medium"
+                >
+                  Show All Markers
+                </button>
+              </div>
+              <PlaceList
+                places={places}
+                onSelectPlaceInList={onSelectPlaceInList}
+              />
+            </>
+          )}
+        </div>
+
+        {/* Handle Drag (Mobile) */}
+        {isMobile && (
+          <div
+            className="
+              absolute top-0 right-0
+              h-full w-2
+              bg-gray-200
+              cursor-col-resize
+              hover:bg-gray-300
+              z-50
+            "
+            onTouchStart={handleTouchStart}
+          />
+        )}
+
+        {/* >< */}
+        {isMobile && isOpen && (
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="
+              absolute top-1/2
+              transform -translate-y-1/2
+              bg-green-300 w-8 h-8
+              flex items-center justify-center
+              rounded-full shadow
+              z-50
+              right-[-16px]
+            "
+          >
+            {collapsed ? '>' : '<'}
+          </button>
         )}
       </div>
     </div>

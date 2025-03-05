@@ -22,6 +22,18 @@ const userSchema = new mongoose.Schema({
     minlength: [8, 'Password must be at least 8 characters']
   },
 
+  // Email verification fields
+  verifiedEmail: {
+    type: Boolean,
+    default: false
+  },
+  verifyEmailOTP: {
+    type: String
+  },
+  verifyEmailOTPExpires: {
+    type: Date
+  },
+
   // User profile
   firstName: {
     type: String,
@@ -62,14 +74,15 @@ const userSchema = new mongoose.Schema({
     trim: true
   },
 
-  // Pic
+  // Profile pictures
   avatar: {
-    type: String // เก็บ path ของไฟล์
+    type: String
   },
   cover: {
-    type: String // เก็บ path ของไฟล์
+    type: String
   },
 
+  // Location
   country: {
     type: String,
     default: ""
@@ -79,20 +92,19 @@ const userSchema = new mongoose.Schema({
     default: ""
   },
 
-  // Timestamps
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
+  // Reset password
+  resetPasswordToken: {
+    type: String
   },
-  updatedAt: { 
-    type: Date, 
-    default: Date.now 
-  }
+  resetPasswordExpires: {
+    type: Date
+  },
+
 }, {
-  timestamps: true // for createdAt and updatedAt automatically
+  timestamps: true // Automatically manages createdAt and updatedAt
 });
 
-// อัพเดท updatedAt เมื่อมีการแก้ไขข้อมูล
+// Update timestamp when saving
 userSchema.pre('save', function(next) {
   this.updatedAt = new Date();
   next();
