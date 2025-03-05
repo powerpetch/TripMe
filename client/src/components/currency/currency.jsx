@@ -194,7 +194,7 @@ const CurrencyExchange = () => {
       </div>
 
       {/* Menu mobile */}
-      <MenuBar/>
+      {/* <MenuBar/> */}
     </div>
   );
 };

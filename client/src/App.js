@@ -50,7 +50,7 @@ const HomePage = () => {
       <Testimonial />
       <Tips />
       <Footer />
-      <MenuBar />
+      {/* <MenuBar /> */}
     </>
   );
 };

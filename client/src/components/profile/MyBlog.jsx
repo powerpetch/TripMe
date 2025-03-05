@@ -203,7 +203,7 @@ function MyBlog() {
             <FaUserCircle className="text-gray-400 text-6xl mr-4" />
           )}
           <div className="mt-2 sm:mt-0">
-            {/* ชื่อ user */}
+            {/* user name */}
             <h2 className="text-xl font-bold text-gray-800">
               {user.username || "Unnamed"}
             </h2>
