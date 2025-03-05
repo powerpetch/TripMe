@@ -14,11 +14,13 @@ const { connectdb } = require('./config/db');
 const app = express();
 
 // middleware
-app.use(express.json());
+app.use(express.json()); // to use req.body
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// routes
+
+// use routes
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/trips", tripDetailRoutes);
