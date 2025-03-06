@@ -239,8 +239,12 @@ const CreateMyTrip = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:5001/api/trips', {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/trips`, {
         method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         body: formData,
       });
 

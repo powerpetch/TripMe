@@ -7,11 +7,12 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); 
 const validateTrip = require('../middleware/tripvalidation.js'); // Import your validation middleware
 const { validationResult } = require('express-validator');
+const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
 // create
-router.post('/',
+router.post('/', authMiddleware,
   upload.array('photos'),
   (req, res, next) => {
     try {
@@ -25,6 +26,7 @@ router.post('/',
     }
     next(); // Pass the request to the validation middleware
   },
+  
   validateTrip,
   async (req, res) => {
     const errors = validationResult(req);
@@ -64,9 +66,11 @@ router.post('/',
         // console.log(photoURLs)
       
       }
+      const userId = req.userId
 
       // MongoDB
       const newTrip = new TripDetail({
+        userId,
         country,
         travelPeriod,
         visitedPlaces,

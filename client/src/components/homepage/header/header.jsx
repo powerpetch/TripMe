@@ -85,7 +85,7 @@ const Header = () => {
       
       if (token && storedUser) {
         try {
-          const res = await fetch("http://localhost:5000/api/user/profile", {
+          const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -232,7 +232,7 @@ const Header = () => {
                   src={
                     currentUser.avatar.startsWith("http")
                       ? currentUser.avatar
-                      : `http://localhost:5000${currentUser.avatar}`
+                      : `${process.env.REACT_APP_API_BASE_URL}${currentUser.avatar}`
                   }
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover"
@@ -325,7 +325,7 @@ const Header = () => {
                   src={
                     currentUser.avatar.startsWith("http")
                       ? currentUser.avatar
-                      : `http://localhost:5000${currentUser.avatar}`
+                      : `${process.env.REACT_APP_API_BASE_URL}${currentUser.avatar}`
                   }
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover"

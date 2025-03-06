@@ -19,14 +19,14 @@ import coverimg from "../../images/phd.jpg";
 function ProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const baseUrl = "http://localhost:5000";
+  const baseUrl = `${process.env.REACT_APP_API_BASE_URL}`;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       return;
     }
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
