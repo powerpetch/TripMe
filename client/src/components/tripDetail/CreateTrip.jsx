@@ -27,16 +27,21 @@ const CreateMyTrip = () => {
   useEffect(() => {
     // ดึง token
     const token = localStorage.getItem("token");
+    // console.log(token)
     if (!token) {
+      // console.log("NOTOKEN")
       navigate("/login");
       return;
     }
 
     // เรียก API เพื่อนำข้อมูล user (รวม avatar) มาใช้
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        console.log("Response status:", res.status); 
+        return res.json();
+      })
       .then((data) => {
         if (data.user) {
           setUser(data.user);
@@ -45,7 +50,7 @@ const CreateMyTrip = () => {
             if (data.user.avatar.startsWith("http")) {
               setAvatarURL(data.user.avatar);
             } else {
-              setAvatarURL(`http://localhost:5000${data.user.avatar}`);
+              setAvatarURL(`${process.env.REACT_APP_API_BASE_URL}${data.user.avatar}`);
             }
           }
         } else {

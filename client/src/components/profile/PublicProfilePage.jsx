@@ -21,7 +21,7 @@ function PublicProfilePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return; // if not logged in, do nothing
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -37,7 +37,7 @@ function PublicProfilePage() {
   useEffect(() => {
     const fetchPublicProfile = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/user/public/${username}`);
+        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/public/${username}`);
         const data = await res.json();
         if (res.ok && data.user) {
           setPublicUser(data.user);
@@ -72,7 +72,7 @@ function PublicProfilePage() {
   // check if the url is full url or not (http:// or https://)
   const getFullUrl = (url) => {
     if (!url) return null;
-    return url.startsWith("http") ? url : `http://localhost:5000${url}`;
+    return url.startsWith("http") ? url : `${process.env.REACT_APP_API_BASE_URL}${url}`;
   };
 
   // Cover/Avatar of publicUser
