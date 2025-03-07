@@ -248,13 +248,16 @@ const CreateMyTrip = () => {
         body: formData,
       });
 
+      const data = await response.json();
       if (!response.ok) {
         throw new Error(`Server responded with status: ${response.status}`);
+      } else {
+        navigate(data.redirectUrl);
       }
 
-      const data = await response.json();
+      
       console.log('Trip created:', data);
-      alert('Trip created successfully!');
+      alert('Trip created successfully! Click ok to view your Trip');
     } catch (error) {
       console.error('Error:', error);
     } finally {

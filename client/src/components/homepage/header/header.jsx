@@ -3,14 +3,15 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../../images/new-logo.png";
 import logoGreen from "../../../images/new-logo-green.png";
 import { AiOutlineMenu, AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
-import { FaSignInAlt, FaUserCircle } from "react-icons/fa";
+import { FaSignInAlt, FaUserCircle, FaPlus } from "react-icons/fa";
 
 import "./header.css";
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const location = useLocation();
   const isHome = location.pathname === "/";
@@ -245,7 +246,29 @@ const Header = () => {
 
           {/* have user => icon user + dropdown */}
           {currentUser && (
-            <div className="relative ml-4">
+            <div className="relative ml-4 flex items-center gap-4" flex>
+              <button
+                onClick={() => navigate('/create')}
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+                className={`
+                  flex items-center justify-center 
+                  w-7 h-7 rounded border-3
+                  transition-all duration-300 ease-in-out
+                  ${scrolled 
+                    ? 'bg-transparent border-gray-600 hover:border-blue-600 hover:text-blue-600' 
+                    : 'text-white border-white hover:text-gray-900 hover:border-gray-800'
+                  }
+                  `}
+              >
+              <FaPlus className="text-xl" />
+              </button>
+              {showTooltip && (
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-2 bg-gray-800 text-white text-xs w-max">
+                  Create My Trip
+                </div>
+              )}
+              
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className={`

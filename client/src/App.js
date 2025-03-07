@@ -26,7 +26,8 @@ import Currency from './components/currency/currency';
 import MapPage from './components/map/MapPage';
 
 import CreateTrip from './components/tripDetail/CreateTrip'
-
+// import Trip from './components/tripDetail/Trip'
+import TripDetails from './components/tripDetail/TripDetailShow.jsx';
 
 import ProfilePage from './components/profile/ProfilePage';
 import EditProfilePage from './components/profile/EditProfilePage';
@@ -75,6 +76,10 @@ function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/create" element={<CreateTrip />} />
+        {/* <Route path="/trip" element={<Trip />} /> */}
+        <Route path="/trip/:id" element={<TripDetails />} />
+
+
 
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />

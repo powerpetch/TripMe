@@ -99,6 +99,7 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpires: {
     type: Date
   },
+  trips: [{ type: mongoose.Schema.Types.ObjectId, ref: "TripDetail" }],
 
 }, {
   timestamps: true // Automatically manages createdAt and updatedAt

@@ -8,6 +8,7 @@ const upload = multer({ dest: 'uploads/' });
 const validateTrip = require('../middleware/tripvalidation.js'); // Import your validation middleware
 const { validationResult } = require('express-validator');
 const authMiddleware = require("../middleware/auth");
+const User = require('../models/User.js')
 
 const router = express.Router();
 
@@ -26,7 +27,7 @@ router.post('/', authMiddleware,
     }
     next(); // Pass the request to the validation middleware
   },
-  
+
   validateTrip,
   async (req, res) => {
     const errors = validationResult(req);
@@ -82,8 +83,12 @@ router.post('/', authMiddleware,
         photos: photoURLs,
       });
 
-      await newTrip.save();
-      res.status(201).json({ message: 'Trip created successfully', trip: newTrip });
+      const savedTrip = await newTrip.save();
+      await User.findByIdAndUpdate(userId,{$push: { trips: savedTrip._id}})
+      res.status(201).json({ 
+        message: 'Trip created successfully',
+        trip: savedTrip,
+        redirectUrl: `/trip/${savedTrip._id}` });
       console.log(newTrip)
     } catch (err) {
       console.error('Error Creating Trip:', err);
@@ -138,6 +143,22 @@ router.delete('/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting trip:', error);
     res.status(500).json({ message: 'Server error', error });
+  }
+});
+
+router.get("/:tripId", async (req, res) => {
+  try {
+      const { tripId } = req.params;
+      if (!tripId || tripId === "undefined") {
+        return res.status(400).json({ message: "Invalid trip ID" });
+      } 
+      const trip = await TripDetail.findById(tripId);
+      if (!trip) {
+          return res.status(404).json({ message: "Trip not found" });
+      }
+      res.status(200).json(trip);
+  } catch (error) {
+      res.status(500).json({ message: "Server error" });
   }
 });
 
