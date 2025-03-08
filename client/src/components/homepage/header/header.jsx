@@ -5,6 +5,8 @@ import logoGreen from "../../../images/new-logo-green.png";
 import { AiOutlineMenu, AiOutlineClose, AiOutlineSearch } from "react-icons/ai";
 import { FaSignInAlt, FaUserCircle, FaPlus } from "react-icons/fa";
 
+import NoUserFound from "../../TripTGT/NoUserFound";
+
 import "./header.css";
 
 const Header = () => {
@@ -189,11 +191,11 @@ const Header = () => {
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-4">
           <ul className="flex items-center space-x-6 text-white">
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link className="nav-link" to="/">
                 Home
               </Link>
-            </li>
+            </li> */}
             <li className="nav-item">
               <Link className="nav-link" to="/Translator">
                 Translator
@@ -210,15 +212,33 @@ const Header = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <a
-                className="nav-link"
-                href="http://localhost:5173/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Trip-tgt
-              </a>
+              <Link className="nav-link" to="/">
+                Trip-me
+              </Link>
             </li>
+            {/* <li className="nav-item">
+          {currentUser ? (
+            <a
+              className="nav-link"
+              href="http://localhost:5173/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trip-tgt
+            </a>
+          ) : (
+            <span
+              onClick={() => navigate("/NoUserFound")}
+            >
+              Trip-tgt
+            </span>
+          )}
+        </li> */}
+        <li className="nav-item">
+          <Link className="nav-link" to="/trip-tgt">
+            Trip-tgt
+          </Link>
+        </li>
           </ul>
 
           {/* if not signin yet user => Sign In */}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import WOW from 'wowjs';
 import { Routes, Route } from 'react-router-dom';
 
@@ -36,6 +36,9 @@ import MyBlog from './components/profile/MyBlog';
 
 import PublicProfilePage from './components/profile/PublicProfilePage';
 
+import TripTGTPage from "./components/TripTGT/TripTGTPage";
+import NoUserFound from "./components/TripTGT/NoUserFound";
+
 // auth
 import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 import ResetPasswordPage from './components/auth/ResetPasswordPage';
@@ -62,6 +65,25 @@ const HomePage = () => {
 };
 
 function App() {
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return; // ยังไม่ได้ล็อกอิน
+
+    // เรียก API หา user
+    fetch("http://localhost:5000/api/user/profile", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setCurrentUser(data.user);
+        }
+      })
+      .catch((err) => console.error("Fetch user error:", err));
+  }, []);
+
   useEffect(() => {
     new WOW.WOW().init();
   }, []);
@@ -90,6 +112,13 @@ function App() {
 
         <Route path="/users/:username" element={<PublicProfilePage />} />
         <Route path="/my-blog" element={<MyBlog />} />
+
+        <Route
+          path="/trip-tgt"
+          element={
+            currentUser ? <TripTGTPage /> : <NoUserFound />
+          }
+        />
         
         <Route path="*" element={<NotFound />} />
       </Routes>

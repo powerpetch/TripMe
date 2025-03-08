@@ -42,13 +42,13 @@ const CurrencyExchange = () => {
   }, [baseCurrency, compareCurrency, amount]);
 
   const handleAmountChange = (e) => {
-    const value = e.target.value;
+    const value = Math.max(0, parseFloat(e.target.value) || 0);
     setAmount(value);
     setConvertedAmount((exchangeRates[compareCurrency.value] * value).toFixed(2));
   };
-
+  
   const handleConvertedAmountChange = (e) => {
-    const value = e.target.value;
+    const value = Math.max(0, parseFloat(e.target.value) || 0);
     setConvertedAmount(value);
     setAmount((value / exchangeRates[compareCurrency.value]).toFixed(2));
   };
@@ -83,7 +83,7 @@ const CurrencyExchange = () => {
             mb-6 
             w-full
           ">
-            {/* ส่วนซ้าย (baseCurrency) */}
+            {/* baseCurrency */}
             <div className="flex-1 w-full">
               <label className="block text-gray-700 font-semibold mb-1">
                 Amount
@@ -91,6 +91,7 @@ const CurrencyExchange = () => {
               <div className="flex items-center gap-2 border p-2 rounded-md bg-white shadow-sm">
                 <input
                   type="number"
+                  min="0"
                   value={amount}
                   onChange={handleAmountChange}
                   className="w-full border-none outline-none text-base md:text-lg"
@@ -104,11 +105,11 @@ const CurrencyExchange = () => {
               </div>
             </div>
 
-            {/* สัญลักษณ์สลับ */}
+            {/* swap */}
             <div className="hidden md:block text-3xl font-bold">⇆</div>
             <div className="block md:hidden text-3xl font-bold">⇅</div>
 
-            {/* ส่วนขวา (compareCurrency) */}
+            {/* compareCurrency */}
             <div className="flex-1 w-full">
               <label className="block text-gray-700 font-semibold mb-1">
                 Converted to
@@ -116,6 +117,7 @@ const CurrencyExchange = () => {
               <div className="flex items-center gap-2 border p-2 rounded-md bg-white shadow-sm">
                 <input
                   type="number"
+                  min="0"
                   value={convertedAmount}
                   onChange={handleConvertedAmountChange}
                   className="w-full border-none outline-none text-base md:text-lg"
@@ -164,7 +166,7 @@ const CurrencyExchange = () => {
             </button>
           </div>
 
-          {/* ตาราง exchange rates */}
+          {/* exchange rates table */}
           <div className="bg-white p-4 md:p-6 rounded-lg shadow-md w-full mt-8">
             <h3 className="text-lg md:text-xl font-semibold mb-4 text-center">
               Exchange Rates

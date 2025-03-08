@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaCamera } from "react-icons/fa";
+import "../TripTGT/Loader.css";
 import logoGreen from "../../images/new-logo-green.png";
 import { COUNTRY_CODES, COUNTRIES, DAYS, MONTHS, YEARS, LANGUAGES } from "../../js/mockData";
 import Header from "../homepage/header/OtherHeader";
@@ -8,6 +9,7 @@ import Header from "../homepage/header/OtherHeader";
 function EditProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [coverFile, setCoverFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
@@ -45,15 +47,19 @@ function EditProfilePage() {
   ? (user.avatar.startsWith("http") ? user.avatar : `${baseUrl}${user.avatar}`)
   : null;
 
-const coverURL = user && user.cover 
+  const coverURL = user && user.cover 
   ? (user.cover.startsWith("http") ? user.cover : `${baseUrl}${user.cover}`)
   : null;
 
 
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) return;
-
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+  
     fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -61,7 +67,8 @@ const coverURL = user && user.cover
       .then((data) => {
         if (data.user) {
           setUser(data.user);
-
+  
+          // Set all the user data
           if (data.user.cover) {
             setCoverPreview(
               data.user.cover.startsWith("http")
@@ -76,12 +83,13 @@ const coverURL = user && user.cover
                 : `${baseUrl}${data.user.avatar}`
             );
           }
-
+  
+          // Set all other user fields
           setUsername(data.user.username || "");
           setFirstName(data.user.firstName || "");
           setLastName(data.user.lastName || "");
           setGender(data.user.gender || "N/A");
-
+  
           if (data.user.tel) {
             const found = COUNTRY_CODES.find((c) =>
               data.user.tel.startsWith(c.value)
@@ -98,16 +106,16 @@ const coverURL = user && user.cover
             setTel("");
             setCountryCode("");
           }
-
+  
           setLanguage(data.user.language || "");
-
+  
           if (data.user.dob) {
             const [d, m, y] = data.user.dob.split("/");
             setDobDay(d || "");
             setDobMonth(m || "");
             setDobYear(y || "");
           }
-
+  
           setTwitter(data.user.twitter || "");
           setFacebook(data.user.facebook || "");
           setInstagram(data.user.instagram || "");
@@ -115,8 +123,31 @@ const coverURL = user && user.cover
           setCity(data.user.city || "");
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error(err))
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
+  
+  // Add loading state check
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="loader"></div>
+      </div>
+    );
+  }
+  
+  // Add user check before rendering
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-gray-600 text-lg">
+          No user found. Please Sign In first.
+        </p>
+      </div>
+    );
+  }
 
   const actualSave = () => {
     const token = localStorage.getItem("token");
@@ -207,15 +238,6 @@ const coverURL = user && user.cover
     navigate("/profile");
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-600 text-lg">
-          No user found. Please Sign In first.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white pb-8">

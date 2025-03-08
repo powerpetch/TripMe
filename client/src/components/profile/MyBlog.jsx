@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
 import Header from "../homepage/header/OtherHeader";
+import "../TripTGT/Loader.css";
 
 function MyBlog() {
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ function MyBlog() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-gray-600 text-lg">Loading...</p>
+        <div className="loader"></div>
       </div>
     );
   }

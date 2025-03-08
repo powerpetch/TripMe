@@ -124,10 +124,8 @@ const AuthPage = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("loginTime", Date.now().toString());
-        // for social network domain(: ))
-        document.cookie = `token=${data.token}; path=/; domain=localhost; secure; samesite=None`;
-
         navigate("/");
+        window.location.reload();
       } else {
         setIsEmailError(true);
         setIsPasswordError(true);

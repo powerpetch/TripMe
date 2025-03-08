@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaUserCircle, FaEye, FaEyeSlash } from "react-icons/fa";
 import logoGreen from "../../images/new-logo-green.png";
+import "../TripTGT/Loader.css";
 
 function ChangePasswordPage() {
   const navigate = useNavigate();
@@ -113,7 +114,7 @@ function ChangePasswordPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600">Loading...</p>
+        <div className="loader"></div>
       </div>
     );
   }

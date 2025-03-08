@@ -12,21 +12,24 @@ import {
 } from "react-icons/fa";
 import { MdAddBox } from "react-icons/md";
 import { FaUnlock } from "react-icons/fa6";
-
+import "../TripTGT/Loader.css";
 import logoGreen from "../../images/new-logo-green.png";
 import coverimg from "../../images/phd.jpg";
 
 function ProfilePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const baseUrl = `${process.env.REACT_APP_API_BASE_URL}`;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
+      setLoading(false);
       return;
     }
-    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
+
+    fetch(`${baseUrl}/api/user/profile`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -40,8 +43,19 @@ function ProfilePage() {
           console.log("No valid user, please log in again");
         }
       })
-      .catch((err) => console.error(err));
-  }, []);
+      .catch((err) => console.error("Fetch user error:", err))
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [baseUrl]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="loader"></div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
