@@ -26,7 +26,7 @@ import Currency from './components/currency/currency';
 import MapPage from './components/map/MapPage';
 
 import CreateTrip from './components/tripDetail/CreateTrip'
-// import Trip from './components/tripDetail/Trip'
+import EditTrip from './components/tripDetail/EditTrip'
 import TripDetails from './components/tripDetail/TripDetailShow.jsx';
 
 import ProfilePage from './components/profile/ProfilePage';
@@ -100,6 +100,8 @@ function App() {
         <Route path="/create" element={<CreateTrip />} />
         {/* <Route path="/trip" element={<Trip />} /> */}
         <Route path="/trip/:id" element={<TripDetails />} />
+        <Route path="/edit-trip/:tripId" element={<EditTrip />} />
+
 
 
 
