@@ -122,6 +122,8 @@ const AuthPage = () => {
 
       if (res.ok && data.success) {
         localStorage.setItem("token", data.token);
+        document.cookie =
+          "data.token=" + data.token + "; path=/; domain=localhost";
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("loginTime", Date.now().toString());
         navigate("/");
@@ -129,6 +131,7 @@ const AuthPage = () => {
       } else {
         setIsEmailError(true);
         setIsPasswordError(true);
+        
         // alert(data.message || "Sign In Error");
       }
     } catch (err) {

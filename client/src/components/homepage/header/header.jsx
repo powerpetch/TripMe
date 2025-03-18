@@ -212,8 +212,8 @@ const Header = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/">
-                Trip-me
+              <Link className="nav-link" to="/trips">
+                Discover
               </Link>
             </li>
             {/* <li className="nav-item">
@@ -389,6 +389,13 @@ const Header = () => {
         >
           Map
         </Link>
+        <Link
+          className="text-lg text-white"
+          to="/trips"
+          onClick={() => setMenuOpen(false)}
+        >
+          Discover
+        </Link>
         <a
         href="http://localhost:5173/"
           className="text-lg text-white"
@@ -425,6 +432,13 @@ const Header = () => {
         {/* Mobile Menu - User Profile Section */}
         {currentUser && (
           <>
+            <Link
+            className="text-lg text-white"
+            to="/create"
+            onClick={() => setMenuOpen(false)}
+          >
+            + Create My Trip
+          </Link>
             {/* User Info Button - Clickable to show/hide options */}
             <div
               onClick={() => setShowMobileProfileMenu(!showMobileProfileMenu)}

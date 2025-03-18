@@ -117,10 +117,10 @@ router.post(
   }
 );
 
-router.get("/", async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
-    const trips = await TripDetail.find(); // Fetch all trips from the database
-    res.status(200).json(trips); // Send the trips as JSON response
+    const trips = await TripDetail.find().populate("userId", "username").sort({ createdAt: -1 });; 
+    res.status(200).json(trips); 
   } catch (err) {
     console.error("Error fetching trips:", err);
     res.status(500).json({ message: "Error fetching trips", error: err });

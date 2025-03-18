@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 import { useDropzone } from 'react-dropzone';
 import Header2 from '../homepage/header/OtherHeader';
+import { COUNTRIES } from "../../js/mockData";
 // import { format } from 'date-fns';
 import { 
   Menu, X, MapPin, Building, Bus, 
-  Cloud, DollarSign, Image, PlusCircle, Trash2, Shirt, Lightbulb
+  Cloud, DollarSign, Image, PlusCircle, Trash2, Shirt, Lightbulb, AlertCircle
 } from 'lucide-react';
 import { FaCalendarAlt } from 'react-icons/fa';
 
@@ -74,6 +75,15 @@ const CreateMyTrip = () => {
   const [clothingTips, setClothingTips] = useState('');
   const [budgetItems, setBudgetItems] = useState([]);
   const [photos, setPhotos] = useState([]);
+  const [errors, setErrors] = useState({
+    country: '',
+    dates: '',
+    places: '',
+    accommodations: '',
+    transportations: '',
+    budget: '',
+    photos: ''
+  });
   
   // Current section
   const [activeSection, setActiveSection] = useState('general');
@@ -213,10 +223,79 @@ const CreateMyTrip = () => {
     }
   };
 
+  const validateForm = () => {
+    const newErrors = {
+      country: '',
+      dates: '',
+      places: '',
+      accommodations: '',
+      transportations: '',
+      budget: '',
+      photos: ''
+    };
+    let isValid = true;
+
+    if (!country.trim()) {
+      newErrors.country = 'Country name is required';
+      isValid = false;
+    }
+
+    if (!startDate || !endDate) {
+      newErrors.dates = 'Both start and end dates are required';
+      isValid = false;
+    }
+
+    if (visitedPlaces.length === 0 || !visitedPlaces.some(place => place.name.trim())) {
+      newErrors.places = 'At least one visited place with a name is required';
+      isValid = false;
+    }
+
+    if (accommodations.length === 0 || !accommodations.some(acc => acc.name.trim())) {
+      newErrors.accommodations = 'At least one accommodation with a name is required';
+      isValid = false;
+    }
+
+    if (transportations.length === 0 || !transportations.some(trans => trans.type && trans.from && trans.to)) {
+      newErrors.transportations = 'At least one transportation with type, origin, and destination is required';
+      isValid = false;
+    }
+
+    if (budgetItems.length === 0 || !budgetItems.some(item => item.category && item.amount)) {
+      newErrors.budget = 'At least one budget item with category and amount is required';
+      isValid = false;
+    }
+
+    if (photos.length === 0) {
+      newErrors.photos = 'At least one photo is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
 
   // Handle form submission
   const handleSubmit = async(e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      const errorSections = {
+        country: 'general',
+        dates: 'general',
+        places: 'places',
+        accommodations: 'accommodation',
+        transportations: 'transportation',
+        budget: 'budget',
+        photos: 'gallery'
+      };
+
+      const firstErrorField = Object.keys(errors).find(key => errors[key]);
+      if (firstErrorField) {
+        setActiveSection(errorSections[firstErrorField]);
+      }
+      return;
+    }
     setLoading(true);
     // console.log({
     //   country,
@@ -269,7 +348,7 @@ const CreateMyTrip = () => {
       setLoading(false); // End the loading state
     }
   };
-    // Reset form or navigate to another page
+
 
 
   // Calculate total budget
@@ -278,7 +357,15 @@ const CreateMyTrip = () => {
     return sum + amount;
   }, 0);
 
-  
+  const ErrorMessage = ({ message }) => {
+    if (!message) return null;
+    return (
+      <div className="flex items-center text-red-600 text-sm mt-1">
+        <AlertCircle size={16} className="mr-1" />
+        {message}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-green-50">
@@ -349,10 +436,11 @@ const CreateMyTrip = () => {
                     type="text"
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className={`w-full p-3 border ${errors.country ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
                     placeholder="Enter country name"
                   />
-                </div>
+                  <ErrorMessage message={errors.country} />  
+~                </div>
                 
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">Travel Period</label>
@@ -366,7 +454,7 @@ const CreateMyTrip = () => {
                         selectsStart
                         startDate={startDate}
                         endDate={endDate}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer custom-datepicker"
+                        className={`w-full p-3 border ${errors.dates ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
                         placeholderText=""
                         dateFormat="MMMM d, yyyy"
                       />
@@ -386,7 +474,7 @@ const CreateMyTrip = () => {
                         endDate={endDate}
                         minDate={startDate}
                         disabled={!startDate}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer custom-datepicker"
+                        className={`w-full p-3 border ${errors.dates ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-green-500`}
                         placeholderText=""
                         dateFormat="MMMM d, yyyy"
                       />
@@ -394,7 +482,9 @@ const CreateMyTrip = () => {
                       </div>
                       
                     </div>
+                    
                   </div>
+                  <ErrorMessage message={errors.dates} />
                 </div>
                 
                 <div className="mt-6">
@@ -460,6 +550,7 @@ const CreateMyTrip = () => {
                         rows={3}
                       />
                     </div>
+                    
                   </div>
                 ))}
                 
@@ -470,6 +561,7 @@ const CreateMyTrip = () => {
                 >
                   <PlusCircle size={18} className="mr-2" /> Add Place
                 </button>
+                <ErrorMessage message={errors.places} />
               </div>
             )}
             
@@ -531,6 +623,7 @@ const CreateMyTrip = () => {
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="e.g., Booking.com, Airbnb"
                         />
+                        <ErrorMessage message={errors.accommodations} />
                       </div>
                       
                       {/* <div>
@@ -550,10 +643,11 @@ const CreateMyTrip = () => {
                 <button
                   type="button"
                   onClick={addAccommodation}
-                  className="flex items-center justify-center w-full p-3 border border-dashed border-green-500 rounded-md text-green-600 hover:bg-green-50"
+                  className={`flex items-center justify-center w-full p-3 border border-dashed  border-green-500 rounded-md text-green-600 hover:bg-green-50`}
                 >
                   <PlusCircle size={18} className="mr-2" /> Add Accommodation
                 </button>
+                <ErrorMessage message={errors.accommodations} />
               </div>
             )}
             
@@ -650,6 +744,7 @@ const CreateMyTrip = () => {
                 >
                   <PlusCircle size={18} className="mr-2" /> Add Transportation
                 </button>
+                <ErrorMessage message={errors.transportations} />
               </div>
             )}
             
@@ -765,7 +860,9 @@ const CreateMyTrip = () => {
                   <h4 className="font-semibold text-lg mb-2">Budget Summary</h4>
                   <p className="text-xl">Total: <span className="font-bold">${totalBudget.toFixed(2)}</span></p>
                 </div>
+                <ErrorMessage message={errors.budget} />
               </div>
+              
             )}
             
             {/* Gallery Section */}
@@ -801,6 +898,7 @@ const CreateMyTrip = () => {
                     ))}
                   </div>
                 )}
+                <ErrorMessage message={errors.photos} />
               </div>
             )}
             

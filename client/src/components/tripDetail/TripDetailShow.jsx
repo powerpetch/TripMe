@@ -95,7 +95,7 @@ const TripDetailsShow = () => {
               className="absolute top-4 right-4 text-white z-10"
               onClick={() => setActiveImage(null)} // Close modal when clicked
             >
-              <X size={50} color="black" className="border-2 border-white p-2 rounded-full"/> 
+              <X size={32} color="white" className="border-2 border-white p-2 bg-gray-500 rounded-full"/> 
             </button>
            
             <button
@@ -107,7 +107,7 @@ const TripDetailsShow = () => {
                 setActiveImage(trip.photos[activeImageIndex === 0 ? trip.photos.length - 1 : activeImageIndex - 1].url);
               }}
             >
-              <ChevronLeft size={32} color="white" className="border-2 border-white p-2 rounded-full"/>
+              <ChevronLeft size={32} color="white" className="border-2 border-white p-2 bg-gray-500 rounded-full"/>
             </button>
 
             <div className="w-full h-auto">
@@ -127,7 +127,7 @@ const TripDetailsShow = () => {
                 setActiveImage(trip.photos[activeImageIndex === trip.photos.length - 1 ? 0 : activeImageIndex + 1].url);
               }}
             >
-              <ChevronRight size={32} color="white" className="border-2 border-white p-2 rounded-full" />
+              <ChevronRight size={32} color="white" className="border-2 border-white p-2 bg-gray-500 rounded-full" />
             </button>
           </div>
         </div>

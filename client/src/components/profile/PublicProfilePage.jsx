@@ -21,7 +21,7 @@ function PublicProfilePage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return; // if not logged in, do nothing
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())

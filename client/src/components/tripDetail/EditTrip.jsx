@@ -182,7 +182,7 @@ const EditMyTrip = () => {
 
   const updateAccommodation = (id, field, value) => {
     setAccommodations(accommodations.map(accommodation => 
-      accommodation.id === id ? { ...accommodation, [field]: value } : accommodation
+      accommodation._id === id ? { ...accommodation, [field]: value } : accommodation
     ));
   };
 
@@ -205,7 +205,7 @@ const EditMyTrip = () => {
 
   const updateTransportation = (id, field, value) => {
     setTransportations(transportations.map(transportation => 
-      transportation.id === id ? { ...transportation, [field]: value } : transportation
+      transportation._id === id ? { ...transportation, [field]: value } : transportation
     ));
   };
 
@@ -226,7 +226,7 @@ const EditMyTrip = () => {
 
   const updateBudgetItem = (id, field, value) => {
     setBudgetItems(budgetItems.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
+      item._id === id ? { ...item, [field]: value } : item
     ));
   };
 

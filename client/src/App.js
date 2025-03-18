@@ -28,6 +28,7 @@ import MapPage from './components/map/MapPage';
 import CreateTrip from './components/tripDetail/CreateTrip'
 import EditTrip from './components/tripDetail/EditTrip'
 import TripDetails from './components/tripDetail/TripDetailShow.jsx';
+import AllTrips from './components/tripDetail/AllTrips.jsx';
 
 import ProfilePage from './components/profile/ProfilePage';
 import EditProfilePage from './components/profile/EditProfilePage';
@@ -72,7 +73,7 @@ function App() {
     if (!token) return; // ยังไม่ได้ล็อกอิน
 
     // เรียก API หา user
-    fetch("http://localhost:5000/api/user/profile", {
+    fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -101,6 +102,7 @@ function App() {
         {/* <Route path="/trip" element={<Trip />} /> */}
         <Route path="/trip/:id" element={<TripDetails />} />
         <Route path="/edit-trip/:tripId" element={<EditTrip />} />
+        <Route path="/trips" element={<AllTrips />} />
 
 
 
