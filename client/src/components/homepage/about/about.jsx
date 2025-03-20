@@ -37,17 +37,13 @@ const About = () => {
         <div className="row">
           <div className="col-md-12">
             <div className="text-4xl sectioner-header text-center">
-              <h3>Just 3 Step</h3>
+              <h3>TripMe</h3>
               <span className="line"></span>
-              <p>
-                Sed quis nisi nisi. Proin consectetur porttitor dui sit amet
-                viverra. Fusce sit amet lorem faucibus, vestibulum ante in,
-                pharetra ante.
-              </p>
+              <p>Connecting solo travelers with seamless tools for exploring the world.</p>
             </div>
             <div className="section-content text-center">
               <div className="row">
-                {/* Plans */}
+                {/* Step 1: Plans */}
                 <div className="col-md-4">
                   <motion.div
                     className="text-lg flex flex-col items-center icon-box"
@@ -59,16 +55,16 @@ const About = () => {
                     <img
                       className="w-16 h-16 mb-4"
                       src="https://themexriver.com/wp/goyto/wp-content/uploads/2024/04/ft1-1.webp"
-                      alt="Support"
+                      alt="Plans"
                     />
                     <h5 className="text-lg font-semibold">Plans</h5>
                     <p className="text-gray-500">
-                      Phasellus lobortis justo a magna facilisis, in commodo tellus rutrum. Sed vitae condimentum nulla.
+                      Create and share itineraries with fellow travelers.
                     </p>
                   </motion.div>
                 </div>
 
-                {/* Book */}
+                {/* Step 2: Book */}
                 <div className="col-md-4">
                   <motion.div
                     className="text-lg flex flex-col items-center icon-box"
@@ -80,16 +76,16 @@ const About = () => {
                     <img
                       className="w-16 h-16 mb-4"
                       src="https://themexriver.com/wp/goyto/wp-content/uploads/2024/04/ft2.webp"
-                      alt="Cross Platform"
+                      alt="Book"
                     />
                     <h5 className="text-lg font-semibold">Book</h5>
                     <p className="text-gray-500">
-                      Phasellus lobortis justo a magna facilisis, in commodo tellus rutrum. Sed vitae condimentum nulla.
+                      Easily book your travel experiences with our integrated platform.
                     </p>
                   </motion.div>
                 </div>
 
-                {/* Go */}
+                {/* Step 3: Go */}
                 <div className="col-md-4">
                   <motion.div
                     className="text-lg flex flex-col items-center icon-box"
@@ -101,11 +97,11 @@ const About = () => {
                     <img
                       className="w-16 h-16 mb-4"
                       src="https://themexriver.com/wp/goyto/wp-content/uploads/2024/04/ft3.webp"
-                      alt="Fast"
+                      alt="Go"
                     />
                     <h5 className="text-lg font-semibold">Go</h5>
                     <p className="text-gray-500">
-                      Phasellus lobortis justo a magna facilisis, in commodo tellus rutrum. Sed vitae condimentum nulla.
+                      Start your adventure with confidence using essential travel tools.
                     </p>
                   </motion.div>
                 </div>

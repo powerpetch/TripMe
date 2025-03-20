@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Link } from 'react-router-dom';
 import { FaHeart } from "react-icons/fa";
-import {
+import { 
   Trash2,
   SquarePen,
   MapPin,
@@ -12,16 +11,41 @@ import {
 } from "lucide-react";
 import Header from '../homepage/header/header';
 
+
+function fLetterCap(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ฟังก์ชัน shuffle array (สำหรับ sort แบบ random)
+function shuffleArray(array) {
+  const newArr = [...array];
+  for (let i = newArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+  }
+  return newArr;
+}
+
 const AllTrips = () => {
   const navigate = useNavigate();
-  const[trips,setTrips] = useState([]);
+  const location = useLocation();
+  
+  const [trips, setTrips] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fLetterCap = (str) => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+  // ----- Search & Sort -----
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOption, setSortOption] = useState("random");
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const searchParam = queryParams.get("search");
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const fetchTrips = async () => {
@@ -32,17 +56,20 @@ const AllTrips = () => {
         }
         const data = await response.json();
         setTrips(data);
-        
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-  fetchTrips();
+    fetchTrips();
   }, []);
-  console.log(trips)
 
+  const filteredTrips = useMemo(() => {
+    return trips.filter(trip =>
+      trip.country.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [trips, searchTerm]);
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -53,10 +80,10 @@ const AllTrips = () => {
     }
   };
 
-  const renderTripCards = (trips) => {
+  const renderTripCards = (tripList) => {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
-        {trips.map((trip, index) => (
+        {tripList.map((trip, index) => (
           <motion.div
             key={trip._id}
             className="bg-white rounded-xl overflow-hidden shadow-lg"
@@ -86,7 +113,9 @@ const AllTrips = () => {
                 </div>
                 <div className="flex items-center text-sm space-x-2 text-gray-200">
                   <Calendar size={14} />
-                  <span>{new Date(trip.travelPeriod.startDate).toLocaleDateString()}</span>
+                  <span>
+                    {new Date(trip.travelPeriod.startDate).toLocaleDateString()}
+                  </span>
                 </div>
               </motion.div>
             </div>
@@ -107,20 +136,29 @@ const AllTrips = () => {
                   <span className="text-sm font-medium">12</span>
                 </div>
               </div>
-
-              <motion.div 
-                className="flex justify-between pt-3 border-t"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-              </motion.div>
             </div>
           </motion.div>
         ))}
       </div>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <span class="loader"></span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 pb-8">
       <Header />
@@ -129,16 +167,49 @@ const AllTrips = () => {
           <p className="text-gray-600">No trips have been created yet.</p>
         </div>
       )}
+
       <div className="pt-24 max-w-6xl mx-auto w-full px-4">
-        <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">Explore All Trips</h1>
-        {renderTripCards(trips)}
-        
+        <h1 className="text-3xl font-bold text-green-700 mb-8 text-center">
+          Explore All Trips
+        </h1>
+
+        {/* Search & Sort Controls */}
+        <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+          {/* Search Bar */}
+          <div className="w-full sm:w-1/2 mb-4 sm:mb-0 sm:mr-4">
+            <input
+              type="text"
+              placeholder="Search by country..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+          {/* Sort Dropdown */}
+          <div>
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+            >
+              <option value="random">Random</option>
+              <option value="dateAsc">Date Ascending</option>
+              <option value="dateDesc">Date Descending</option>
+              <option value="countryAsc">Country A-Z</option>
+              <option value="countryDesc">Country Z-A</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Render Trips with filter & sort */}
+        {filteredTrips.length > 0 ? (
+        renderTripCards(filteredTrips)
+      ) : (
+        <p>No matching trips found.</p>
+      )}
       </div>
-
-      
-      
     </div>
-  )
-}
+  );
+};
 
-export default AllTrips
+export default AllTrips;

@@ -4,11 +4,15 @@ import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
 import "./background.css";
 import "./animations.css";
+import { toast, ToastContainer } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
 
 const AuthPage = () => {
   const navigate = useNavigate();
 
   const [isSignUp, setIsSignUp] = useState(false);
+  // For mobile responsiveness
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   // Sign In
   const [signInEmail, setSignInEmail] = useState("");
@@ -31,6 +35,16 @@ const AuthPage = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isOtpVerified, setIsOtpVerified] = useState(false);
 
+  // Check for mobile screen size on window resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // -------------- Request OTP --------------
   const handleRequestOtp = async () => {
     setIsEmailError(false);
@@ -41,6 +55,8 @@ const AuthPage = () => {
       setSignUpError("Please fill all fields correctly before requesting OTP.");
       return;
     }
+
+    toast.info("Sending OTP to your email. Please check your inbox.");
 
     try {
       // ใช้ /signup ในการสร้าง user + ส่ง OTP
@@ -94,16 +110,11 @@ const AuthPage = () => {
   };
 
   // -------------- Sign Up (final) --------------
-  // ในที่นี้ ถ้า OTP ยังไม่ verify => ไม่ให้ sign up
-  // แต่จริงๆ user ถูกสร้างใน DB แล้ว => signUp = "finish"
-  // (หรือจะไม่ต้องมีปุ่มนี้ก็ได้ ถ้า verify OTP = sign up สำเร็จ)
   const handleSignUpFinal = () => {
     if (!isOtpVerified) {
       setSignUpError("Please verify OTP first.");
       return;
     }
-    // ถ้า otpVerified = true => แปลว่า user ใช้อีเมล + pass + OTP สำเร็จ => เข้า sign in ได้เลย
-    // alert("Your email is verified. You can now Sign In.");
     setIsSignUp(false); // กลับไปหน้า sign in
   };
 
@@ -122,16 +133,16 @@ const AuthPage = () => {
 
       if (res.ok && data.success) {
         localStorage.setItem("token", data.token);
-        document.cookie =
-          "data.token=" + data.token + "; path=/; domain=localhost";
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("loginTime", Date.now().toString());
+
+        document.cookie = "data.token=" + data.token + "; path=/; domain=localhost";
+
         navigate("/");
         window.location.reload();
       } else {
         setIsEmailError(true);
         setIsPasswordError(true);
-        
         // alert(data.message || "Sign In Error");
       }
     } catch (err) {
@@ -148,27 +159,53 @@ const AuthPage = () => {
         <li></li><li></li><li></li><li></li><li></li>
       </ul>
 
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="relative w-full max-w-4xl h-[600px] bg-white/90 shadow-2xl flex overflow-hidden rounded-2xl m-4 backdrop-blur-sm">
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
 
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className={`relative w-full ${isMobile ? 'max-w-md' : 'max-w-4xl'} ${isMobile ? 'h-auto py-10' : 'h-[600px]'} bg-white/90 shadow-2xl flex overflow-hidden rounded-2xl backdrop-blur-sm`}>
           {/* ปุ่มปิด */}
           <button
             onClick={() => navigate("/")}
             className={`
               absolute top-4 left-4 z-30 transition-colors duration-300
-              ${isSignUp ? "text-white hover:text-green-200" : "text-green-600 hover:text-green-800"}
+              ${isSignUp && !isMobile ? "text-white hover:text-green-200" : "text-green-600 hover:text-green-800"}
             `}
           >
             <FaTimes size={24} />
           </button>
 
+          {/* Mobile Toggle Button */}
+          {isMobile && (
+            <div className="absolute top-4 right-4 z-30">
+              <button 
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="px-4 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition-colors"
+              >
+                {isSignUp ? "Sign In" : "Sign Up"}
+              </button>
+            </div>
+          )}
+
           {/* Left Section - Sign In */}
           <div className={`
-            absolute w-1/2 h-full flex flex-col justify-center p-12
+            ${isMobile ? 'relative w-full' : 'absolute w-1/2'} h-full flex flex-col justify-center p-6 md:p-12
             transition-all duration-700 ease-in-out z-20 bg-white/90
-            ${isSignUp ? "-translate-x-full opacity-0" : "translate-x-0 opacity-100"}
+            ${isMobile 
+              ? (isSignUp ? 'hidden' : 'block') 
+              : (isSignUp ? '-translate-x-full opacity-0' : 'translate-x-0 opacity-100')
+            }
           `}>
-            <h2 className="text-3xl font-bold text-green-600 mb-6">Welcome Back</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-6">Welcome Back</h2>
             <input
               type="email"
               placeholder="Email"
@@ -185,7 +222,7 @@ const AuthPage = () => {
                 type={showSignInPassword ? "text" : "password"}
                 placeholder="Password"
                 className={`
-                  w-full p-3 pl-10 pr-10 border-2 rounded-lg focus:outline-none transition-colors
+                  w-full p-3 pr-10 border-2 rounded-lg focus:outline-none transition-colors
                   ${isPasswordError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
                 `}
                 value={signInPassword}
@@ -217,11 +254,14 @@ const AuthPage = () => {
 
           {/* Right Section - Sign Up */}
           <div className={`
-            absolute w-1/2 h-full right-0 flex flex-col justify-center p-12
+            ${isMobile ? 'relative w-full' : 'absolute w-1/2 right-0'} h-full flex flex-col justify-center p-6 md:p-12
             transition-all duration-700 ease-in-out z-20 bg-white/90
-            ${isSignUp ? "translate-x-0 opacity-100" : "translate-x-full opacity-0"}
+            ${isMobile 
+              ? (isSignUp ? 'block' : 'hidden') 
+              : (isSignUp ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0')
+            }
           `}>
-            <h2 className="text-3xl font-bold text-green-600 mb-6">Create Account</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-green-600 mb-6">Create Account</h2>
             
             {/* Name */}
             <input
@@ -236,12 +276,12 @@ const AuthPage = () => {
             />
 
             {/* Email + Button Get OTP */}
-            <div className="flex items-center space-x-2 mb-3">
+            <div className="flex flex-col md:flex-row md:items-center md:space-x-2 mb-3">
               <input
                 type="email"
                 placeholder="Email"
                 className={`
-                  flex-1 p-3 border-2 rounded-lg focus:outline-none transition-colors
+                  w-full p-3 border-2 rounded-lg focus:outline-none transition-colors mb-2 md:mb-0
                   ${isEmailError ? 'error-input shake' : 'border-green-100 focus:border-green-500'}
                 `}
                 value={signUpEmail}
@@ -249,7 +289,7 @@ const AuthPage = () => {
               />
               <button
                 onClick={handleRequestOtp}
-                className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 w-full md:w-auto"
               >
                 Get OTP
               </button>
@@ -257,17 +297,17 @@ const AuthPage = () => {
 
             {/* ถ้า OTP ถูกส่งแล้ว => โชว์ช่องกรอก OTP */}
             {isOtpSent && (
-              <div className="flex items-center space-x-2 mb-3">
+              <div className="flex flex-col md:flex-row md:items-center md:space-x-2 mb-3">
                 <input
                   type="text"
                   placeholder="OTP"
-                  className="p-3 border-2 rounded-lg flex-1"
+                  className="p-3 border-2 rounded-lg w-full mb-2 md:mb-0"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                 />
                 <button
                   onClick={handleVerifyOtp}
-                  className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 w-full md:w-auto"
                 >
                   Verify
                 </button>
@@ -320,44 +360,46 @@ const AuthPage = () => {
             )}
           </div>
 
-          {/* Sliding Overlay */}
-          <div className={`
-            absolute w-1/2 h-full right-0 bg-green-600 text-white flex items-center justify-center
-            transition-all duration-700 ease-in-out
-            ${isSignUp ? "-translate-x-full" : "translate-x-0"}
-          `}>
-            <div className="px-12 text-center">
-              {isSignUp ? (
-                <>
-                  <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
-                  <p className="text-green-100 mb-6">
-                    To keep connected with us, please login <br/>
-                    with your personal info
-                  </p>
-                  <button 
-                    onClick={() => setIsSignUp(false)}
-                    className="px-8 py-2 border-2 border-white rounded-lg hover:bg-white hover:text-green-600 transition-colors font-semibold"
-                  >
-                    SIGN IN
-                  </button>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-3xl font-bold mb-4">Hello, Friend!</h2>
-                  <p className="text-green-100 mb-7">
-                    Enter your personal details and start <br/>
-                    journey with us
-                  </p>
-                  <button 
-                    onClick={() => setIsSignUp(true)}
-                    className="px-8 py-2 border-2 border-white rounded-lg hover:bg-white hover:text-green-600 transition-colors font-semibold"
-                  >
-                    SIGN UP
-                  </button>
-                </>
-              )}
+          {/* Sliding Overlay - Only show on desktop */}
+          {!isMobile && (
+            <div className={`
+              absolute w-1/2 h-full right-0 bg-green-600 text-white flex items-center justify-center
+              transition-all duration-700 ease-in-out
+              ${isSignUp ? "-translate-x-full" : "translate-x-0"}
+            `}>
+              <div className="px-12 text-center">
+                {isSignUp ? (
+                  <>
+                    <h2 className="text-3xl font-bold mb-4">Welcome Back!</h2>
+                    <p className="text-green-100 mb-6">
+                      To keep connected with us, please login <br/>
+                      with your personal info
+                    </p>
+                    <button 
+                      onClick={() => setIsSignUp(false)}
+                      className="px-8 py-2 border-2 border-white rounded-lg hover:bg-white hover:text-green-600 transition-colors font-semibold"
+                    >
+                      SIGN IN
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-3xl font-bold mb-4">Hello, Friend!</h2>
+                    <p className="text-green-100 mb-7">
+                      Enter your personal details and start <br/>
+                      journey with us
+                    </p>
+                    <button 
+                      onClick={() => setIsSignUp(true)}
+                      className="px-8 py-2 border-2 border-white rounded-lg hover:bg-white hover:text-green-600 transition-colors font-semibold"
+                    >
+                      SIGN UP
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

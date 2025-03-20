@@ -131,7 +131,44 @@ body{
     animation-duration: 11s;
 }
 
-
+/* For Mobile Devices */
+@media screen and (max-width: 768px) {
+    .max-w-4xl {
+      max-width: 100% !important;
+      width: 100%;
+      padding: 1rem;  /* Reduce padding */
+    }
+  
+    .flex_1 {
+      flex-direction: column;  /* Stack the forms vertically */
+    }
+  
+    .h-600px {
+      height: auto;  /* Allow container to adjust its height on small screens */
+    }
+  
+    .p-12 {
+      padding: 2rem 1rem; /* Adjust padding for smaller screens */
+    }
+  
+    .text-3xl {
+      font-size: 1.75rem; /* Adjust font size for smaller devices */
+    }
+  
+    .w-full {
+      width: 100%;  /* Ensure elements take full width */
+    }
+  
+    .p-3 {
+      padding: 0.75rem; /* Reduce padding for mobile */
+    }
+  
+    /* Other element adjustments for better mobile experience */
+    .btn {
+      padding: 0.75rem;  /* Adjust button size */
+    }
+  }
+  
 
 @keyframes animate {
 
@@ -148,3 +185,4 @@ body{
     }
 
 }
+

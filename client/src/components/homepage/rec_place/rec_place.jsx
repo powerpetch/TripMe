@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // เพิ่ม import
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 
@@ -12,9 +13,14 @@ import "./rec_place.css";
 import User1 from "../../../assets/Mount-Fuji.jpg";
 import User2 from "../../../assets/Sydney.jpg";
 import User3 from "../../../assets/paris.jpg";
+import User4 from "../../../assets/new-york.jpg";
+import User5 from "../../../assets/phuket.jpg";
+import User6 from "../../../assets/china.webp";
+import User7 from "../../../assets/venice.jpeg";
 
 const Blog = () => {
   const headerRef = useRef(null);
+  const navigate = useNavigate(); // เตรียมใช้ navigate
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -23,21 +29,22 @@ const Blog = () => {
           entry.target.classList.add('visible');
         }
       },
-      {
-        threshold: 0.1
-      }
+      { threshold: 0.1 }
     );
 
     if (headerRef.current) {
       observer.observe(headerRef.current);
     }
-
     return () => {
       if (headerRef.current) {
         observer.unobserve(headerRef.current);
       }
     };
   }, []);
+
+  const handleViewMore = (searchKeyword) => {
+    navigate(`/trips?search=${encodeURIComponent(searchKeyword)}`);
+  };
 
   return (
     <section className="testimonial section-padding" data-scroll-index="4">
@@ -60,110 +67,145 @@ const Blog = () => {
               nextEl: '.swiper-button-next'
             }}
             grabCursor={true}
-            pagination={{el: ".swiper-pagination", clickable: true, dynamicBullets: true}}
+            pagination={{ el: ".swiper-pagination", clickable: true, dynamicBullets: true }}
             loop
             className="swiper-container"
             breakpoints={{
-              300: {slidesPerView: 1},
-              855: {slidesPerView: 2},
-              1149: {slidesPerView: 3},
-              1448: {slidesPerView: 4},
+              300: { slidesPerView: 1 },
+              855: { slidesPerView: 2 },
+              1149: { slidesPerView: 3 },
+              1448: { slidesPerView: 4 },
             }}
           >
-            {/* Slide 1 */}
+            {/* Mount Fuji */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User1} alt="" className="card-img"/>
+                  <img src={User1} alt="Mount Fuji" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">Mount Fuji, Japan</h3>
+                  <p className="description">12,388 ft active volcano. Best visited Mar-May or Sep-Nov.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("japan")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
 
-            {/* Slide 2 */}
+            {/* Sydney */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User2} alt="" className="card-img"/>
+                  <img src={User2} alt="Sydney Opera House" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">Sydney, Australia</h3>
+                  <p className="description">Iconic harbor city. Opera House & beaches. Perfect Dec-Feb.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("australia")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
 
-            {/* Slide 3 */}
+            {/* Paris */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User1} alt="" className="card-img"/>
+                  <img src={User3} alt="Paris Eiffel Tower" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">Paris, France</h3>
+                  <p className="description">City of Light. Art, cuisine & culture. Best Apr-Jun.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("france")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
 
-            {/* Slide 4 */}
+            {/* New York */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User3} alt="" className="card-img"/>
+                  <img src={User4} alt="New York City" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">New York City, USA</h3>
+                  <p className="description">The Big Apple. Shopping, Broadway & Central Park.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("usa")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
 
-            {/* Slide 5 */}
+            {/* Phuket */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User2} alt="" className="card-img"/>
+                  <img src={User5} alt="Phuket Beach" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">Phuket, Thailand</h3>
+                  <p className="description">Tropical paradise. Beaches & nightlife. Best Nov-Apr.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("thailand")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
 
-            {/* Slide 6 */}
+            {/* Great Wall */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User3} alt="" className="card-img"/>
+                  <img src={User6} alt="Great Wall of China" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">Great Wall, China</h3>
+                  <p className="description">21,196 km ancient wonder. Mutianyu section popular.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("china")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
 
-            {/* Slide 7 */}
+            {/* Venice */}
             <SwiperSlide>
               <article className="card-article">
                 <div className="card-image">
-                  <img src={User2} alt="" className="card-img"/>
+                  <img src={User7} alt="Venice Canals" className="card-img"/>
                 </div>
                 <div className="card-data">
-                  <h3 className="name">Sed quis</h3>
-                  <p className="description">Lorem ipsum dolor sit amet consectetur.</p>
-                  <button className="button">View More</button>
+                  <h3 className="name">Venice, Italy</h3>
+                  <p className="description">City of canals. 417 bridges, gondolas & waterways.</p>
+                  <button
+                    className="button"
+                    onClick={() => handleViewMore("italy")}
+                  >
+                    View More
+                  </button>
                 </div>
               </article>
             </SwiperSlide>
@@ -176,115 +218,3 @@ const Blog = () => {
 };
 
 export default Blog;
-
-// const CardSlider = () => {
-//   return (
-//     <main>
-// 		<div className="blog">
-// 			<Swiper
-// 				modules={[Pagination]}
-// 				grabCursor={true}
-// 				initialSlide={2}
-// 				centeredSlides={true}
-// 				slidesPerView="auto"
-// 				speed={800}
-// 				slideToClickedSlide={true}
-// 				pagination={{ el: ".swiper-pagination" , clickable: true}}
-// 				breakpoints={{
-// 					320: {slidesPerView: 40,},
-// 					430: {slidesPerView: 50,},
-// 					580: {slidesPerView: 70,},
-// 					650: {slidesPerView: 30,},
-// 				}}>
-// 				<SwiperSlide className="swiper-slide slide-1">
-// 					<div className="title">
-// 						<h1>Slide 1</h1>
-// 					</div>
-// 					<div className="content">
-// 						<div className="score">4.8</div>
-// 						<div className="text">
-// 							<h2>Slide 1</h2>
-// 							<p>
-// 								Lorem ipsum dolor sit amet, 
-// 								consectetur adipiscing elit. 
-// 								Sed ac urna eget nunc vestibulum
-// 							</p>
-// 						</div>
-// 						<div className="genre">
-// 							<span style={{ "--i": 1 }}>Drama</span>
-// 							<span style={{ "--i": 2 }}>Action</span>  
-// 						</div>
-// 					</div>
-// 				</SwiperSlide> 
-
-// 				<SwiperSlide className="swiper-slide slide-2">
-// 					<div className="title">
-// 						<h1>Slide 2</h1>
-// 					</div>
-// 					<div className="content">
-// 						<div className="score">4.8</div>
-// 						<div className="text">
-// 							<h2>Slide 2</h2>
-// 							<p>
-// 								Lorem ipsum dolor sit amet, 
-// 								consectetur adipiscing elit. 
-// 								Sed ac urna eget nunc vestibulum
-// 							</p>
-// 						</div>
-// 						<div className="genre">
-// 							<span style={{ "--i": 1 }}>Drama</span>
-// 							<span style={{ "--i": 2 }}>Action</span>  
-// 						</div>
-// 					</div>
-// 				</SwiperSlide> 
-
-// 				<SwiperSlide className="swiper-slide slide-3">
-// 					<div className="title">
-// 						<h1>Slide 3</h1>
-// 					</div>
-// 					<div className="content">
-// 						<div className="score">4.8</div>
-// 						<div className="text">
-// 							<h2>Slide 3</h2>
-// 							<p>
-// 								Lorem ipsum dolor sit amet, 
-// 								consectetur adipiscing elit. 
-// 								Sed ac urna eget nunc vestibulum
-// 							</p>
-// 						</div>
-// 						<div className="genre">
-// 							<span style={{ "--i": 1 }}>Drama</span>
-// 							<span style={{ "--i": 2 }}>Action</span>  
-// 						</div>
-// 					</div>
-// 				</SwiperSlide>
-
-// 				<SwiperSlide className="swiper-slide slide-4">
-// 					<div className="title">
-// 						<h1>Slide 4</h1>
-// 					</div>
-// 					<div className="content">
-// 						<div className="score">4.8</div>
-// 						<div className="text">
-// 							<h2>Slide 4</h2>
-// 							<p>
-// 								Lorem ipsum dolor sit amet, 
-// 								consectetur adipiscing elit. 
-// 								Sed ac urna eget nunc vestibulum
-// 							</p>
-// 						</div>
-// 						<div className="genre">
-// 							<span style={{ "--i": 1 }}>Drama</span>
-// 							<span style={{ "--i": 2 }}>Action</span>  
-// 						</div>
-// 					</div>
-// 				</SwiperSlide> 
-
-// 				<div className="swiper-pagination"></div>
-// 			</Swiper>
-// 		</div>
-//     </main>
-//   );
-// }
-
-// export default CardSlider;

@@ -84,6 +84,8 @@ const Header = () => {
     }
   }, []);
 
+  
+
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem("token");
@@ -164,6 +166,26 @@ const Header = () => {
     </div>
   );
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/trips?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === "Enter") {
+        handleSearch();
+      }
+    };
+  
+    // Add event listener for Enter key
+    document.addEventListener("keypress", handleKeyPress);
+  
+    // Clean up the event listener
+    return () => document.removeEventListener("keypress", handleKeyPress);
+  }, [searchQuery]);
+
   return (
     <nav
       className={`navbar ${
@@ -212,8 +234,8 @@ const Header = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/trips">
-                Discover
+              <Link className="nav-link" to="/Trip">
+                Trip-me
               </Link>
             </li>
             {/* <li className="nav-item">
@@ -325,6 +347,7 @@ const Header = () => {
         </div>
       </div>
 
+
       {/* Overlay mobile */}
       {menuOpen && (
         <div
@@ -338,7 +361,7 @@ const Header = () => {
         className={`
           fixed top-0 right-0 w-3/4 h-full bg-black text-white p-6
           transform transition-transform duration-300 ease-in-out shadow-lg
-          flex flex-col space-y-6
+          flex flex-col overflow-y-auto
           ${menuOpen ? "translate-x-0" : "translate-x-full"} md:hidden
         `}
       >
@@ -349,6 +372,7 @@ const Header = () => {
           <AiOutlineClose size={24} />
         </button>
 
+        <div className="flex flex-col space-y-6 mt-6">
         {/* Search Bar (Mobile) */}
         <div className="flex items-center bg-gray-800 p-2 rounded-lg">
           <AiOutlineSearch className="text-gray-400 mr-2" size={20} />
@@ -389,13 +413,6 @@ const Header = () => {
         >
           Map
         </Link>
-        <Link
-          className="text-lg text-white"
-          to="/trips"
-          onClick={() => setMenuOpen(false)}
-        >
-          Discover
-        </Link>
         <a
         href="http://localhost:5173/"
           className="text-lg text-white"
@@ -429,16 +446,10 @@ const Header = () => {
           </button>
         )}
 
+
         {/* Mobile Menu - User Profile Section */}
         {currentUser && (
           <>
-            <Link
-            className="text-lg text-white"
-            to="/create"
-            onClick={() => setMenuOpen(false)}
-          >
-            + Create My Trip
-          </Link>
             {/* User Info Button - Clickable to show/hide options */}
             <div
               onClick={() => setShowMobileProfileMenu(!showMobileProfileMenu)}
@@ -526,6 +537,7 @@ const Header = () => {
             </button>
           </>
         )}
+                </div>
       </div>
     </nav>
   );

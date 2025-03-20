@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useNavigate } from "react-router-dom";
 
 
 // Import images
@@ -19,6 +20,7 @@ const TravelSection = () => {
   
   const controls = useAnimation();
   const titleControls = useAnimation();
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (inView) {
@@ -67,7 +69,7 @@ const TravelSection = () => {
             <div className="w-12 h-12 bg-green-100 flex items-center justify-center rounded-full">
               <img
                 src={icon1}
-                alt="Best of Hotel"
+                alt="Share Travel Stories"
                 className="w-6 h-6"
                 onError={(e) => {
                   console.error('Failed to load icon1');
@@ -76,10 +78,10 @@ const TravelSection = () => {
               />
             </div>
             <div className="ml-4">
-              <h3 className="text-lg font-bold text-gray-800">Best of Hotel</h3>
+              <h3 className="text-lg font-bold text-gray-800">Share your moment</h3>
               <p className="text-gray-600">
-                We don't just work with concrete and steel. We are approachable
-                with even our highest.
+                Create and share your travel experiences, photos, and stories. 
+                Inspire others with your unique adventures and travel tips.
               </p>
             </div>
           </div>
@@ -87,7 +89,7 @@ const TravelSection = () => {
             <div className="w-12 h-12 bg-green-100 flex items-center justify-center rounded-full">
               <img
                 src={icon2}
-                alt="Friendly price"
+                alt="Connect Travelers"
                 className="w-6 h-6"
                 onError={(e) => {
                   console.error('Failed to load icon2');
@@ -96,10 +98,10 @@ const TravelSection = () => {
               />
             </div>
             <div className="ml-4">
-              <h3 className="text-lg font-bold text-gray-800">Friendly Price</h3>
+              <h3 className="text-lg font-bold text-gray-800">Find new friends</h3>
               <p className="text-gray-600">
-                We don't just work with concrete and steel. We are approachable
-                with even our highest.
+                Join a vibrant community of travelers. Like, comment, and interact 
+                with fellow adventurers from around the world.
               </p>
             </div>
           </div>
@@ -150,7 +152,10 @@ const TravelSection = () => {
         </div>
 
         <div className="text-center mt-8">
-          <button className="bg-green-800 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-900 transition">
+          <button 
+            onClick={() => navigate('/trip-tgt')}
+            className="bg-green-800 text-white px-6 py-3 rounded-full shadow-lg hover:bg-green-900 transition"
+          >
             Find Out More
           </button>
         </div>

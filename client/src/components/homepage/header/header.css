@@ -95,3 +95,8 @@
     width: 69%;
     margin: 0 auto;
   }
+
+  .mobile-sidebar {
+    max-height: 100vh;  /* Limit the height */
+    overflow-y: auto;   /* Make it scrollable */
+  }
