@@ -234,8 +234,8 @@ const Header = () => {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/Trip">
-                Trip-me
+              <Link className="nav-link" to="/trips">
+                Discovery
               </Link>
             </li>
             {/* <li className="nav-item">
@@ -413,13 +413,20 @@ const Header = () => {
         >
           Map
         </Link>
-        <a
-        href="http://localhost:5173/"
+        <Link
+          className="text-lg text-white"
+          to="/trips"
+          onClick={() => setMenuOpen(false)}
+        >
+          Discovery
+        </Link>
+        <Link
+          to="/trip-tgt"
           className="text-lg text-white"
           onClick={() => setMenuOpen(false)}
         >
           Trip-tgt
-        </a>
+        </Link>
 
         {/* not sg user => button Sign In (mobile) */}
         {!currentUser && (

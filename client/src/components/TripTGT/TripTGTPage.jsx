@@ -1,15 +1,15 @@
-import React from 'react';
-import './Loader.css'
+import React from "react";
+import "./Loader.css";
 
 function TripTGTPage() {
   React.useEffect(() => {
-    window.location.href = 'http://localhost:5173/';
+    // Use replace to avoid adding a new history entry
+    window.location.replace("http://localhost:5173/");
   }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4">
-      <span class="loader"></span>
-      {/* <p className="text-gray-600 text-lg">Loading TripTGT...</p> */}
+      <span className="loader"></span>
     </div>
   );
 }

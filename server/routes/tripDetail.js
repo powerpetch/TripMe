@@ -119,7 +119,7 @@ router.post(
 
 router.get("/all", async (req, res) => {
   try {
-    const trips = await TripDetail.find().populate("userId", "username").sort({ createdAt: -1 });; 
+    const trips = await TripDetail.find().populate("userId", "username avatar").sort({ createdAt: -1 });; 
     res.status(200).json(trips); 
   } catch (err) {
     console.error("Error fetching trips:", err);
@@ -205,6 +205,29 @@ router.get("/user/trips", authMiddleware, async (req, res) => {
   } catch (error) {
     console.error("Error fetching trips:", error);
     res.status(500).json({ message: "Server error." });
+  }
+});
+
+router.get("/user/:username", async (req, res) => {
+  try {
+    const { username } = req.params; // Get the username from the URL
+    const user = await User.findOne({ username }); // Find the user by username
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch trips created by this user
+    const trips = await TripDetail.find({ userId: user._id }).populate("userId", "username");
+
+    if (trips.length === 0) {
+      return res.status(404).json({ message: "No trips found for this user" });
+    }
+
+    res.status(200).json(trips);
+  } catch (error) {
+    console.error("Error fetching user's trips:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

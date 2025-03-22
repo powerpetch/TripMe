@@ -1,22 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaHeart } from "react-icons/fa";
-import { 
-  Trash2,
-  SquarePen,
-  MapPin,
-  Calendar,
-  ArrowRight,
-} from "lucide-react";
+import { FaUserCircle } from "react-icons/fa";
+import { MapPin, Calendar, ArrowRight } from "lucide-react";
 import Header from '../homepage/header/header';
-
 
 function fLetterCap(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-// ฟังก์ชัน shuffle array (สำหรับ sort แบบ random)
 function shuffleArray(array) {
   const newArr = [...array];
   for (let i = newArr.length - 1; i > 0; i--) {
@@ -29,7 +21,7 @@ function shuffleArray(array) {
 const AllTrips = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const [trips, setTrips] = useState([]);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +39,7 @@ const AllTrips = () => {
     }
   }, [location.search]);
 
+  // Fetch all trips
   useEffect(() => {
     const fetchTrips = async () => {
       try {
@@ -65,12 +58,14 @@ const AllTrips = () => {
     fetchTrips();
   }, []);
 
+  // Filter by country
   const filteredTrips = useMemo(() => {
     return trips.filter(trip =>
       trip.country.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [trips, searchTerm]);
 
+  // Card animations
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -95,6 +90,7 @@ const AllTrips = () => {
             onHoverStart={() => setHoveredCard(trip._id)}
             onHoverEnd={() => setHoveredCard(null)}
           >
+            {/* Trip Image */}
             <div className="relative">
               <img
                 src={trip.photos[0]?.url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e"}
@@ -109,7 +105,9 @@ const AllTrips = () => {
               >
                 <div className="flex items-center space-x-2 mb-2">
                   <MapPin size={16} className="text-green-400" />
-                  <h3 className="text-xl font-bold">{fLetterCap(trip.country)}</h3>
+                  <h3 className="text-xl font-bold">
+                    {fLetterCap(trip.country)}
+                  </h3>
                 </div>
                 <div className="flex items-center text-sm space-x-2 text-gray-200">
                   <Calendar size={14} />
@@ -120,8 +118,10 @@ const AllTrips = () => {
               </motion.div>
             </div>
 
+            {/* Trip Info */}
             <div className="p-4">
               <div className="flex items-center justify-between mb-4">
+                {/* View Details Button */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -131,9 +131,28 @@ const AllTrips = () => {
                   <span>View Details</span>
                   <ArrowRight size={16} />
                 </motion.button>
-                <div className="flex items-center space-x-1 text-pink-500">
-                  <FaHeart />
-                  <span className="text-sm font-medium">12</span>
+
+                {/* Owner's avatar or fallback icon */}
+                <div
+                  className="flex items-center space-x-2 text-gray-600 cursor-pointer"
+                  onClick={() => navigate(`/users/${trip.userId?.username}`)}
+                >
+                  {trip.userId?.avatar ? (
+                    <img
+                      src={
+                        trip.userId.avatar.startsWith("http")
+                          ? trip.userId.avatar
+                          : `${process.env.REACT_APP_API_BASE_URL}${trip.userId.avatar}`
+                      }
+                      alt="Owner Avatar"
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <FaUserCircle className="w-6 h-6" />
+                  )}
+                  <span className="text-sm font-medium">
+                    {trip.userId?.username || "No Owner"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -146,7 +165,7 @@ const AllTrips = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <span class="loader"></span>
+        <span className="loader"></span>
       </div>
     );
   }
@@ -201,12 +220,12 @@ const AllTrips = () => {
           </div>
         </div>
 
-        {/* Render Trips with filter & sort */}
+        {/* Render Trips */}
         {filteredTrips.length > 0 ? (
-        renderTripCards(filteredTrips)
-      ) : (
-        <p>No matching trips found.</p>
-      )}
+          renderTripCards(filteredTrips)
+        ) : (
+          <p>No matching trips found.</p>
+        )}
       </div>
     </div>
   );

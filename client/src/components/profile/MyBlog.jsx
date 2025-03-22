@@ -179,10 +179,10 @@ function MyBlog() {
                   <span>View Details</span>
                   <ArrowRight size={16} />
                 </motion.button>
-                <div className="flex items-center space-x-1 text-pink-500">
+                {/* <div className="flex items-center space-x-1 text-pink-500">
                   <FaHeart />
                   <span className="text-sm font-medium">12</span>
-                </div>
+                </div> */}
               </div>
 
               <motion.div 
@@ -352,7 +352,7 @@ function MyBlog() {
             animate={{ opacity: 1, y: 0 }}
             className="flex space-x-4"
           >
-            {["created", "liked"].map((tab) => (
+            {["created"].map((tab) => (
               <motion.button
                 key={tab}
                 whileHover={{ scale: 1.05 }}

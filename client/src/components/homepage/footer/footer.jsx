@@ -67,16 +67,16 @@ const Footer = () => {
               Company
             </h1>
             <ul className="flex flex-col gap-3">
-              {FooterLinks.map((link) => (
-                <li
-                  key={link.title}
-                  className="cursor-pointer hover:translate-x-1 duration-300 hover:!text-primary space-x-1 text-gray-400"
-                >
-                  <a href={link.link}>
-                    <span>{link.title}</span>
-                  </a>
-                </li>
-              ))}
+            {FooterLinks.map((link) => (
+            <li
+              key={link.title}
+              className="cursor-pointer hover:translate-x-1 duration-300 text-white space-x-1"
+            >
+              <a href={link.link}>
+                <span>{link.title}</span>
+              </a>
+            </li>
+          ))}
             </ul>
           </div>
 
@@ -85,16 +85,16 @@ const Footer = () => {
               Help
             </h1>
             <ul className="flex flex-col gap-3">
-              {HelpLinks.map((link) => (
-                <li
-                  key={link.title}
-                  className="cursor-pointer hover:translate-x-1 duration-300 hover:!text-primary space-x-1 text-gray-400"
-                >
-                  <a href={link.link}>
-                    <span>{link.title}</span>
-                  </a>
-                </li>
-              ))}
+            {HelpLinks.map((link) => (
+            <li
+              key={link.title}
+              className="cursor-pointer hover:translate-x-1 duration-300 text-white space-x-1"
+            >
+              <a href={link.link}>
+                <span>{link.title}</span>
+              </a>
+            </li>
+          ))}
             </ul>
           </div>
         </div>

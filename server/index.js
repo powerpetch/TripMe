@@ -9,6 +9,8 @@ const mongoose = require('mongoose'); // Add mongoose import
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const tripDetailRoutes = require("./routes/tripDetail.js");
+
+const postsRouter = require("./routes/posts");
 const { connectdb } = require('./config/db');
 
 const app = express();
@@ -24,6 +26,14 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/trips", tripDetailRoutes);
+
+app.use(postsRouter);
+
+app.use(cors({
+  origin: 'http://localhost:3000', // Your frontend URL
+  credentials: true
+}));
+
 
 // test route
 app.get("/", (req, res) => {
