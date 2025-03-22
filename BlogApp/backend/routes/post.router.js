@@ -77,20 +77,21 @@ export const createPost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
   try {
-    console.log("Fetching all posts...");
+    //find in posts collection
     const posts = await Post.find({});
-    console.log("Fetched posts:", posts);
     res.status(200).json({ success: true, data: { posts } });
   } catch (error) {
-    console.log("Error fetching posts:", error);
+    console.log("Error on fetching all posts");
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 export const getPostByName = async (req, res) => {
   try {
-    const postName = req.username;
-    const posts = await Post.find({ name: postName });
+    const postName = req.userId;
+    const posts = (await Post.find()).filter(
+      (posts) => postName === posts.userID
+    );
     res.status(200).json({ success: true, data: { posts } });
   } catch (error) {
     console.log("That person have no post");
@@ -230,13 +231,11 @@ export const getProfile = async (req, res) => {
   try {
     const existingUser = await User.findOne({ uid: userId });
     if (existingUser) {
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "User already exists",
-          profile: existingUser,
-        });
+      res.status(200).json({
+        success: true,
+        message: "User already exists",
+        profile: existingUser,
+      });
       return;
     }
 
@@ -248,53 +247,108 @@ export const getProfile = async (req, res) => {
 
     await newUser.save();
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "User saved",
-        profile: { username, userId, avatar },
-      });
+    res.status(200).json({
+      success: true,
+      message: "User saved",
+      profile: { username, userId, avatar },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-export const postLike = async(req, res) => {
-  const pid = req.params.pid
-  const uid = req.userId
+export const postLike = async (req, res) => {
+  const pid = req.params.pid;
+  const uid = req.userId;
 
-  try{
-    const user = await User.findOne({uid: uid})
-    const post = await Post.findById(pid)
-    console.log(user)
-    user.likes.push(pid)
-    post.likeby.push(uid)
+  try {
+    const user = await User.findOne({ uid: uid });
+    const post = await Post.findById(pid);
+    console.log(user);
 
-    const numLikes = post.likeby.length
+    if (post.likeby.includes(uid)) {
+      post.likeby = post.likeby.filter((like) => like !== uid);
+      user.like = user.likes.filter((like) => like !== pid);
 
-    await user.save()
-    await post.save()
-    
-    res.status(200).json({sucess: true, post: post, user: user, numLikes: numLikes})
+      await post.save();
+      await user.save();
 
-  }catch(error){
-    console.log(error)
-    res.status(500).json({succes: false, message:"Server error liking post"})
+      res.status(200).json({ success: "updated", likes: post.likeby.length });
+      return;
+    }
+
+    user.likes.push(pid);
+    post.likeby.push(uid);
+
+    const numLikes = post.likeby.length;
+
+    await user.save();
+    await post.save();
+
+    res
+      .status(200)
+      .json({ success: true, post: post, user: user, numLikes: numLikes });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error liking post" });
   }
-}
+};
 
-export const getLike = async(req, res) => {
-  const pid = req.params.pid
+export const getLike = async (req, res) => {
+  const pid = req.params.pid;
 
-  try{
-    const post = await Post.findById(pid)
+  try {
+    const post = await Post.findById(pid);
 
-    const count = post.likeby.length
+    const count = post.likeby.length;
 
-    res.status(200).json({sucess:true, data: count})
-  }catch(err){
-    res.status(500).json({succes:false, message:"Server error getting like"})
+    res.status(200).json({ success: true, data: count });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Server error getting like" });
   }
-}
+};
+
+export const getTopPost = async (req, res) => {
+  console.log("Check top posts");
+
+  try {
+    const topPost = await Post.aggregate([
+      {
+        $project: {
+          name: 1,
+          content: 1,
+          country: 1,
+          image: 1,
+          likebyLength: { $size: "$likeby" }, // get likeby size
+        },
+      },
+      {
+        $sort: { likebyLength: -1 }, // Sort by the size of 'likeby' array in descending order
+      },
+      {
+        $limit: 3,
+      },
+    ]);
+
+    res.status(200).json({ success: true, data: topPost });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: "Error getting top posts" });
+  }
+};
+
+export const getByCountry = async (req, res) => {
+  try {
+    const country = req.params.country;
+    const post = await Post.findOne({ country: country });
+    res.status(200).json({ success: true, data: post });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Error getting posts" });
+  }
+};

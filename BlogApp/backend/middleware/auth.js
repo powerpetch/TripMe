@@ -8,11 +8,9 @@ const authMiddleware = (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     req.userId = decoded.id;
     req.username = decoded.username;
     req.avatar = decoded.avatar || undefined;
-
     next();
   } catch (err) {
     console.error("JWT Error:", err);

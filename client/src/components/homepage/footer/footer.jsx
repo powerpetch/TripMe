@@ -63,20 +63,20 @@ const Footer = () => {
 
           {/* Links - each takes 1 column */}
           <div className="py-8 px-4">
-            <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-3">
+            <h1 className="sm:text-xl text-xl font-bold sm:text-left text-justify mb-3 text-white">
               Company
             </h1>
             <ul className="flex flex-col gap-3">
             {FooterLinks.map((link) => (
-            <li
-              key={link.title}
-              className="cursor-pointer hover:translate-x-1 duration-300 text-white space-x-1"
-            >
-              <a href={link.link}>
-                <span>{link.title}</span>
-              </a>
-            </li>
-          ))}
+              <li
+                key={link.title}
+                className="cursor-pointer hover:translate-x-1 duration-300 text-white hover:text-gray-300 space-x-1"
+              >
+                <a href={link.link} className="text-white hover:text-gray-300">
+                  <span>{link.title}</span>
+                </a>
+              </li>
+            ))}
             </ul>
           </div>
 
@@ -86,21 +86,21 @@ const Footer = () => {
             </h1>
             <ul className="flex flex-col gap-3">
             {HelpLinks.map((link) => (
-            <li
-              key={link.title}
-              className="cursor-pointer hover:translate-x-1 duration-300 text-white space-x-1"
-            >
-              <a href={link.link}>
-                <span>{link.title}</span>
-              </a>
-            </li>
-          ))}
+              <li
+                key={link.title}
+                className="cursor-pointer hover:translate-x-1 duration-300 text-white hover:text-gray-300 space-x-1"
+              >
+                <a href={link.link} className="text-white hover:text-gray-300">
+                  <span>{link.title}</span>
+                </a>
+              </li>
+            ))}
             </ul>
           </div>
         </div>
 
         {/* Copyright Section */}
-        <div className="text-center pt-8 mt-2 border-t border-gray-700">
+        <div className="text-center pt-4 pb-6 mt-2 border-t border-gray-700">
           <p className="text-gray-400 text-sm">
             © {new Date().getFullYear()} Trip-me. All rights reserved.
           </p>

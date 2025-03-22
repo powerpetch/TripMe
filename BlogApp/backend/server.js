@@ -11,10 +11,12 @@ import {
   createPost,
   deletePost,
   getAllPosts,
+  getByCountry,
   getComment,
   getLike,
   getPostByName,
   getProfile,
+  getTopPost,
   getUser,
   postComment,
   postLike,
@@ -57,7 +59,7 @@ app.get("/api/profile", authMiddleware, getProfile);
 // post a like
 app.post("/api/posts/like/:pid", authMiddleware, postLike);
 
-app.get("/api/posts/like/:pid", authMiddleware, getLike)
+app.get("/api/posts/like/:pid", authMiddleware, getLike);
 
 // get all post
 app.get("/api/posts", getAllPosts);
@@ -70,6 +72,12 @@ app.get("/api/posts/ai/:location/:duration", chatAi);
 
 // get all comments
 app.get("/api/posts/comment/:pid", getComment);
+
+// get top three post
+app.get("/api/posts/pop", getTopPost);
+
+// get post by country
+app.get("/api/posts/:country", getByCountry);
 
 app.listen(PORT, () => {
   console.log("Connecting to MongoDB...");

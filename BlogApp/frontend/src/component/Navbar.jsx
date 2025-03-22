@@ -5,8 +5,9 @@ import {
   useDisclosure,
   Image,
   HStack,
+  useBreakpointValue,
 } from "@chakra-ui/react";
-import { Link, useLocation, } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CreateModal from "./CreateModal";
 import { IoHome } from "react-icons/io5";
 import { IoPersonSharp } from "react-icons/io5";
@@ -17,10 +18,27 @@ import logo from "../images/new-logo-green.png";
 const Navbar = () => {
   const location = useLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const handleLogoClick = () => {
-    window.location.href = 'http://localhost:3000';
+  const tripMe = () => {
+    window.location.href = "http://localhost:3000/";
   };
+
+  // Responsive values based on screen size
+  const iconSize = useBreakpointValue({ base: "18px", sm: "20px", md: "23px" });
+  const buttonSpacing = useBreakpointValue({ base: "4", sm: "5", md: "7" });
+  const groupSpacing = useBreakpointValue({
+    base: "30px",
+    sm: "60px",
+    md: "90px",
+  });
+  const logoWidth = useBreakpointValue({ base: "40%", sm: "45%", md: "50%" });
+  const logoMargin = useBreakpointValue({
+    base: "20px",
+    sm: "35px",
+    md: "50px",
+  });
+
+  // Control logo visibility - hidden on mobile, visible on sm and above
+  const logoDisplay = useBreakpointValue({ base: "none", sm: "block" });
 
   return (
     <HStack
@@ -37,19 +55,19 @@ const Navbar = () => {
       justifyContent="center"
       alignItems="center"
     >
-      
       <Box
         position={"absolute"}
         left="10px"
-        cursor="pointer" 
-        onClick={handleLogoClick}
+        onClick={tripMe}
+        style={{ cursor: "pointer" }}
+        display={logoDisplay} // Hide on mobile, show on tablet and up
       >
-        <Image 
-          src={logo} 
-          objectFit={"contain"} 
-          w={"50%"} 
-          fill={"#166534"} 
-          ml={"50px"}
+        <Image
+          src={logo}
+          objectFit={"contain"}
+          w={logoWidth}
+          fill={"#166534"}
+          ml={logoMargin}
         />
       </Box>
       <Box
@@ -60,12 +78,16 @@ const Navbar = () => {
         flexGrow="1"
         mb={"30px"}
       >
-        <ButtonGroup gap="7" mt={10} flexDirection="row" alignItems="center" spacing={"90px"}>
+        <ButtonGroup
+          gap={buttonSpacing}
+          mt={10}
+          flexDirection="row"
+          alignItems="center"
+          spacing={groupSpacing}
+        >
           <Link to={"/"}>
             <Button
-              color={location.pathname === "/" ? "white" : "#166534"}
-              bg={location.pathname === "/" ? "#166534" : "transparent"}
-              // color={"#166534"}
+              color={"#166534"}
               variant={"ghost"}
               width="100%"
               display="flex"
@@ -76,15 +98,16 @@ const Navbar = () => {
                   bg: "#d1d1d1", // Lighter hover effect color
                   boxShadow: "lg",
                 },
+                borderBottom:
+                  location.pathname === "/" ? "2px solid #166534" : "none", // Green bottom border
               }}
             >
-              <IoHome size={"23px"} />
+              <IoHome size={iconSize} />
             </Button>
           </Link>
           <Link to={"/mypage"}>
             <Button
-              color={location.pathname === "/mypage" ? "white" : "#166534"}
-              bg={location.pathname === "/mypage" ? "#166534" : "transparent"}
+              color={"#166534"}
               variant={"ghost"}
               width="100%"
               display="flex"
@@ -95,16 +118,19 @@ const Navbar = () => {
                   bg: "#d1d1d1", // Lighter hover effect color
                   boxShadow: "lg",
                 },
+                borderBottom:
+                  location.pathname === "/mypage"
+                    ? "2px solid #166534"
+                    : "none", // Green bottom border
               }}
             >
-              <IoPersonSharp size={"23px"} />
+              <IoPersonSharp size={iconSize} />
             </Button>
           </Link>
 
           <Link to={"/country"}>
             <Button
-              color={location.pathname === "/country" ? "white" : "#166534"}
-              bg={location.pathname === "/country" ? "#166534" : "transparent"}
+              color={"#166534"}
               variant={"ghost"}
               width="100%"
               display="flex"
@@ -115,9 +141,13 @@ const Navbar = () => {
                   bg: "#d1d1d1", // Lighter hover effect color
                   boxShadow: "lg",
                 },
+                borderBottom:
+                  location.pathname === "/country"
+                    ? "2px solid #166534"
+                    : "none", // Green bottom border
               }}
             >
-              <RiRobot3Line size={"23px"} />
+              <RiRobot3Line size={iconSize} />
             </Button>
           </Link>
           <Button
@@ -136,7 +166,7 @@ const Navbar = () => {
             }}
           >
             <CiSquarePlus
-              size={"23px"}
+              size={iconSize}
               style={{
                 strokeWidth: "1",
               }}

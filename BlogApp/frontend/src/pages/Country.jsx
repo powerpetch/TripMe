@@ -11,6 +11,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  SimpleGrid,
   Text,
   useDisclosure,
   useToast,
@@ -21,7 +22,6 @@ import { getPlan } from "../api";
 import PlanModel from "../component/PlanModel";
 import { FaEarthAmericas } from "react-icons/fa6";
 import { MdAutoAwesome } from "react-icons/md";
-
 const Country = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initialRef = React.useRef(null);
@@ -169,10 +169,17 @@ const Country = () => {
           finalFocusRef={finalRef}
           isOpen={isOpen}
           onClose={onClose}
+          isCentered
+          size={{ base: "sm", md: "md" }}
         >
           <ModalOverlay />
-          <ModalContent>
-            <ModalHeader display={"flex"} alignItems={"center"}>
+          <ModalContent
+            mx={{ base: 4, md: 0 }}
+            w={{ base: "auto", md: "md" }}
+            maxW={{ base: "90%", md: "md" }}
+            borderRadius="md"
+          >
+            <ModalHeader display="flex" alignItems="center" gap={2}>
               Easy trip...
               <FaEarthAmericas />
             </ModalHeader>
@@ -205,18 +212,23 @@ const Country = () => {
                 onClick={handlePrompt}
                 isLoading={loading}
                 loadingText="Fetching Plan"
+                size={{ base: "sm", md: "md" }}
               >
                 Get plan!!
               </Button>
-              <Button onClick={onClose}>Cancel</Button>
+              <Button onClick={onClose} size={{ base: "sm", md: "md" }}>
+                Cancel
+              </Button>
             </ModalFooter>
           </ModalContent>
         </Modal>
-        <VStack>
-          {out.map((day, index) => (
-            <PlanModel key={index} response={day} />
-          ))}
-        </VStack>
+        <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} mt={4}>
+          {Array.isArray(out) &&
+            out.length > 0 &&
+            out
+              .filter((day) => day.trim() !== "" && day !== "\n")
+              .map((day, index) => <PlanModel key={index} response={day} />)}
+        </SimpleGrid>
       </Container>
     </>
   );

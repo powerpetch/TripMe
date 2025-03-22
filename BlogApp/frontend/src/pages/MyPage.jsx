@@ -6,20 +6,45 @@ import {
   Text,
   useDisclosure,
   useToast,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import Postbox from "../component/Postbox";
 import CreateModal from "../component/CreateModal";
+import Profile from "../component/Profile";
+
 const MyPage = () => {
   const [myPost, setMyPost] = useState([]);
-
   const toast = useToast();
-
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Responsive values
+  const containerMaxWidth = useBreakpointValue({
+    base: "95%",
+    sm: "90%",
+    md: "70%",
+    lg: "46%",
+  });
+
+  const containerPosition = useBreakpointValue({
+    base: "relative",
+    md: "fixed",
+  });
+
+  const containerMarginTop = useBreakpointValue({
+    base: "65px",
+    md: "75px",
+  });
+
+  const innerMarginTop = useBreakpointValue({
+    base: 4,
+    md: 10,
+  });
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const response = await fetchMyPost("cheng");
+        const response = await fetchMyPost();
+        console.log(response);
         setMyPost(response.data.posts);
       } catch (error) {
         console.log(error);
@@ -27,10 +52,10 @@ const MyPage = () => {
     };
     fetchPosts();
   }, []);
+
   const handleDelete = async (postID) => {
     try {
       const response = await deletePost(postID);
-
       setMyPost((newPost) => newPost.filter((post) => post._id !== postID));
       console.log(response.status);
 
@@ -49,45 +74,36 @@ const MyPage = () => {
       });
     }
   };
+
   return (
     <>
+      <Profile />
       <Container
-        mt={10}
-        maxW={"40%"}
-        bg={"white"}
-        borderRadius={"10px"}
+        mt={1}
+        maxW={containerMaxWidth}
+        bg={"#eef2f3"}
+        borderRadius={"15px"}
         border={"1px solid #E4E0E1"}
         boxShadow={"lg"}
-        marginTop={"75px"}
-        position={"fixed"} // Fix the container's position
+        marginTop={containerMarginTop}
+        position={containerPosition}
         top={0}
         left={0}
         right={0}
         bottom={0}
         zIndex={10}
-        overflowY={"auto"}
-        sx={{
-          "&::-webkit-scrollbar": {
-            width: "5px",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: "#f1f1f1",
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: "#888",
-            borderRadius: "10px",
-          },
-          "&::-webkit-scrollbar-thumb:hover": {
-            background: "#555",
-          },
-        }}
+        overflowY="auto"
+        mx="auto" // Center on mobile
+        height={containerPosition === "relative" ? "auto" : "auto"}
+        pb={4} // Add padding at bottom for mobile
       >
         <Container
-          mt={10}
+          mt={innerMarginTop}
           maxW={"container.md"}
-          height="100vh" // Make sure the height is full for scrolling content
+          height={containerPosition === "fixed" ? "100vh" : "auto"}
+          px={{ base: 2, md: 4 }}
         >
-          <SimpleGrid columns={1}>
+          <SimpleGrid columns={1} spacing={{ base: 3, md: 4 }}>
             {[...myPost].reverse().map((post) => (
               <Postbox
                 key={post._id}
@@ -103,6 +119,7 @@ const MyPage = () => {
               color={"blue.700"}
               onClick={onOpen}
               cursor={"pointer"}
+              my={4}
             >
               Make some post!!!
             </Text>

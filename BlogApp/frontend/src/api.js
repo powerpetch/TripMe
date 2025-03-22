@@ -1,7 +1,7 @@
 export const createPost = async (postData) => {
   console.log("Post Data being sent:", postData);
   try {
-    const response = await fetch("http://localhost:5001/api/posts", {
+    const response = await fetch("http://localhost:5002/api/posts", {
       method: "POST",
       body: postData,
       credentials: "include",
@@ -21,7 +21,7 @@ export const createPost = async (postData) => {
 
 export const fetchAllPosts = async () => {
   try {
-    const response = await fetch("http://localhost:5001/api/posts", {
+    const response = await fetch("http://localhost:5002/api/posts", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -42,11 +42,12 @@ export const fetchAllPosts = async () => {
 
 export const fetchMyPost = async () => {
   try {
-    const response = await fetch(`http://localhost:5001/api/posts`, {
+    const response = await fetch(`http://localhost:5002/api/posts/byname`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -63,7 +64,7 @@ export const fetchMyPost = async () => {
 
 export const deletePost = async (postID) => {
   try {
-    const response = await fetch(`http://localhost:5001/api/posts/${postID}`, {
+    const response = await fetch(`http://localhost:5002/api/posts/${postID}`, {
       method: "DELETE",
     });
     if (!response.ok) {
@@ -80,7 +81,7 @@ export const deletePost = async (postID) => {
 
 export const getCountries = async () => {
   try {
-    const response = await fetch("http://localhost:5001/api/ai");
+    const response = await fetch("http://localhost:5002/api/ai");
     if (!response.ok) {
       throw new Error(`Error: ${response.status}, ${response.statusText}`);
     }
@@ -98,7 +99,7 @@ export const getPlan = async (promptData) => {
   console.log(location, duration);
   try {
     const response = await fetch(
-      `http://localhost:5001/api/posts/ai/${location}/${duration}`
+      `http://localhost:5002/api/posts/ai/${location}/${duration}`
     );
     if (!response.ok) {
       throw new Error(`Error: ${response.status}, ${response.statusText}`);
@@ -116,7 +117,7 @@ export const addComment = async (commentData, postID) => {
   console.log(commentData);
   try {
     const response = await fetch(
-      `http://localhost:5001/api/posts/comment/${postID}`,
+      `http://localhost:5002/api/posts/comment/${postID}`,
       {
         method: "POST",
         headers: {
@@ -140,7 +141,7 @@ export const addComment = async (commentData, postID) => {
 export const getComments = async (postID) => {
   try {
     const response = await fetch(
-      `http://localhost:5001/api/posts/comment/${postID}`
+      `http://localhost:5002/api/posts/comment/${postID}`
     );
     if (!response.ok) {
       throw new Error(`Error: ${response.status}, ${response.message}`);
@@ -155,7 +156,7 @@ export const getComments = async (postID) => {
 
 export const getUser = async () => {
   try {
-    const response = await fetch("http://localhost:5001/api/profile", {
+    const response = await fetch("http://localhost:5002/api/profile", {
       credentials: "include",
     });
     if (!response.ok) {
@@ -173,7 +174,7 @@ export const getUser = async () => {
 export const likePost = async (pid) => {
   try {
     const response = await fetch(
-      `http://localhost:5001/api/posts/like/${pid}`,
+      `http://localhost:5002/api/posts/like/${pid}`,
       {
         method: "POST",
         credentials: "include",
@@ -188,10 +189,9 @@ export const likePost = async (pid) => {
 };
 
 export const getLike = async (pid) => {
-  console.log(pid)
   try {
     const response = await fetch(
-      `http://localhost:5001/api/posts/like/${pid}`,
+      `http://localhost:5002/api/posts/like/${pid}`,
       {
         credentials: "include",
       }
@@ -201,5 +201,19 @@ export const getLike = async (pid) => {
   } catch (err) {
     console.log(err);
     return { success: false, message: "Error getting likes" };
+  }
+};
+
+export const getTopPost = async () => {
+  try {
+    const response = await fetch("http://localhost:5002/api/posts/pop");
+    if (!response.ok) {
+      throw new Error("error fetching top posts");
+    }
+    const data = await response.json();
+    console.log(data);
+    return data;
+  } catch (err) {
+    console.log(err);
   }
 };

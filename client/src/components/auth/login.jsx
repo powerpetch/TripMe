@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaFacebook, FaGoogle, FaLinkedin, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useNavigate } from 'react-router-dom';
 import "./background.css";

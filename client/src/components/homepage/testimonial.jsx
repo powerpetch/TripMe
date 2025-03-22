@@ -52,30 +52,39 @@ const Testimonial = () => {
 
   useEffect(() => {
     async function fetchPosts() {
-      try {
-        const response = await fetch("http://localhost:5001/api/posts", {
-          method: "GET",
-        });
-        const text = await response.text();
-        console.log("Raw response text:", text);
-
-        if (text.trim().startsWith("{")) {
-          const data = JSON.parse(text);
-          console.log("Parsed data:", data);
-          // data.data.posts => array of posts
-          setTestimonialData(data.data.posts);
-        } else {
-          console.error("Received non-JSON response:", text);
-          setError("Received non-JSON response");
+      const ports = [5001, 5002];
+      let success = false;
+  
+      for (const port of ports) {
+        try {
+          const response = await fetch(`http://localhost:${port}/api/posts`, {
+            method: "GET",
+          });
+          const text = await response.text();
+          console.log(`Trying port ${port}...`);
+  
+          if (text.trim().startsWith("{")) {
+            const data = JSON.parse(text);
+            console.log("Parsed data:", data);
+            setTestimonialData(data.data.posts);
+            success = true;
+            break;
+          }
+        } catch (err) {
+          console.log(`Failed to fetch from port ${port}:`, err.message);
+          if (port === ports[ports.length - 1]) {
+            setError(`Error: Could not connect to any server`);
+            console.error("All ports failed:", err);
+          }
         }
-      } catch (err) {
-        setError(`Error: ${err.message}`);
-        console.error("Error fetching posts:", err);
-      } finally {
-        setIsLoading(false);
       }
+  
+      if (!success) {
+        setError("Could not fetch data from any available port");
+      }
+      setIsLoading(false);
     }
-
+  
     fetchPosts();
   }, []);
 

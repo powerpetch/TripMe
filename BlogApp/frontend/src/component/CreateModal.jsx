@@ -10,6 +10,7 @@ import {
   ModalOverlay,
   Textarea,
   useToast,
+  Box,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
 import { FaImage } from "react-icons/fa6";
@@ -50,7 +51,8 @@ const CreateModal = ({ isOpen, onClose }) => {
           status: "success",
           isClosable: true,
         });
-        onClose;
+        window.location.reload();
+        onClose();
       } else {
         toast({
           title: "Error",
@@ -72,42 +74,58 @@ const CreateModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"lg"} >
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size={{ base: "sm", sm: "md", md: "lg" }}
+      isCentered
+    >
       <ModalOverlay
         bg="rgba(0, 0, 0, 0.4)"
         style={{
           backdropFilter: "blur(10px)",
         }}
       />
-      <ModalContent maxW={"40%"}>
-        <ModalHeader>Share your moment</ModalHeader>
+      <ModalContent
+        maxW={{ base: "90%", sm: "80%", md: "60%", lg: "40%" }}
+        mx="auto"
+      >
+        <ModalHeader fontSize={{ base: "lg", md: "xl" }}>
+          Share your moment
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Input
             placeholder="Country"
             mb={4}
             value={newPost.country}
-            onChange={(e) => setNewPost({ ...newPost, country: e.target.value })}
+            onChange={(e) =>
+              setNewPost({ ...newPost, country: e.target.value })
+            }
+            size={{ base: "md", md: "lg" }}
           />
           <Textarea
-          height={"150px"}
-          size={"lg"}
+            height={{ base: "120px", md: "150px" }}
+            size={{ base: "md", md: "lg" }}
             placeholder="How is your trip?"
             value={newPost.content}
             onChange={(e) =>
               setNewPost({ ...newPost, content: e.target.value })
             }
           />
-          <Button
-          mt={"10px"}
-            leftIcon={<FaImage size={"20px"} />}
-            variant="outline"
-            colorScheme="teal"
-            size="md"
-            onClick={() => fileInputRef.current.click()}
-            border={"0"}
-          >
-          </Button>
+          <Box mt={{ base: "8px", md: "10px" }}>
+            <Button
+              leftIcon={<FaImage size={16} />}
+              variant="outline"
+              colorScheme="teal"
+              size={{ base: "sm", md: "md" }}
+              onClick={() => fileInputRef.current.click()}
+              border="0"
+              p={2}
+            >
+              {newPost.image ? "Image selected" : ""}
+            </Button>
+          </Box>
           <Input
             type="file"
             onChange={(e) =>
@@ -119,16 +137,22 @@ const CreateModal = ({ isOpen, onClose }) => {
         </ModalBody>
 
         <ModalFooter>
-          <Link to={"/mypage"}>
+          <Link to={"/"}>
             <Button
               colorScheme="teal"
               variant="outline"
               onClick={() => handleSubmit()}
+              size={{ base: "sm", md: "md" }}
+              mr={2}
             >
               Submit
             </Button>
           </Link>
-          <Button variant="ghost" onClick={onClose}>
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            size={{ base: "sm", md: "md" }}
+          >
             Cancel
           </Button>
         </ModalFooter>
