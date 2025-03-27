@@ -5,31 +5,27 @@ import { useDropzone } from 'react-dropzone';
 import Header2 from '../homepage/header/OtherHeader';
 import { motion } from "framer-motion";
 import { 
-  Menu, X, MapPin, Building, Bus, 
+  MapPin, Building, Bus, 
   Cloud, DollarSign, Image, PlusCircle, Trash2, Shirt, Lightbulb
 } from 'lucide-react';
 import { FaCalendarAlt } from 'react-icons/fa';
 
 import "react-datepicker/dist/react-datepicker.css";
-import logoGreen from '../../images/new-logo-green.png';
-
 import Header from '../homepage/header/header';
 
 const EditMyTrip = () => {
   const { tripId } = useParams(); 
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // state for user
+  // For user avatar
   const [avatarURL, setAvatarURL] = useState(null);
+
+  // Trip details from server
   const [tripDetails, setTripDetails] = useState({
     country: '',
-    travelPeriod: {
-      startDate: '',
-      endDate: '',
-    },
+    travelPeriod: { startDate: '', endDate: '' },
     visitedPlaces: [],
     accommodations: [],
     transportations: [],
@@ -39,28 +35,37 @@ const EditMyTrip = () => {
     photos: [],
   });
 
+  // Current form states
+  const [country, setCountry] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [visitedPlaces, setVisitedPlaces] = useState([]);
+  const [accommodations, setAccommodations] = useState([]);
+  const [transportations, setTransportations] = useState([]);
+  const [weatherNotes, setWeatherNotes] = useState('');
+  const [clothingTips, setClothingTips] = useState('');
+  const [budgetItems, setBudgetItems] = useState([]);
+  const [photos, setPhotos] = useState([]);
+  const [deletedPhotos, setDeletedPhotos] = useState([]);
+
+  // For multi-step sections
+  const [activeSection, setActiveSection] = useState('general');
+
+  // 1. Fetch user (for avatar)
   useEffect(() => {
-    // ดึง token
     const token = localStorage.getItem("token");
-    // console.log(token)
     if (!token) {
-      // console.log("NOTOKEN")
       navigate("/login");
       return;
     }
-
-    // เรียก API เพื่อนำข้อมูล user (รวม avatar) มาใช้
     fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
-        console.log("Response status:", res.status); 
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         if (data.user) {
           setUser(data.user);
-          // ตรวจสอบ avatar
+          // handle avatar
           if (data.user.avatar) {
             if (data.user.avatar.startsWith("http")) {
               setAvatarURL(data.user.avatar);
@@ -78,15 +83,15 @@ const EditMyTrip = () => {
       });
   }, [navigate]);
 
+  // 2. Fetch trip details
   useEffect(() => {
     const fetchTripDetails = async () => {
       try {
+        setLoading(true);
         const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/trips/${tripId}`);
         const tripData = await res.json();
         if (res.ok) {
-          console.log("Trip data received:", tripData);
           setTripDetails(tripData);
-
         } else {
           console.error("Failed to fetch trip details");
         }
@@ -96,190 +101,199 @@ const EditMyTrip = () => {
         setLoading(false);
       }
     };
-    
     fetchTripDetails();
   }, [tripId]);
 
-  // Form state
-  const [country, setCountry] = useState('');
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [visitedPlaces, setVisitedPlaces] = useState([]);
-  const [accommodations, setAccommodations] = useState([]);
-  const [transportations, setTransportations] = useState([]);
-  const [weatherNotes, setWeatherNotes] = useState('');
-  const [clothingTips, setClothingTips] = useState('');
-  const [budgetItems, setBudgetItems] = useState([]);
-  const [photos, setPhotos] = useState([]);
-  const [deletedPhotos, setDeletedPhotos] = useState([])
-  console.log("Photos: ", photos)
-  console.log(deletedPhotos)
-
-  
-  // Current section
-  const [activeSection, setActiveSection] = useState('general');
-
+  // 3. Populate local states from tripDetails
   useEffect(() => {
     if (tripDetails) {
-        setCountry(tripDetails.country)
-        setStartDate(tripDetails.travelPeriod?.startDate ? new Date(tripDetails.travelPeriod.startDate) : null);
-        setEndDate(tripDetails.travelPeriod?.endDate ? new Date(tripDetails.travelPeriod.endDate) : null);
-        setVisitedPlaces(tripDetails.visitedPlaces || []);
-        setAccommodations(tripDetails.accommodations || []);
-        setTransportations(tripDetails.transportations || []);
-        setWeatherNotes(tripDetails.weatherNotes || "")
-        setClothingTips(tripDetails.clothingTips || "")
-        setBudgetItems(tripDetails.budgetItems || []);
+      setCountry(tripDetails.country || '');
+      setStartDate(
+        tripDetails.travelPeriod?.startDate
+          ? new Date(tripDetails.travelPeriod.startDate)
+          : null
+      );
+      setEndDate(
+        tripDetails.travelPeriod?.endDate
+          ? new Date(tripDetails.travelPeriod.endDate)
+          : null
+      );
+      // unify visitedPlaces: rename _id -> id
+      setVisitedPlaces(
+        (tripDetails.visitedPlaces || []).map((p) => ({
+          ...p,
+          id: p._id, // unify
+        }))
+      );
+      // unify accommodations: rename _id -> id
+      setAccommodations(
+        (tripDetails.accommodations || []).map((a) => ({
+          ...a,
+          id: a._id,
+        }))
+      );
+      // unify transportations
+      setTransportations(
+        (tripDetails.transportations || []).map((t) => ({
+          ...t,
+          id: t._id,
+        }))
+      );
+      // unify budgetItems
+      setBudgetItems(
+        (tripDetails.budgetItems || []).map((b) => ({
+          ...b,
+          id: b._id,
+        }))
+      );
+
+      setWeatherNotes(tripDetails.weatherNotes || "");
+      setClothingTips(tripDetails.clothingTips || "");
+
+      // unify photos
+      if (tripDetails.photos) {
         setPhotos(
-            tripDetails.photos.map((photo) => ({
-                id: photo._id, // Use database ID
-                url: photo.url, // Existing Cloudinary URL
-                public_id: photo.public_id, // Cloudinary public ID
-                isExisting: true, // Marks it as an existing file
-                file: null, // No new file needed
-              }))   
+          tripDetails.photos.map((photo) => ({
+            id: photo._id, // Use database ID
+            url: photo.url,
+            public_id: photo.public_id,
+            isExisting: true,
+            file: null,
+          }))
         );
-
+      }
     }
-
   }, [tripDetails]);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  // ---- 4. Add/Update/Remove logic for each section ----
 
-  // Handle visited places
+  // Visited Places
   const addVisitedPlace = () => {
     const newPlace = {
       id: Date.now().toString(),
       name: '',
       description: ''
     };
-    setVisitedPlaces(visitedPlaces => [...visitedPlaces, newPlace]);
+    setVisitedPlaces((prev) => [...prev, newPlace]);
   };
-
   const updateVisitedPlace = (id, field, value) => {
-    setVisitedPlaces(visitedPlaces.map(place => 
-      place._id === id ? { ...place, [field]: value } : place
-    ));
+    setVisitedPlaces((prev) =>
+      prev.map((place) => 
+        place.id === id ? { ...place, [field]: value } : place
+      )
+    );
   };
-  
   const removeVisitedPlace = (id) => {
-    setVisitedPlaces(visitedPlaces => visitedPlaces.filter(place => place.id !== id));
+    setVisitedPlaces((prev) => prev.filter((place) => place.id !== id));
   };
 
-  // Handle accommodations
+  // Accommodations
   const addAccommodation = () => {
-    const newAccommodation = {
+    const newAcc = {
       id: Date.now().toString(),
       name: '',
       type: '',
       bookingPlatform: '',
-    //   cost: ''
     };
-    setAccommodations([...accommodations, newAccommodation]);
+    setAccommodations((prev) => [...prev, newAcc]);
   };
-
   const updateAccommodation = (id, field, value) => {
-    setAccommodations(accommodations.map(accommodation => 
-      accommodation._id === id ? { ...accommodation, [field]: value } : accommodation
-    ));
+    setAccommodations((prev) =>
+      prev.map((acc) =>
+        acc.id === id ? { ...acc, [field]: value } : acc
+      )
+    );
   };
-
   const removeAccommodation = (id) => {
-    setAccommodations(accommodations.filter(accommodation => accommodation.id !== id));
+    setAccommodations((prev) => prev.filter((acc) => acc.id !== id));
   };
 
-  // Handle transportation
+  // Transportations
   const addTransportation = () => {
-    const newTransportation = {
+    const newTrans = {
       id: Date.now().toString(),
       type: '',
       from: '',
       to: '',
       bookingPlatform: '',
-    //   cost: ''
     };
-    setTransportations([...transportations, newTransportation]);
+    setTransportations((prev) => [...prev, newTrans]);
   };
-
   const updateTransportation = (id, field, value) => {
-    setTransportations(transportations.map(transportation => 
-      transportation._id === id ? { ...transportation, [field]: value } : transportation
-    ));
+    setTransportations((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, [field]: value } : t
+      )
+    );
   };
-
   const removeTransportation = (id) => {
-    setTransportations(transportations.filter(transportation => transportation.id !== id));
+    setTransportations((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Handle budget items
+  // Budget Items
   const addBudgetItem = () => {
-    const newBudgetItem = {
+    const newBudget = {
       id: Date.now().toString(),
       category: '',
       description: '',
       amount: ''
     };
-    setBudgetItems([...budgetItems, newBudgetItem]);
+    setBudgetItems((prev) => [...prev, newBudget]);
   };
-
   const updateBudgetItem = (id, field, value) => {
-    setBudgetItems(budgetItems.map(item => 
-      item._id === id ? { ...item, [field]: value } : item
-    ));
+    setBudgetItems((prev) =>
+      prev.map((b) =>
+        b.id === id ? { ...b, [field]: value } : b
+      )
+    );
   };
-
   const removeBudgetItem = (id) => {
-    setBudgetItems(budgetItems.filter(item => item.id !== id));
+    setBudgetItems((prev) => prev.filter((b) => b.id !== id));
   };
 
-  // Handle photo uploads
+  // Photo uploads
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {'image/*': [] },
-    onDrop: acceptedFiles => {
-      const newPhotos = acceptedFiles.map(file => ({
+    accept: { 'image/*': [] },
+    onDrop: (acceptedFiles) => {
+      const newPhotos = acceptedFiles.map((file) => ({
         id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
         file,
         preview: URL.createObjectURL(file),
-        uploaded: false,
         isExisting: false,
         url: null,
-        public_id: null
+        public_id: null,
       }));
-      setPhotos([...photos, ...newPhotos]);
-    }
+      setPhotos((prev) => [...prev, ...newPhotos]);
+    },
   });
-
-
   const removePhoto = (id) => {
-    setPhotos((prevPhotos) => {
-        const updatedPhotos = prevPhotos.filter((photo) => photo.id !== id);
+    setPhotos((prev) => {
+      const photoToRemove = prev.find((p) => p.id === id);
+      if (!photoToRemove) return prev;
 
-        // Revoke preview URL if it's a new photo
-        const photoToRemove = prevPhotos.find((photo) => photo.id === id);
-        if (photoToRemove.isExisting){
-            setDeletedPhotos([...deletedPhotos, photoToRemove])      
-        }
-        if (photoToRemove) {
-            URL.revokeObjectURL(photoToRemove.preview);
-        }
-
-        return updatedPhotos;
-        });
+      // If it's an existing photo from DB, push it to deletedPhotos
+      if (photoToRemove.isExisting) {
+        setDeletedPhotos((deleted) => [...deleted, photoToRemove]);
+      }
+      // Revoke preview if new
+      if (photoToRemove.preview) {
+        URL.revokeObjectURL(photoToRemove.preview);
+      }
+      return prev.filter((p) => p.id !== id);
+    });
   };
 
+  // Next/Prev section
   const navigateToNextSection = (e) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     const sections = ['general', 'places', 'accommodation', 'transportation', 'tips', 'budget', 'gallery'];
     const currentIndex = sections.indexOf(activeSection);
     if (currentIndex < sections.length - 1) {
       setActiveSection(sections[currentIndex + 1]);
     }
   };
-
   const navigateToPreviousSection = (e) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     const sections = ['general', 'places', 'accommodation', 'transportation', 'tips', 'budget', 'gallery'];
     const currentIndex = sections.indexOf(activeSection);
     if (currentIndex > 0) {
@@ -287,22 +301,17 @@ const EditMyTrip = () => {
     }
   };
 
+  // Calculate total budget
+  const totalBudget = budgetItems.reduce((sum, item) => {
+    const amount = parseFloat(item.amount) || 0;
+    return sum + amount;
+  }, 0);
 
-  // Handle form submission
-  const handleSubmit = async(e) => {
+  // Submit form
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // console.log({
-    //   country,
-    //   travelPeriod: { startDate, endDate },
-    //   visitedPlaces,
-    //   accommodations,
-    //   transportations,
-    //   weatherNotes,
-    //   clothingTips,
-    //   budgetItems,
-    //   photos: photos.map(photo => photo.file)
-    // });
+
     const formData = new FormData();
     formData.append('country', country);
     formData.append('travelPeriod', JSON.stringify({ startDate, endDate }));
@@ -312,49 +321,31 @@ const EditMyTrip = () => {
     formData.append('weatherNotes', weatherNotes);
     formData.append('clothingTips', clothingTips);
     formData.append('budgetItems', JSON.stringify(budgetItems));
-
     for (const photo of photos) {
-        if (!photo.isExisting) {
-            formData.append("photos", photo.file);
-        }
+      if (!photo.isExisting && photo.file) {
+        formData.append("photos", photo.file);
+      }
     }
     formData.append('deletedPhotos', JSON.stringify(deletedPhotos));
 
-
-
     try {
-    //   const token = localStorage.getItem("token");
       const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/trips/${tripId}`, {
         method: 'PUT',
-        // headers: {
-        //   Authorization: `Bearer ${token}`,
-        // },
         body: formData,
       });
-
       if (!response.ok) {
-        const errorText = await response.text(); // Capture text in case it's not JSON
+        const errorText = await response.text();
         throw new Error(`Server responded with status: ${response.status}, message: ${errorText}`);
       }
-      
       const data = await response.json();
       console.log('Trip updated:', data);
-      alert('Trip updated successfully! Click ok to view your Trip');
       navigate(data.redirectUrl);
     } catch (error) {
       console.error('Error:', error);
     } finally {
-      setLoading(false); // End the loading state
+      setLoading(false);
     }
   };
-    // Reset form or navigate to another page
-
-
-  // Calculate total budget
-  const totalBudget = budgetItems.reduce((sum, item) => {
-    const amount = parseFloat(item.amount) || 0;
-    return sum + amount;
-  }, 0);
 
   if (loading) {
     return (
@@ -368,17 +359,14 @@ const EditMyTrip = () => {
     );
   }
 
-  
-
   return (
     <div className="min-h-screen flex flex-col bg-green-50">
       <Header2 user={user} avatarUrl={avatarURL} />
 
-      {/* Main Content */}
       <div className="flex-1 pt-20 p-4 mt-20">
         <div className="max-w-5xl mx-auto px-4 py-8 bg-white shadow-lg rounded-lg mt-4">
           <h2 className="text-3xl font-bold text-center text-green-600 mb-6">Edit My Trip</h2>
-          
+
           {/* Section Navigation */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             <button 
@@ -424,15 +412,15 @@ const EditMyTrip = () => {
               Gallery
             </button>
           </div>
-          
+
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* General Section */}
+            {/* General */}
             {activeSection === 'general' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
                   <MapPin className="mr-2" /> General Information
                 </h3>
-                
+
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">Country</label>
                   <input
@@ -443,108 +431,104 @@ const EditMyTrip = () => {
                     placeholder="Enter country name"
                   />
                 </div>
-                
+
                 <div className="mb-4">
                   <label className="block text-gray-700 font-medium mb-2">Travel Period</label>
                   <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1">
                       <label className="block text-gray-600 text-sm mb-1">Start Date</label>
                       <div className='relative'>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        selectsStart
-                        startDate={startDate}
-                        endDate={endDate}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer custom-datepicker"
-                        placeholderText=""
-                        dateFormat="MMMM d, yyyy"
-                      />
-                      {!startDate && (<FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />)}
-
+                        <DatePicker
+                          selected={startDate}
+                          onChange={(date) => setStartDate(date)}
+                          selectsStart
+                          startDate={startDate}
+                          endDate={endDate}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer custom-datepicker"
+                          placeholderText=""
+                          dateFormat="MMMM d, yyyy"
+                        />
+                        {!startDate && (
+                          <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                        )}
                       </div>
-                      
                     </div>
                     <div className="flex-1">
                       <label className="block text-gray-600 text-sm mb-1">End Date</label>
                       <div className='relative'>
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        selectsEnd
-                        startDate={startDate}
-                        endDate={endDate}
-                        minDate={startDate}
-                        disabled={!startDate}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer custom-datepicker"
-                        placeholderText=""
-                        dateFormat="MMMM d, yyyy"
-                      />
-                      {!endDate && (<FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />)}
+                        <DatePicker
+                          selected={endDate}
+                          onChange={(date) => setEndDate(date)}
+                          selectsEnd
+                          startDate={startDate}
+                          endDate={endDate}
+                          minDate={startDate}
+                          disabled={!startDate}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer custom-datepicker"
+                          placeholderText=""
+                          dateFormat="MMMM d, yyyy"
+                        />
+                        {!endDate && (
+                          <FaCalendarAlt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                        )}
                       </div>
-                      
                     </div>
                   </div>
                 </div>
-                
-                <div className="mt-6">
-                  <p className="text-gray-600">
-                  {startDate && endDate ? (
-                    (() => {
-                    // Calculate the duration in days
-                    const durationInDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-                    
-                    // Check if the duration is zero and return the appropriate message
-                    return durationInDays === 0
-                    ? 'Trip duration: Less than a day'
-                    : durationInDays === 1
-                    ? `Trip duration: ${durationInDays} day`
-                    : `Trip duration: ${durationInDays} days`;
-                })()
-                ) : (
-                'Please select both start and end dates to see trip duration'
-                )}
-                  </p>
+
+                <div className="mt-6 text-gray-600">
+                  {startDate && endDate ? (() => {
+                    const durationInDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                    if (durationInDays <= 0) {
+                      return 'Trip duration: Less than a day';
+                    } else if (durationInDays === 1) {
+                      return `Trip duration: ${durationInDays} day`;
+                    } else {
+                      return `Trip duration: ${durationInDays} days`;
+                    }
+                  })() : (
+                    'Please select both start and end dates to see trip duration'
+                  )}
                 </div>
               </div>
             )}
-            
-            {/* Visited Places Section */}
+
+            {/* Places */}
             {activeSection === 'places' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
                   <MapPin className="mr-2" /> Visited Places
                 </h3>
-                
+
                 {visitedPlaces.map((place, index) => (
-                  <div key={place._id} className="mb-6 p-4 border border-gray-200 rounded-lg">
+                  <div key={place.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-medium">Place #{index + 1}</h4>
-                      <button 
+                      <button
                         type="button"
-                        onClick={() => removeVisitedPlace(place._id)}
+                        onClick={() => removeVisitedPlace(place.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
-                    
+
                     <div className="mb-3">
                       <label className="block text-gray-600 text-sm mb-1">Place Name</label>
                       <input
                         type="text"
                         value={place.name}
-                        onChange={(e) => updateVisitedPlace(place._id, 'name', e.target.value)}
+                        onChange={(e) => updateVisitedPlace(place.id, 'name', e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         placeholder="Enter place name"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-600 text-sm mb-1">Description</label>
                       <textarea
                         value={place.description}
-                        onChange={(e) => updateVisitedPlace(place._id, 'description', e.target.value)}
+                        onChange={(e) => updateVisitedPlace(place.id, 'description', e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         placeholder="Describe your experience"
                         rows={3}
@@ -552,7 +536,7 @@ const EditMyTrip = () => {
                     </div>
                   </div>
                 ))}
-                
+
                 <button
                   type="button"
                   onClick={addVisitedPlace}
@@ -562,44 +546,44 @@ const EditMyTrip = () => {
                 </button>
               </div>
             )}
-            
-            {/* Accommodation Section */}
+
+            {/* Accommodation */}
             {activeSection === 'accommodation' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
                   <Building className="mr-2" /> Accommodation
                 </h3>
-                
-                {accommodations.map((accommodation, index) => (
-                  <div key={accommodation._id} className="mb-6 p-4 border border-gray-200 rounded-lg">
+
+                {accommodations.map((acc, index) => (
+                  <div key={acc.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-medium">Accommodation #{index + 1}</h4>
-                      <button 
+                      <button
                         type="button"
-                        onClick={() => removeAccommodation(accommodation._id)}
+                        onClick={() => removeAccommodation(acc.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Name</label>
                         <input
                           type="text"
-                          value={accommodation.name}
-                          onChange={(e) => updateAccommodation(accommodation._id, 'name', e.target.value)}
+                          value={acc.name}
+                          onChange={(e) => updateAccommodation(acc.id, 'name', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="Hotel/Airbnb name"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Type</label>
                         <select
-                          value={accommodation.type}
-                          onChange={(e) => updateAccommodation(accommodation._id, 'type', e.target.value)}
+                          value={acc.type}
+                          onChange={(e) => updateAccommodation(acc.id, 'type', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         >
                           <option value="">Select type</option>
@@ -611,32 +595,21 @@ const EditMyTrip = () => {
                           <option value="Other">Other</option>
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Booking Platform</label>
                         <input
                           type="text"
-                          value={accommodation.bookingPlatform}
-                          onChange={(e) => updateAccommodation(accommodation._id, 'bookingPlatform', e.target.value)}
+                          value={acc.bookingPlatform}
+                          onChange={(e) => updateAccommodation(acc.id, 'bookingPlatform', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="e.g., Booking.com, Airbnb"
                         />
                       </div>
-                      
-                      {/* <div>
-                        <label className="block text-gray-600 text-sm mb-1">Cost</label>
-                        <input
-                          type="text"
-                          value={accommodation.cost}
-                          onChange={(e) => updateAccommodation(accommodation.id, 'cost', e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          placeholder="Cost in your currency"
-                        />
-                      </div> */}
                     </div>
                   </div>
                 ))}
-                
+
                 <button
                   type="button"
                   onClick={addAccommodation}
@@ -646,33 +619,33 @@ const EditMyTrip = () => {
                 </button>
               </div>
             )}
-            
-            {/* Transportation Section */}
+
+            {/* Transportation */}
             {activeSection === 'transportation' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
                   <Bus className="mr-2" /> Transportation
                 </h3>
-                
-                {transportations.map((transportation, index) => (
-                  <div key={transportation._id} className="mb-6 p-4 border border-gray-200 rounded-lg">
+
+                {transportations.map((t, index) => (
+                  <div key={t.id} className="mb-6 p-4 border border-gray-200 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-medium">Transportation #{index + 1}</h4>
-                      <button 
+                      <button
                         type="button"
-                        onClick={() => removeTransportation(transportation._id)}
+                        onClick={() => removeTransportation(t.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Type</label>
                         <select
-                          value={transportation.type}
-                          onChange={(e) => updateTransportation(transportation._id, 'type', e.target.value)}
+                          value={t.type}
+                          onChange={(e) => updateTransportation(t.id, 'type', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         >
                           <option value="">Select type</option>
@@ -685,54 +658,43 @@ const EditMyTrip = () => {
                           <option value="Other">Other</option>
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">From</label>
                         <input
                           type="text"
-                          value={transportation.from}
-                          onChange={(e) => updateTransportation(transportation._id, 'from', e.target.value)}
+                          value={t.from}
+                          onChange={(e) => updateTransportation(t.id, 'from', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="Origin"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">To</label>
                         <input
                           type="text"
-                          value={transportation.to}
-                          onChange={(e) => updateTransportation(transportation._id, 'to', e.target.value)}
+                          value={t.to}
+                          onChange={(e) => updateTransportation(t.id, 'to', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="Destination"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Booking Platform</label>
                         <input
                           type="text"
-                          value={transportation.bookingPlatform}
-                          onChange={(e) => updateTransportation(transportation._id, 'bookingPlatform', e.target.value)}
+                          value={t.bookingPlatform}
+                          onChange={(e) => updateTransportation(t.id, 'bookingPlatform', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="e.g., Expedia, Airline website"
                         />
                       </div>
-                      
-                      {/* <div>
-                        <label className="block text-gray-600 text-sm mb-1">Cost</label>
-                        <input
-                          type="text"
-                          value={transportation.cost}
-                          onChange={(e) => updateTransportation(transportation.id, 'cost', e.target.value)}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                          placeholder="Cost in your currency"
-                        />
-                      </div> */}
                     </div>
                   </div>
                 ))}
-                
+
                 <button
                   type="button"
                   onClick={addTransportation}
@@ -742,20 +704,20 @@ const EditMyTrip = () => {
                 </button>
               </div>
             )}
-            
-            {/* Tips Section */}
+
+            {/* Tips */}
             {activeSection === 'tips' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
-                    <Lightbulb className="mr-2" />
-                    Tips
+                  <Lightbulb className="mr-2" />
+                  Tips
                 </h3>
-                
+
                 <div className="mb-6">
                   <label className="flex text-gray-700 font-medium mb-2">
                     <Cloud className="mr-2" />
                     Weather Notes
-                </label>
+                  </label>
                   <textarea
                     value={weatherNotes}
                     onChange={(e) => setWeatherNotes(e.target.value)}
@@ -764,11 +726,12 @@ const EditMyTrip = () => {
                     rows={4}
                   />
                 </div>
-                
+
                 <div>
                   <label className="flex text-gray-700 font-medium mb-2">
                     <Shirt className="mr-2" />
-                    Tips on Clothing</label>
+                    Tips on Clothing
+                  </label>
                   <textarea
                     value={clothingTips}
                     onChange={(e) => setClothingTips(e.target.value)}
@@ -779,33 +742,33 @@ const EditMyTrip = () => {
                 </div>
               </div>
             )}
-            
-            {/* Budget Section */}
+
+            {/* Budget */}
             {activeSection === 'budget' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
                   <DollarSign className="mr-2" /> Budget
                 </h3>
-                
+
                 {budgetItems.map((item, index) => (
                   <div key={item.id} className="mb-4 p-4 border border-gray-200 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
                       <h4 className="font-medium">Budget Item #{index + 1}</h4>
-                      <button 
+                      <button
                         type="button"
-                        onClick={() => removeBudgetItem(item._id)}
+                        onClick={() => removeBudgetItem(item.id)}
                         className="text-red-500 hover:text-red-700"
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Category</label>
                         <select
                           value={item.category}
-                          onChange={(e) => updateBudgetItem(item._id, 'category', e.target.value)}
+                          onChange={(e) => updateBudgetItem(item.id, 'category', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                         >
                           <option value="">Select category</option>
@@ -817,24 +780,24 @@ const EditMyTrip = () => {
                           <option value="Other">Other</option>
                         </select>
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Description</label>
                         <input
                           type="text"
                           value={item.description}
-                          onChange={(e) => updateBudgetItem(item._id, 'description', e.target.value)}
+                          onChange={(e) => updateBudgetItem(item.id, 'description', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="Description"
                         />
                       </div>
-                      
+
                       <div>
                         <label className="block text-gray-600 text-sm mb-1">Amount</label>
                         <input
                           type="number"
                           value={item.amount}
-                          onChange={(e) => updateBudgetItem(item._id, 'amount', e.target.value)}
+                          onChange={(e) => updateBudgetItem(item.id, 'amount', e.target.value)}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="Amount"
                         />
@@ -842,7 +805,7 @@ const EditMyTrip = () => {
                     </div>
                   </div>
                 ))}
-                
+
                 <button
                   type="button"
                   onClick={addBudgetItem}
@@ -850,27 +813,34 @@ const EditMyTrip = () => {
                 >
                   <PlusCircle size={18} className="mr-2" /> Add Budget Item
                 </button>
-                
+
                 <div className="mt-6 p-4 bg-green-50 rounded-lg">
                   <h4 className="font-semibold text-lg mb-2">Budget Summary</h4>
-                  <p className="text-xl">Total: <span className="font-bold">${totalBudget.toFixed(2)}</span></p>
+                  <p className="text-xl">
+                    Total: <span className="font-bold">${totalBudget.toFixed(2)}</span>
+                  </p>
                 </div>
               </div>
             )}
-            
-            {/* Gallery Section */}
+
+            {/* Gallery */}
             {activeSection === 'gallery' && (
               <div className="bg-white p-6 rounded-lg shadow-md">
                 <h3 className="text-xl font-semibold mb-4 flex items-center text-green-700">
                   <Image className="mr-2" /> Trip Gallery
                 </h3>
-                
-                <div {...getRootProps()} className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 mb-6">
+
+                <div
+                  {...getRootProps()}
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 mb-6"
+                >
                   <input {...getInputProps()} />
                   <p className="text-gray-500">Drag & drop photos here, or click to select files</p>
-                  <p className="text-sm text-gray-400 mt-2">Upload your trip photos to create a gallery</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Upload your trip photos to create a gallery
+                  </p>
                 </div>
-                
+
                 {photos.length > 0 && (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {photos.map((photo) => (
@@ -882,10 +852,12 @@ const EditMyTrip = () => {
                         />
                         <button
                           type="button"
-                          onClick={() => removePhoto(photo.id)}
+                          onClick={() => {
+                            removePhoto(photo.id);
+                          }}
                           className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-100 group-hover:opacity-100 transition-opacity"
                         >
-                          <Trash2 size={20}/>
+                          <Trash2 size={20} />
                         </button>
                       </div>
                     ))}
@@ -893,13 +865,13 @@ const EditMyTrip = () => {
                 )}
               </div>
             )}
-            
+
             {/* Navigation Buttons */}
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-500">
                 {activeSection !== 'general' && (
                   <button
-                    type="button" // Explicitly set type to button
+                    type="button"
                     onClick={navigateToPreviousSection}
                     className="text-green-600 hover:underline"
                   >
@@ -907,11 +879,11 @@ const EditMyTrip = () => {
                   </button>
                 )}
               </div>
-              
+
               <div className="flex gap-4">
                 {activeSection !== 'gallery' ? (
                   <button
-                    type="button" // Explicitly set type to button
+                    type="button"
                     onClick={navigateToNextSection}
                     className="px-6 py-3 bg-green-100 text-green-700 rounded-md hover:bg-green-200"
                   >
@@ -919,10 +891,11 @@ const EditMyTrip = () => {
                   </button>
                 ) : (
                   <button
-                    type="submit" disabled={loading}// This button should submit the form
+                    type="submit"
+                    disabled={loading}
                     className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700"
                   >
-                  {loading ? 'Creating Trip...' : 'Save Trip'}
+                    {loading ? 'Saving...' : 'Save Trip'}
                   </button>
                 )}
               </div>

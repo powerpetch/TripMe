@@ -21,7 +21,7 @@ const MyPage = () => {
   const containerMaxWidth = useBreakpointValue({
     base: "95%",
     sm: "90%",
-    md: "70%",
+    md: "90%",
     lg: "46%",
   });
 
@@ -38,6 +38,12 @@ const MyPage = () => {
   const innerMarginTop = useBreakpointValue({
     base: 4,
     md: 10,
+  });
+
+  // Profile visibility (only on laptops)
+  const profileDisplay = useBreakpointValue({
+    base: "none", // Hide on mobile & tablet
+    lg: "block", // Show on laptops and larger screens
   });
 
   useEffect(() => {
@@ -77,7 +83,9 @@ const MyPage = () => {
 
   return (
     <>
-      <Profile />
+      {/* Profile only visible on laptops */}
+      {profileDisplay === "lg" && <Profile />}
+
       <Container
         mt={1}
         maxW={containerMaxWidth}

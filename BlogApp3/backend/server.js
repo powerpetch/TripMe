@@ -15,9 +15,10 @@ import {
   getComment,
   getLike,
   getPostByName,
+  getPostsByUsername,
   getProfile,
   getTopPost,
-  getUser,
+  getUserByName,
   postComment,
   postLike,
 } from "./routes/post.router.js";
@@ -78,6 +79,12 @@ app.get("/api/posts/pop", getTopPost);
 
 // get post by country
 app.get("/api/posts/:country", getByCountry);
+
+//get user by username
+app.get("/api/user/:username", getUserByName);
+
+//get post by username
+app.get("/api/posts/find/:username", getPostsByUsername);
 
 app.listen(PORT, () => {
   console.log("Connecting to MongoDB...");

@@ -73,7 +73,7 @@ router.post("/signup", async (req, res) => {
 
     const mailOptions = {
       to: user.email,
-      from: "no-reply@yourapp.com",
+      from: process.env.EMAIL_USER,
       subject: "Email Verification OTP",
       text: `
         Hello ${user.username},

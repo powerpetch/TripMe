@@ -28,10 +28,10 @@ const CreateModal = ({ isOpen, onClose }) => {
   const fileInputRef = useRef(null);
 
   const handleSubmit = async () => {
-    if (!newPost.country || !newPost.content) {
-      alert("Please fill in all fields");
-      return;
-    }
+    // if (!newPost.country || !newPost.content) {
+    //   alert("Please fill in all fields");
+    //   return;
+    // }
 
     const formData = new FormData();
     formData.append("country", newPost.country);
@@ -56,7 +56,7 @@ const CreateModal = ({ isOpen, onClose }) => {
       } else {
         toast({
           title: "Error",
-          description: response.message,
+          description: "Please provide all fields",
           status: "error",
           duration: 5000,
           isClosable: true,

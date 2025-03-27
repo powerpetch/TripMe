@@ -26,6 +26,10 @@ function MyBlog() {
   const [activeTab, setActiveTab] = useState("created");
   const [hoveredCard, setHoveredCard] = useState(null);
 
+  // State for delete confirmation modal
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [tripToDelete, setTripToDelete] = useState(null);
+
   const fLetterCap = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
@@ -39,9 +43,12 @@ function MyBlog() {
       }
 
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/trips/user/trips`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/trips/user/trips`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await res.json();
         if (res.ok) {
           setTrips(data);
@@ -53,7 +60,7 @@ function MyBlog() {
       }
     };
     fetchTrips();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -64,9 +71,12 @@ function MyBlog() {
       }
 
       try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/user/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${process.env.REACT_APP_API_BASE_URL}/api/user/profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await res.json();
         if (res.ok && data.user) {
           setUser(data.user);
@@ -97,27 +107,35 @@ function MyBlog() {
       </div>
     );
   }
-  
 
+  // New function to open the delete modal
+  const openDeleteModal = (tripId) => {
+    setTripToDelete(tripId);
+    setDeleteModalOpen(true);
+  };
+
+  // Updated deletion function without window.confirm
   const handleDelete = async (tripId) => {
-    setLoading(true)
-    if (window.confirm("Are you sure you want to delete this trip?")) {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/trips/${tripId}`, {
+    setLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_BASE_URL}/api/trips/${tripId}`,
+        {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },
-        });
-        setLoading(false)
-        if (res.ok) {
-          setTrips(trips.filter(trip => trip._id !== tripId));
-        } else {
-          throw new Error("Failed to delete trip");
         }
-      } catch (err) {
-        console.error("Delete error:", err);
-        alert("Failed to delete trip");
+      );
+      if (res.ok) {
+        setTrips(trips.filter((trip) => trip._id !== tripId));
+      } else {
+        throw new Error("Failed to delete trip");
       }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Failed to delete trip");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -147,7 +165,10 @@ function MyBlog() {
           >
             <div className="relative">
               <img
-                src={trip.photos[0]?.url || "https://images.unsplash.com/photo-1469474968028-56623f02e42e"}
+                src={
+                  trip.photos[0]?.url ||
+                  "https://images.unsplash.com/photo-1469474968028-56623f02e42e"
+                }
                 alt={trip.country}
                 className="w-full h-56 object-cover transition-transform duration-300"
               />
@@ -179,10 +200,6 @@ function MyBlog() {
                   <span>View Details</span>
                   <ArrowRight size={16} />
                 </motion.button>
-                {/* <div className="flex items-center space-x-1 text-pink-500">
-                  <FaHeart />
-                  <span className="text-sm font-medium">12</span>
-                </div> */}
               </div>
 
               <motion.div 
@@ -204,7 +221,8 @@ function MyBlog() {
                 <motion.button
                   whileHover={{ scale: 1.05, color: "#EF4444" }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDelete(trip._id)}
+                  // Open our custom delete modal instead of using window.confirm
+                  onClick={() => openDeleteModal(trip._id)}
                   className="flex items-center space-x-1 text-gray-600 hover:text-red-500 transition-colors"
                 >
                   <Trash2 size={16} />
@@ -276,10 +294,7 @@ function MyBlog() {
           className="bg-white rounded-xl shadow-md p-6 mb-8"
         >
           <div className="flex flex-col sm:flex-row items-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              className="relative"
-            >
+            <motion.div whileHover={{ scale: 1.05 }} className="relative">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
@@ -372,6 +387,40 @@ function MyBlog() {
 
         {activeTab === "created" ? renderTripCards(trips) : renderTripCards([])}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black opacity-50"
+            onClick={() => setDeleteModalOpen(false)}
+          ></div>
+          {/* Modal */}
+          <div className="bg-white p-6 rounded-lg z-10 max-w-sm mx-auto">
+            <p className="text-lg font-medium">
+              Are you sure you want to delete this trip?
+            </p>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await handleDelete(tripToDelete);
+                  setDeleteModalOpen(false);
+                }}
+                className="px-4 py-2 bg-red-500 text-white rounded"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

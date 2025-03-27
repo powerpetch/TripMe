@@ -1,6 +1,5 @@
 {
   "name": "my-travel-app",
-  "homepage": "https://powerpetch.github.io/TripMe",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

@@ -352,3 +352,37 @@ export const getByCountry = async (req, res) => {
     res.status(500).json({ success: false, message: "Error getting posts" });
   }
 };
+
+export const getUserByName = async (req, res) => {
+  const username = req.params.username;
+
+  try {
+    const user = await User.find({ username: username });
+    if (!user) {
+      res.status(404).json({ succes: false, message: "no user found" });
+      return;
+    }
+    res.status(200).json({ succes: true, user: user });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ sucess: false, message: "server error finding user" });
+  }
+};
+
+export const getPostsByUsername = async (req, res) => {
+  const username = req.params.username;
+  try {
+    const posts = await Post.find({ name: username });
+    if (posts.length === 0) {
+      res.status(404).json({ success: false, message: "posts not found" });
+      return;
+    }
+    res.status(200).json({ success: true, data: { posts } });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "server error getting posts from username",
+    });
+  }
+};

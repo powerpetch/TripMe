@@ -1,13 +1,25 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
-async function testConnection() {
-    try {
-        const conn = await mongoose.connect(process.env.MONGO_URI_ATLAS);
-        console.log('MongoDB Atlas Connected:', conn.connection.host);
-    } catch (error) {
-        console.error('Error:', error.message);
-    }
-}
+(async () => {
+  try {
+    let transporter = nodemailer.createTransport({
+      service: "Gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
 
-testConnection();
+    let info = await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: "your-personal-email@example.com",
+      subject: "Test Email",
+      text: "If you see this, your nodemailer credentials work!"
+    });
+
+    console.log("Email sent:", info);
+  } catch (err) {
+    console.error("Test email error:", err);
+  }
+})();

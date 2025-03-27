@@ -26,4 +26,3 @@ export const connectUserDB = async () => {
         // process code 1 mean exit with failure, 0 mean success
     }
 }
-

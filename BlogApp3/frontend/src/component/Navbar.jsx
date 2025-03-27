@@ -14,31 +14,59 @@ import { IoPersonSharp } from "react-icons/io5";
 import { CiSquarePlus } from "react-icons/ci";
 import { RiRobot3Line } from "react-icons/ri";
 import logo from "../images/new-logo-green.png";
+import { IoMdSearch } from "react-icons/io";
 
 const Navbar = () => {
   const location = useLocation();
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   const tripMe = () => {
     window.location.href = "http://localhost:3000/";
   };
 
-  // Responsive values based on screen size
-  const iconSize = useBreakpointValue({ base: "18px", sm: "20px", md: "23px" });
-  const buttonSpacing = useBreakpointValue({ base: "4", sm: "5", md: "7" });
+  const iconSize = useBreakpointValue({
+    base: "18px",    // Mobile
+    sm: "20px",      // Tablet
+    md: "22px",      // iPad/Small laptop
+    lg: "23px",      // Desktop
+    xl: "24px"       // Large screens
+  });
+  const buttonSpacing = useBreakpointValue({
+    base: "2",
+    sm: "4",
+    md: "5",
+    lg: "6",
+    xl: "7"
+  });
   const groupSpacing = useBreakpointValue({
-    base: "30px",
-    sm: "60px",
-    md: "90px",
-  });
-  const logoWidth = useBreakpointValue({ base: "40%", sm: "45%", md: "50%" });
-  const logoMargin = useBreakpointValue({
-    base: "20px",
-    sm: "35px",
+    base: "10px",
+    sm: "30px",
     md: "50px",
+    lg: "70px",
+    xl: "90px"
   });
+  const logoWidth = useBreakpointValue({
+    base: "30%",
+    sm: "35%",
+    md: "40%",
+    lg: "45%",
+    xl: "50%"
+  });
+  const logoMargin = useBreakpointValue({
+    base: "10px",
+    sm: "20px",
+    md: "35px",
+    lg: "40px",
+    xl: "50px"
+  });
+  
 
-  // Control logo visibility - hidden on mobile, visible on sm and above
-  const logoDisplay = useBreakpointValue({ base: "none", sm: "block" });
+  const logoDisplay = useBreakpointValue({
+    base: "none",
+    sm: "none",
+    md: "none",
+    lg: "block",
+  });
 
   return (
     <HStack
@@ -60,7 +88,7 @@ const Navbar = () => {
         left="10px"
         onClick={tripMe}
         style={{ cursor: "pointer" }}
-        display={logoDisplay} // Hide on mobile, show on tablet and up
+        display={logoDisplay} 
       >
         <Image
           src={logo}
@@ -95,11 +123,11 @@ const Navbar = () => {
               alignItems="center"
               sx={{
                 _hover: {
-                  bg: "#d1d1d1", // Lighter hover effect color
+                  bg: "#d1d1d1", 
                   boxShadow: "lg",
                 },
                 borderBottom:
-                  location.pathname === "/" ? "2px solid #166534" : "none", // Green bottom border
+                  location.pathname === "/" ? "2px solid #166534" : "none", 
               }}
             >
               <IoHome size={iconSize} />
@@ -115,19 +143,18 @@ const Navbar = () => {
               alignItems="center"
               sx={{
                 _hover: {
-                  bg: "#d1d1d1", // Lighter hover effect color
+                  bg: "#d1d1d1",
                   boxShadow: "lg",
                 },
                 borderBottom:
                   location.pathname === "/mypage"
                     ? "2px solid #166534"
-                    : "none", // Green bottom border
+                    : "none", 
               }}
             >
               <IoPersonSharp size={iconSize} />
             </Button>
           </Link>
-
           <Link to={"/country"}>
             <Button
               color={"#166534"}
@@ -138,13 +165,13 @@ const Navbar = () => {
               alignItems="center"
               sx={{
                 _hover: {
-                  bg: "#d1d1d1", // Lighter hover effect color
+                  bg: "#d1d1d1", 
                   boxShadow: "lg",
                 },
                 borderBottom:
                   location.pathname === "/country"
                     ? "2px solid #166534"
-                    : "none", // Green bottom border
+                    : "none", 
               }}
             >
               <RiRobot3Line size={iconSize} />
@@ -172,6 +199,29 @@ const Navbar = () => {
               }}
             />
           </Button>
+          <Link to={"/search"}>
+            <Button
+              variant={"ghost"}
+              color={"#166534"}
+              width="100%"
+              display="flex"
+              justifyContent="center"
+              alignItems="center"
+              sx={{
+                _hover: {
+                  bg: "#d1d1d1",
+                  boxShadow: "lg",
+                },
+              }}
+            >
+              <IoMdSearch
+                size={iconSize}
+                style={{
+                  strokeWidth: "1",
+                }}
+              />
+            </Button>
+          </Link>
         </ButtonGroup>
       </Box>
       <CreateModal isOpen={isOpen} onClose={onClose} />

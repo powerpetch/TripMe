@@ -38,20 +38,17 @@ const TopPost = () => {
     fetchTopPost();
   }, []);
 
-  // Sort posts by the number of likes
   const sortedPosts = [...topPost].sort(
     (a, b) => b.likebyLength - a.likebyLength
   );
 
-  console.log("State topPost:", sortedPosts); // Debugging
-
   return (
     <Container
       position="fixed"
-      top="40%"
-      right="20px"
+      top={{ base: "10%", md: "40%" }}
+      right={{ base: "10px", md: "20px" }}
       transform="translateY(-50%)"
-      w="320px"
+      w={{ base: "90%", sm: "80%", md: "320px" }} // Adjust width on different screens
       maxH="420px"
       bgColor={"transparent"}
       borderRadius="lg"
@@ -80,8 +77,6 @@ const TopPost = () => {
       ) : (
         sortedPosts.map((top, index) => (
           <Popover key={top._id} placement="bottom-start">
-            {" "}
-            {/* Explicit placement */}
             <PopoverTrigger>
               <Box
                 padding="12px"
@@ -97,22 +92,30 @@ const TopPost = () => {
                 }}
               >
                 <Flex justifyContent="space-between" alignItems="center">
-                  <Text fontWeight="bold" color="#166534">
+                  <Text
+                    fontWeight="bold"
+                    color="#166534"
+                    fontSize={{ base: "sm", md: "md" }}
+                  >
                     {top.country}
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                     {top.name}
                   </Text>
                 </Flex>
-                <Text fontSize="sm" color="gray.500">
+                <Text fontSize={{ base: "xs", md: "sm" }} color="gray.500">
                   #{index + 1}
-                </Text>{" "}
-                {/* Ranking */}
+                </Text>
                 <Flex alignItems="center" mt={2}>
-                  <Icon as={FcLike} color="#166534" boxSize={3} mr={2} />
-                  <Text fontSize="sm" color="gray.600">
+                  <Icon
+                    as={FcLike}
+                    color="#166534"
+                    boxSize={{ base: 3, md: 4 }}
+                    mr={2}
+                  />
+                  <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                     {top.likebyLength} Likes
-                  </Text>{" "}
+                  </Text>
                 </Flex>
               </Box>
             </PopoverTrigger>
@@ -121,15 +124,23 @@ const TopPost = () => {
               border={"none"}
               boxShadow="lg"
               bg="white"
-              width="260px"
+              width={{ base: "90%", sm: "80%", md: "260px" }} // Adjust width on different screens
             >
               <PopoverArrow />
               <PopoverBody>
                 <Flex direction="column" alignItems="flex-start">
-                  <Text color="gray.600" fontSize="sm" mb={3}>
+                  <Text
+                    color="gray.600"
+                    fontSize={{ base: "xs", md: "sm" }}
+                    mb={3}
+                  >
                     {top.country}
                   </Text>
-                  <Text color="gray.800" fontSize="md" mb={2}>
+                  <Text
+                    color="gray.800"
+                    fontSize={{ base: "sm", md: "md" }}
+                    mb={2}
+                  >
                     {top.content}
                   </Text>
                   {top.image && (
@@ -137,17 +148,21 @@ const TopPost = () => {
                       src={top.image}
                       alt="Post Image"
                       borderRadius="md"
-                      boxSize="200px" // Larger image size for a better landscape view
+                      boxSize={{ base: "150px", md: "200px" }} // Adjust image size for responsiveness
                       objectFit="cover"
                       mb={3}
                     />
                   )}
                   <Flex alignItems="center" mt={3}>
-                    <Icon as={FcLike} color="#166534" boxSize={5} mr={2} />
-                    <Text fontSize="sm" color="gray.600">
+                    <Icon
+                      as={FcLike}
+                      color="#166534"
+                      boxSize={{ base: 4, md: 5 }}
+                      mr={2}
+                    />
+                    <Text fontSize={{ base: "xs", md: "sm" }} color="gray.600">
                       {top.likebyLength} Likes
                     </Text>
-                    {/* Corrected field */}
                   </Flex>
                 </Flex>
               </PopoverBody>

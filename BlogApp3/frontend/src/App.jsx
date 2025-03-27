@@ -5,6 +5,7 @@ import Home from "./pages/Home.jsx";
 import Create from "./pages/Create.jsx";
 import MyPage from "./pages/MyPage.jsx";
 import Country from "./pages/Country.jsx";
+import Search from "./pages/Search.jsx";
 
 function App() {
   const location = window.location.href;
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/create" element={<Create />} />
             <Route path="/mypage" element={<MyPage />} />
+            <Route path="/search" element={<Search />} />
           </Routes>
         </Box>
 

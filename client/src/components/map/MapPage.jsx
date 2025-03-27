@@ -181,7 +181,7 @@ function MapPage() {
           onBackToList={handleBackToList}
         />
       </div>
-      <MenuBar />
+      {/* <MenuBar /> */}
     </div>
   );
 }

@@ -211,9 +211,40 @@ export const getTopPost = async () => {
       throw new Error("error fetching top posts");
     }
     const data = await response.json();
-    console.log(data);
     return data;
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const findUserByName = async (username) => {
+  try {
+    const response = await fetch(`http://localhost:5002/api/user/${username}`);
+    if (!response.ok) {
+      throw new Error("error fetching user");
+    }
+    const data = await response.json();
+    console.log(data);
+
+    return data;
+  } catch (err) {
+    console.log(err);
+    return;
+  }
+};
+
+export const findPostsByName = async (username) => {
+  try {
+    const response = await fetch(
+      `http://localhost:5002/api/posts/find/${username}`
+    );
+    if (!response.ok) {
+      throw new Error("error fetching post by name");
+    }
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.log(err);
+    return;
   }
 };

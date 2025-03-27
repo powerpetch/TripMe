@@ -427,6 +427,13 @@ const Header = () => {
         >
           Trip-tgt
         </Link>
+        <Link
+          to="/create"
+          className="text-lg text-white"
+          onClick={() => setMenuOpen(false)}
+        >
+          Create My Trip
+        </Link>
 
         {/* not sg user => button Sign In (mobile) */}
         {!currentUser && (

@@ -22,7 +22,7 @@ const Feeds = () => {
   const containerWidth = useBreakpointValue({
     base: "95%", // iPhone (mobile)
     sm: "85%", // Small tablets
-    md: "70%", // iPad/tablets
+    md: "90%", // iPad/tablets - INCREASED from 70% to 90%
     lg: "46%", // Desktop/laptop (original size)
   });
 
@@ -99,7 +99,6 @@ const Feeds = () => {
                   </Text>
                 </CardBody>
               </Card>
-
               {/* Reverse array so latest posts are at the top */}
               {[...allPost].reverse().map((post) => (
                 <Postbox key={post._id} post={post} />

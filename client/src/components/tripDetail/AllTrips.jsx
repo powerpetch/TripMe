@@ -60,10 +60,33 @@ const AllTrips = () => {
 
   // Filter by country
   const filteredTrips = useMemo(() => {
-    return trips.filter(trip =>
+    let filtered = trips.filter(trip =>
       trip.country.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [trips, searchTerm]);
+  
+    switch (sortOption) {
+      case "dateAsc":
+        filtered.sort((a, b) => new Date(a.travelPeriod.startDate) - new Date(b.travelPeriod.startDate));
+        break;
+      case "dateDesc":
+        filtered.sort((a, b) => new Date(b.travelPeriod.startDate) - new Date(a.travelPeriod.startDate));
+        break;
+      case "countryAsc":
+        filtered.sort((a, b) => a.country.localeCompare(b.country));
+        break;
+      case "countryDesc":
+        filtered.sort((a, b) => b.country.localeCompare(a.country));
+        break;
+      case "random":
+        filtered = shuffleArray(filtered);
+        break;
+      default:
+        break;
+    }
+  
+    return filtered;
+  }, [trips, searchTerm, sortOption]);
+  
 
   // Card animations
   const cardVariants = {

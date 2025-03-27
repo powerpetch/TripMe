@@ -51,6 +51,7 @@ const Profile = () => {
       borderRadius={30}
       w={boxWidth}
       transition="all 0.3s ease"
+      ml={5}
     >
       <Flex
         p={flexPadding}

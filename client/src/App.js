@@ -120,7 +120,7 @@ function App() {
         <Route
           path="/trip-tgt"
           element={
-            currentUser ? <TripTGTPage /> : <NoUserFound />
+            currentUser ? <TripTGTPage /> : <AuthPage />
           }
         />
         
